@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/wikimedia/service-template-node",
   "dependencies": {
+    "ajv": "^6.5.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",
@@ -39,6 +40,9 @@
     "express": "^4.16.3",
     "http-shutdown": "^1.2.0",
     "js-yaml": "^3.12.0",
+    "kad": "^2.5.1",
+    "lodash": "^4.17.11",
+    "node-rdkafka": "^2.4.2",
     "preq": "^0.5.6",
     "service-runner": "^2.6.3",
     "swagger-router": "^0.7.1",
