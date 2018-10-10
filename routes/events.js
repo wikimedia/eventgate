@@ -4,19 +4,30 @@
 var P = require('bluebird');
 var preq = require('preq');
 var sUtil = require('../lib/util');
-
 // shortcut
 var HTTPError = sUtil.HTTPError;
 
-const EventInvalidError = require('../lib/schemas').EventInvalidError;
-const EventValidator = require('../lib/schemas').EventValidator;
+
+const _        = require('lodash');
+
+const eUtil = require('../lib/eventbus-utils');
+const {
+    EventInvalidError,
+    EventValidator
+} = require('../lib/validator');
 
 const kafka_factory = require('../lib/kafka');
 
-var base_uri = 'file:///vagrant/srv/event-schemas/jsonschema/';
-// var base_uri = 'https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema';
-const validator = new EventValidator(base_uri);
+var schemaField = 'meta.schema_uri';
+var baseUri = 'file:///vagrant/srv/event-schemas/jsonschema/';
+var fileExt = '.yaml';
 
+const eventSchemaUrlFn = eUtil.getSchemaUrl.bind(null, schemaField, baseUri, fileExt);
+
+// var base_uri = 'https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema';
+const validator = new EventValidator(eventSchemaUrlFn);
+
+var topicField = 'meta.topic';
 
 
 /**
@@ -30,6 +41,16 @@ var router = sUtil.router();
 var app;
 
 
+
+function produce_event(event, kafka_producer) {
+    // TODO: support configurable keys / partitioners?
+    return kafka_producer.produce(
+        eUtil.getTopic(topicField, null, event), undefined, new Buffer(JSON.stringify(event)), undefined
+    );
+}
+
+
+
 // TODO apply Kafka configs from app.config
 kafka_factory.create_kafka_producer().then(kafka_producer => {
     return router.post('/events', (req, res) => {
@@ -38,43 +59,71 @@ kafka_factory.create_kafka_producer().then(kafka_producer => {
         // configured schema_uri_path, and then return the event.  The event may be
         // modified; e.g. if the schema has a default for a field but the event
         // doesn't have it set.
-        return validator.validate(req.body)
+        let events;
+        if (_.isArray(req.body))
+            events = req.body;
+        else
+            events = [req.body];
+
+        // TODO: if empty body fail now.
+
+
+
+        return P.map(events, (event) => {
+            return validator.validate(event)
+            // If we are in this block, the event is valid, produce it.
             .then((event) => {
                 req.logger.log('trace/events', {
                     event: event,
                     message: 'Passed schema validation'
                 });
-                // console.log(event, event.meta.topic);
 
-                // TODO: support configurable keys / partitioners?
-                kafka_producer.produce(
-                    event.meta.topic, undefined, new Buffer(JSON.stringify(event)), undefined
-                )
-                .then((report) => {
-                    console.log('REPORT', report);
-
-                    // TODO should we augment event.meta with kafka stuff?  Perhaps
-                    // an optional query param?  It could be quite nice to get back
-                    // the exact Kafka topic, partition and offset, to be able
-                    // to use them for auditing purposes later.
-
-                    // TODO: do we want to return the (augmented?) event?  Probably not.
-                    res.json(event);
-                    return res.status(204);
-                });
+                return produce_event(event, kafka_producer);
             })
-            .catch(EventInvalidError, (err) => {
-                throw new HTTPError({
-                    status: 400,
-                    type: 'invalid',
-                    title: 'Event Validation Error',
-                    detail: err.message + ' Errors: ' + err.errorsText,
-                    errors: err.errors
-                });
+            // .catch(EventInvalidError, (err) => {
+            //     // TODO: produce invalid event?
+            //     return new HTTPError({
+            //         status: 400,
+            //         type: 'invalid',
+            //         title: 'Event Validation Error',
+            //         detail: err.message + ' Errors: ' + err.errorsText,
+            //         errors: err.errors
+            //     });
+            // })
+            .catch((err) => {
+                // TODO: produce errored event?
+                return err;
             })
-            .catch(err => {
-                throw new HTTPError(err);
+        })
+        .then((statuses) => {
+            // Group event validation and production by status.
+            // Some could succeed and some fail.
+            const grouped = _.groupBy(statuses, (status) => {
+                if (_.isError(status))
+                    return 'error';
+                else
+                    return 'success';
             });
+            let event_errors    = _.get(grouped, 'error',   [])
+            let event_successes = _.get(grouped, 'success', []);
+
+            // No errors, all events produced successfully.
+            if (event_errors.length == 0) {
+                res.statusMessage = `All ${events.length} events were accepted.`;
+                res.status(204);
+                res.end();
+            }
+            else if (event_errors.length != events.length) {
+                res.statusMessage = `${event_successes.length} out of ${events.length} events were accepted, but ${event_errors.length} failed.`
+                res.status(207);
+                res.json({errors: event_errors});
+            }
+            else {
+                res.statusMessage = `${event_successes.length} out of ${events.length} events were accepted.`;
+                res.status(400);
+                res.json({errors: event_errors});
+            }
+        });
     });
 });
 
