@@ -16,7 +16,7 @@ const {
     EventValidator
 } = require('../lib/validator');
 
-const kafka_factory = require('../lib/kafka');
+const kafka = require('../lib/kafka');
 
 
 // TODO: all this stuff from app config
@@ -46,9 +46,9 @@ var app;
 
 
 
-function produce_event(event, kafka_producer) {
+function produceEvent(event, kafkaProducer) {
     // TODO: support configurable keys / partitioners?
-    return kafka_producer.produce(
+    return kafkaProducer.produce(
         eUtil.getTopic(topicField, null, event), undefined, new Buffer(JSON.stringify(event)), undefined
     );
 }
@@ -56,7 +56,7 @@ function produce_event(event, kafka_producer) {
 
 
 // TODO apply Kafka configs from app.config
-kafka_factory.create_kafka_producer().then(kafka_producer => {
+kafka.createKafkaProducer().then(kafkaProducer => {
     return router.post('/events', (req, res) => {
 
         // If empty body, return 400 now.
@@ -68,15 +68,11 @@ kafka_factory.create_kafka_producer().then(kafka_producer => {
         }
 
 
-
         let events;
         if (_.isArray(req.body))
             events = req.body;
         else
             events = [req.body];
-
-
-
 
 
         return P.map(events, (event) => {
@@ -93,7 +89,7 @@ kafka_factory.create_kafka_producer().then(kafka_producer => {
                     message: 'Passed schema validation'
                 });
 
-                return produce_event(event, kafka_producer);
+                return produceEvent(event, kafkaProducer);
             })
             // .catch(EventInvalidError, (err) => {
             //     // TODO: produce invalid event?
@@ -116,24 +112,24 @@ kafka_factory.create_kafka_producer().then(kafka_producer => {
             const grouped = _.groupBy(statuses, (status) => {
                 return _.isError(status) ? 'error' : 'success';
             });
-            const event_errors    = _.get(grouped, 'error',   [])
-            const event_successes = _.get(grouped, 'success', []);
+            const eventErrors    = _.get(grouped, 'error',   [])
+            const eventSuccesses = _.get(grouped, 'success', []);
 
             // No errors, all events produced successfully.
-            if (event_errors.length == 0) {
+            if (eventErrors.length == 0) {
                 res.statusMessage = `All ${events.length} events were accepted.`;
                 res.status(204);
                 res.end();
             }
-            else if (event_errors.length != events.length) {
-                res.statusMessage = `${event_successes.length} out of ${events.length} events were accepted, but ${event_errors.length} failed.`
+            else if (eventErrors.length != events.length) {
+                res.statusMessage = `${eventSuccesses.length} out of ${events.length} events were accepted, but ${eventErrors.length} failed.`
                 res.status(207);
-                res.json({errors: event_errors});
+                res.json({errors: eventErrors});
             }
             else {
-                res.statusMessage = `${event_successes.length} out of ${events.length} events were accepted.`;
+                res.statusMessage = `${eventSuccesses.length} out of ${events.length} events were accepted.`;
                 res.status(400);
-                res.json({errors: event_errors});
+                res.json({errors: eventErrors});
             }
         });
     });
