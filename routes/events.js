@@ -18,13 +18,15 @@ const {
 
 const kafka_factory = require('../lib/kafka');
 
+
+// TODO: all this stuff from app config
 var schemaField = 'meta.schema_uri';
 var baseUri = 'file:///vagrant/srv/event-schemas/jsonschema/';
+// var base_uri = 'https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema';
 var fileExt = '.yaml';
 
 const eventSchemaUrlFn = eUtil.getSchemaUrl.bind(null, schemaField, baseUri, fileExt);
 
-// var base_uri = 'https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema';
 const validator = new EventValidator(eventSchemaUrlFn);
 
 var topicField = 'meta.topic';
