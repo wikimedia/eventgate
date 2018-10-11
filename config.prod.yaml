@@ -60,19 +60,8 @@ services:
       #   - user-agent
       #   - x-request-id
       # the user agent to use when issuing requests
-      # user_agent: service-template-node
-      # the template used for contacting the MW API
-      mwapi_req:
-        method: post
-        uri: http://api.svc.eqiad.wmnet/w/api.php
-        headers:
-          host: '{{request.params.domain}}'
-          user-agent: '{{user-agent}}'
-        body: '{{ default(request.query, {}) }}'
-      # the template used for contacting RESTBase
-      restbase_req:
-        method: '{{request.method}}'
-        uri: http://restbase.svc.eqiad.wmnet/{{domain}}/v1/{+path}
-        query: '{{ default(request.query, {}) }}'
-        headers: '{{request.headers}}'
-        body: '{{request.body}}'
+      user_agent: eventbus
+
+      # kafka configs go here.
+      kafka:
+        metadata.broker.list: 'localhost:9092'

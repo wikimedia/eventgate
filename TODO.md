@@ -1,6 +1,5 @@
 # TODO
 
-- Kafka config from config.yaml
 - Tests for schemas, validators and routes
 - topic -> schema mapping config reading?  from local config files and remote service too?
 - topic prefixing/transformation config (datacenter prefixing)
