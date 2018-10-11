@@ -27,6 +27,8 @@ var fileExt = '.yaml';
 
 const eventSchemaUrlFn = eUtil.getSchemaUrl.bind(null, schemaField, baseUri, fileExt);
 
+// TODO event (id) stringifier function for logging and errors?
+
 const validator = new EventValidator(eventSchemaUrlFn);
 
 var topicField = 'meta.topic';
@@ -57,21 +59,32 @@ function produce_event(event, kafka_producer) {
 kafka_factory.create_kafka_producer().then(kafka_producer => {
     return router.post('/events', (req, res) => {
 
-        // validate will validate req.body as an event against the schema found at the
-        // configured schema_uri_path, and then return the event.  The event may be
-        // modified; e.g. if the schema has a default for a field but the event
-        // doesn't have it set.
+        // If empty body, return 400 now.
+        if (_.isEmpty(req.body)) {
+            res.statusMessage = 'Must provide JSON events in request body.';
+            res.status(400);
+            res.end();
+            return;
+        }
+
+
+
         let events;
         if (_.isArray(req.body))
             events = req.body;
         else
             events = [req.body];
 
-        // TODO: if empty body fail now.
+
 
 
 
         return P.map(events, (event) => {
+            // validate will validate req.body as an event against the schema found at the
+            // schema_uri_path returned by eventSchemaUrlFn, and then return the event.
+            // The event may be modified; e.g. if the schema has a default for a field
+            // but the event doesn't have it set.  If the event failed validation,
+            // an EventInvalidError will be thrown.
             return validator.validate(event)
             // If we are in this block, the event is valid, produce it.
             .then((event) => {
@@ -101,13 +114,10 @@ kafka_factory.create_kafka_producer().then(kafka_producer => {
             // Group event validation and production by status.
             // Some could succeed and some fail.
             const grouped = _.groupBy(statuses, (status) => {
-                if (_.isError(status))
-                    return 'error';
-                else
-                    return 'success';
+                return _.isError(status) ? 'error' : 'success';
             });
-            let event_errors    = _.get(grouped, 'error',   [])
-            let event_successes = _.get(grouped, 'success', []);
+            const event_errors    = _.get(grouped, 'error',   [])
+            const event_successes = _.get(grouped, 'success', []);
 
             // No errors, all events produced successfully.
             if (event_errors.length == 0) {
