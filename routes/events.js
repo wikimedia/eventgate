@@ -38,26 +38,30 @@ function produceEvent(event, topicField, kafkaProducer) {
 }
 
 
+
 // TODO: Not sure if this should be a class at all.  Probably not?
 class EventError extends Error {
-    constructor(error, event, req) {
-        super(error.message);
-        this.stack = error.stack;
+    constructor(originalError, originalEvent, errorTopic = 'eventbus.event-error') {
+        super(originalError.message);
+        this.stack = originalError.stack;
         this.event = {
             meta: {
                 schema_uri: 'error/2',
+                // TODO this is no good!  Gotta figure out how
+                // to make configurable and smart events.
+                topic: errorTopic,
             },
-            emitter_id: 'eventbus',
-            raw_event: _.isString ? event : JSON.stringify(event)
+            emitter_id: 'eventbus',  // TODO: ?
+            raw_event: _.isString(originalEvent) ? originalEvent : JSON.stringify(originalEvent)
         };
 
-        if (error instanceof EventInvalidError) {
-            this.event.message = error.errorsText;
-        } else if (_.isError(error)) {
-            this.event.message = error.message;
-            this.event.stack = error.stack;
+        if (originalError instanceof EventInvalidError) {
+            this.event.message = originalError.errorsText;
+        } else if (_.isError(originalError)) {
+            this.event.message = originalError.message;
+            this.event.stack = originalError.stack;
         } else {
-            this.event.message = error;
+            this.event.message = originalError;
         }
     }
 }
@@ -66,14 +70,14 @@ class EventError extends Error {
 // TODO full event error creation, using event-errors error schema.
 // Would be good to make this a pluggable function to decouple from our error schema.
 
-// function createEventError(error, event, req) {
+// function createErrorEvent(error, event, req) {
 //     const eventError = {
 //         meta: {
 //             schema_uri: 'error/2',
 //         },
 //         emitter_id: 'eventbus',
 //         raw_event: _.isString ? event : JSON.stringify(event)
-//     }
+//     };
 
 //     if (error instanceof EventInvalidError) {
 //         eventError.message = error.errorsText;
@@ -169,27 +173,11 @@ module.exports = function(appObj) {
 
                     return produceEvent(event, app.conf.stream_field, kafkaProducer);
                 })
-
-                // TODO: Should we convert errors into HTTP errors?  I don't think so,
-                // But probably some conversion could be done, especially to make it
-                // easy to produce errored events to an error topic.
-
-                // .catch(EventInvalidError, (err) => {
-                //     // TODO: produce invalid event?
-                //     return new HTTPError({
-                //         status: 400,
-                //         type: 'invalid',
-                //         title: 'Event Validation Error',
-                //         detail: `${err.message}. Errors: ${err.errorsText}`,
-                //         errors: err.errors
-                //     });
-                // })
+                // Convert any errors to EventErrors;
+                // These will be produced to the Kafka error topic if set.
                 .catch((err) => {
-                    // console.log('FAILED! ', err, event);
-                    // console.log(' FIRST BUT IS ', eUtil.objectProperty(err.errors[0]['dataPath'], event));
-                    // TODO: ???
                     // return createEventError(err, event, req);
-                    return new EventError(err, event, req);
+                    return new EventError(err, event);
                     // return err;
                 });
             })
@@ -238,6 +226,18 @@ module.exports = function(appObj) {
                         res.status(400);
                         res.json({ errors: eventFailures });
                     }
+                }
+
+                return eventFailures;
+            })
+            // finally convert eventFailures to error events and produce them
+            // to the error topic (if given).
+            .then((eventFailures) => {
+                if (app.conf.error_topic) {
+                    req.logger.log('info/events', `Producing ${eventFailures.length} error events to topic ${app.conf.error_topic}`);
+                    _.each(eventFailures,
+                        eventError => produceEvent(eventError.event, app.conf.stream_field, kafkaProducer)
+                    );
                 }
             });
         });

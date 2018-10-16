@@ -70,6 +70,8 @@ services:
       # from this field will be passed to the topic transformation function.
       stream_field: meta.topic
 
+      error_topic: eventbus.event-error
+
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
       schema_field: meta.schema_uri
