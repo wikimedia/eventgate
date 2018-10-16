@@ -12,7 +12,7 @@ const extend = require('extend');
 
 // set up the configuration
 let config = {
-    conf: yaml.safeLoad(fs.readFileSync(`${__dirname}/../../config.yaml`))
+    conf: yaml.safeLoad(fs.readFileSync(`${__dirname}/../../config.test.yaml`))
 };
 // build the API endpoint URI by supposing the actual service
 // is the last one in the 'services' list in the config file

@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: trace
+  level: warn
 #  streams:
 #  # Use gelf-stream -> logstash
 #  - type: gelf
@@ -62,8 +62,7 @@ services:
       # the user agent to use when issuing requests
       user_agent: eventbus
 
-      # TODO: Figure out best name for this settting. Test mode?
-      # mock_kafka: true
+      mock_kafka: true
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic tranformation
       # function is configured.  If using topic transformation, the value extracted
@@ -77,7 +76,6 @@ services:
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
       schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas
-      # schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/event-schemas/jsonschema
       # schema_base_uri: file:///vagrant/srv/event-schemas/jsonschema/
       #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema
 

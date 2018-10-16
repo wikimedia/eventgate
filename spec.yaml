@@ -1,0 +1,195 @@
+swagger: '2.0'
+info:
+  version: 0.4.0
+  title: EventBus
+  description: Event Produce Service
+  termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
+  contact:
+    name: the Wikimedia Services team
+    url: http://mediawiki.org/wiki/Services
+  license:
+    name: Apache2
+    url: http://www.apache.org/licenses/LICENSE-2.0
+x-default-params:
+  domain: en.wikipedia.org
+
+paths:
+  # from routes/root.js
+  /robots.txt:
+    get:
+      tags:
+        - Root
+        - Robots
+      description: Gets robots.txt
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      x-amples:
+        - title: robots.txt check
+          request: {}
+          response:
+            status: 200
+            headers:
+              user-agent: '*'
+              disallow: '/'
+  /:
+    get:
+      tags:
+        - Root
+      description: The root service end-point
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      x-amples:
+        - title: root with no query params
+          request: {}
+          response:
+            status: 404
+        - title: spec from root
+          request:
+            query:
+              spec: true
+          response:
+            status: 200
+        - title: doc from root
+          request:
+            query:
+              doc: true
+          response:
+            status: 200
+        - title: root with wrong query param
+          request:
+            query:
+              fooo: true
+          response:
+            status: 404
+
+  # from routes/events.js
+  /v1/events:
+    post:
+      description: Produce events
+      produces:
+        - application/json
+      responses:
+        204:
+          description: Success
+        207:
+          description: Partial Success
+          schema:
+            $ref: '#/definitions/problem'
+        400:
+          description: Failure
+          schema:
+            $ref: '#/definitions/problem'
+
+      x-amples:
+        - title: Produce a single valid event
+          request:
+            headers:
+              content-type: application/json            
+            body:
+              meta:
+                topic: test.event
+                schema_uri: test/1
+                id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
+              test: test_value
+          response:
+            status: 204
+
+        - title: Produce a single invalid event
+          request:
+            headers:
+              content-type: application/json
+            body:
+              meta:
+                topic: test.event
+                schema_uri: test/1
+                id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
+              test: 0.01
+          response:
+            status: 400
+        # TODO: add response body testing on errors too.
+
+        - title: Produce a batch valid events
+          request:
+            headers:
+              content-type: application/json
+            body:
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
+                test: test_value0
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+          response:
+            status: 204
+
+        - title: Produce batch events, one valid, one invalid
+          request:
+            headers:
+              content-type: application/json
+            body:
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
+                test: 12345
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+          response:
+            status: 207
+
+        - title: Produce batch events, all invalid
+          request:
+            headers:
+              content-type: application/json
+            body:
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
+                test: 12345
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+                test_default: 67890
+          response:
+            status: 400
+
+definitions:
+  # A https://tools.ietf.org/html/draft-nottingham-http-problem
+  problem:
+    required:
+      - type
+    properties:
+      status:
+        type: integer
+      type:
+        type: string
+      title:
+        type: string
+      detail:
+        type: string
+      method:
+        type: string
+      uri:
+        type: string

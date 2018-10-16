@@ -5,6 +5,7 @@
 - topic prefixing/transformation config (datacenter prefixing)
 - invalid error produce topic
 - Fire and forget valiation/kafka produce AKA return 204 immediately.
+- monitoring/metrics
 
 # Questions:
 - How to deal with message keys?
@@ -14,6 +15,10 @@
   without appending them to the schema uris
 
 - should we configure schemas for topics by final topic or by un prefixed stream name?
+
+- should we have a query param to allow/disallow parital batch production on any error?
+  i.e. should remaining events be produced if one fails?  This is the default behavior,
+  but maybe users want to configure this.
 
 
 # event schema uri functional???
@@ -36,3 +41,6 @@ function schemaUrl(event) {
     topic = extractTopic(event)
 }
 
+
+
+Should EventError schema be hardcoded into this library?
