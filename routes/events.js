@@ -38,7 +38,6 @@ function produceEvent(event, topicField, kafkaProducer) {
 }
 
 
-
 // TODO: Not sure if this should be a class at all.  Probably not?
 class EventError extends Error {
     constructor(originalError, originalEvent, errorTopic = 'eventbus.event-error') {
@@ -116,7 +115,8 @@ module.exports = function(appObj) {
 
 
     // If in mock/testing mode, use a mock Kafka Producer.
-    const createKafkaProducer = app.conf.mock_kafka ? kafka.createMockKafkaProducer : kafka.createKafkaProducer;
+    const createKafkaProducer =
+        app.conf.mock_kafka ? kafka.createMockKafkaProducer : kafka.createKafkaProducer;
 
     // Create a Kafka Producer using the app configuration.  Once the
     // Kafka Producer is ready, create the /events route.
@@ -136,16 +136,8 @@ module.exports = function(appObj) {
                 return;
             }
 
-            let events = req.body;
-            // TODO: Something is not right with spec.yaml x-amples tests.
-            // Arrays are being encoded as integer-string keyed objects.
-            // Temp hack to work around this til I figure it out.
-            if (_.has(events, '0')) {
-                events = _.values(events);
-                // console.log('HAS 0, using values', events);
-            }
             // Make sure events is an array, even if we were given only one event.
-            events = _.isArray(events) ? events : [events];
+            const events = _.isArray(req.body) ? req.body : [req.body];
 
             // console.log("events are ", events);
             // TODO: bikeshed this query param name.
@@ -207,10 +199,14 @@ module.exports = function(appObj) {
                         res.end();
                     }
                 } else if (eventFailures.length !== events.length) {
-                    const statusMessage = `${eventSuccesses.length} out of ${events.length} events were accepted, but ${eventFailures.length} failed.`;
+                    const statusMessage = `${eventSuccesses.length} out of ${events.length} ` +
+                        `events were accepted, but ${eventFailures.length} failed.`;
 
                     // const eventErrors = eventFailures.map(err => createEventError(err, event))
-                    req.logger.log('warn/events', { errors: eventFailures, message: statusMessage });
+                    req.logger.log(
+                        'warn/events',
+                        { errors: eventFailures, message: statusMessage }
+                    );
 
                     if (!res.finished) {
                         res.statusMessage = statusMessage;
@@ -218,8 +214,12 @@ module.exports = function(appObj) {
                         res.json({ errors: eventFailures });
                     }
                 } else {
-                    const statusMessage = `${eventSuccesses.length} out of ${events.length} events were accepted.`;
-                    req.logger.log('warn/events', { errors: eventFailures, message: statusMessage });
+                    const statusMessage = `${eventSuccesses.length} out of ${events.length} ` +
+                        `events were accepted.`;
+                    req.logger.log(
+                        'warn/events',
+                        { errors: eventFailures, message: statusMessage }
+                    );
 
                     if (!res.finished) {
                         res.statusMessage = statusMessage;
@@ -234,12 +234,17 @@ module.exports = function(appObj) {
             // to the error topic (if given).
             .then((eventFailures) => {
                 if (app.conf.error_topic) {
-                    req.logger.log('info/events', `Producing ${eventFailures.length} error events to topic ${app.conf.error_topic}`);
-                    _.each(eventFailures,
-                        eventError => produceEvent(eventError.event, app.conf.stream_field, kafkaProducer)
+                    const errorTopic = app.conf.error_topic;
+                    req.logger.log(
+                        'info/events',
+                        `Producing ${eventFailures.length} error events to topic ${errorTopic}`
                     );
+                    return _.map(eventFailures, (eventError) => {
+                        return produceEvent(eventError.event, app.conf.stream_field, kafkaProducer);
+                    });
                 }
             });
+            // TODO: catch failed event error production?
         });
     });
 

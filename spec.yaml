@@ -175,6 +175,28 @@ paths:
           response:
             status: 400
 
+        - title: Produce batch events, all invalid, fire and forget
+          request:
+            query:
+              hasty: true
+            headers:
+              content-type: application/json
+            body:
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
+                test: 12345
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+                test_default: 67890
+          response:
+            status: 204
+
+
 definitions:
   # A https://tools.ietf.org/html/draft-nottingham-http-problem
   problem:
