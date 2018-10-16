@@ -195,23 +195,3 @@ paths:
                 test_default: 67890
           response:
             status: 204
-
-
-definitions:
-  # A https://tools.ietf.org/html/draft-nottingham-http-problem
-  problem:
-    required:
-      - type
-    properties:
-      status:
-        type: integer
-      type:
-        type: string
-      title:
-        type: string
-      detail:
-        type: string
-      method:
-        type: string
-      uri:
-        type: string
