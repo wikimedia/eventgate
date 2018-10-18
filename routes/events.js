@@ -140,14 +140,12 @@ module.exports = function(appObj) {
                     );
 
                     const eventErrors = _.map(failedResults, (failedResult) => {
-                        console.log("FAILED R", failedResult);
                         return createEventError(
                             // context will be the error that caused the failure.
                             failedResult.context,
                             failedResult.event
                         );
                     });
-                    console.log('PRODUINT ', eventErrors);
                     return eventbus.process(eventErrors);
                 } else {
                     return results;
