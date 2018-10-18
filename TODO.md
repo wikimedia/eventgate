@@ -2,9 +2,6 @@
 
 - Tests for schemas, validators and routes
 - topic -> schema mapping config reading?  from local config files and remote service too?
-- topic prefixing/transformation config (datacenter prefixing)
-- invalid error produce topic
-- Fire and forget valiation/kafka produce AKA return 204 immediately.
 - monitoring/metrics
 
 # Questions:
@@ -20,27 +17,4 @@
   i.e. should remaining events be produced if one fails?  This is the default behavior,
   but maybe users want to configure this.
 
-
-# event schema uri functional???
-
-event -> schema_uri field
-event -> FULL schema_url
-event -> topic
-
-
-valid -> function (kafka produce) -> http response?
-invalid -> function (kafka produce) -> http response?
-
-
-
-ValidatorCache: FULL schema_url -> validator / schema?
-
-EventValidator(event -> full schema_url)
-
-function schemaUrl(event) {
-    topic = extractTopic(event)
-}
-
-
-
-Should EventError schema be hardcoded into this library?
+- should lib/eventbus.js be a standalone lib?

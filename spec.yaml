@@ -118,6 +118,19 @@ paths:
               test: 0.01
           response:
             status: 400
+
+        - title: Produce a single event that encounters an error
+          request:
+            headers:
+              content-type: application/json
+            body:
+              meta:
+                topic: throw_error
+                schema_uri: test/1
+                id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
+              test: test_value
+          response:
+            status: 500
         # TODO: add response body testing on errors too.
 
         - title: Produce a batch valid events
@@ -156,6 +169,29 @@ paths:
           response:
             status: 207
 
+        - title: Produce batch events, one valid, one invalid, one error
+          request:
+            headers:
+              content-type: application/json
+            body:
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
+                test: 12345
+              - meta:
+                  topic: test.event
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+              - meta:
+                  topic: throw_error
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+          response:
+            status: 207
+
         - title: Produce batch events, all invalid
           request:
             headers:
@@ -174,6 +210,25 @@ paths:
                 test_default: 67890
           response:
             status: 400
+
+        - title: Produce batch events, all errored
+          request:
+            headers:
+              content-type: application/json
+            body:
+              - meta:
+                  topic: throw_error
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
+                test: test_value
+              - meta:
+                  topic: throw_error
+                  schema_uri: test/1
+                  id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
+                test: test_value1
+                test_default: test_value
+          response:
+            status: 500
 
         - title: Produce batch events, all invalid, fire and forget
           request:

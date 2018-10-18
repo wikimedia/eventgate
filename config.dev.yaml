@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: trace
+  level: debug
 #  streams:
 #  # Use gelf-stream -> logstash
 #  - type: gelf
@@ -64,22 +64,28 @@ services:
 
       # TODO: Figure out best name for this settting. Test mode?
       # mock_kafka: true
+
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic tranformation
       # function is configured.  If using topic transformation, the value extracted
       # from this field will be passed to the topic transformation function.
+      
+      #  TODO change this to meta.stream and fill in meta.topic from prefixed value?
+      # stream != topic!
       stream_field: meta.topic
+      id_field: meta.id
+      topic_prefix: 'test.'
 
-      error_topic: eventbus.event-error
-
+      error_schema_uri: error/2
+      error_stream: eventbus.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
       schema_field: meta.schema_uri
 
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
-      schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas
-      # schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/event-schemas/jsonschema
+      # schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas
+      schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/event-schemas/jsonschema
       # schema_base_uri: file:///vagrant/srv/event-schemas/jsonschema/
       #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema
 

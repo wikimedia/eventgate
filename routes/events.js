@@ -1,20 +1,9 @@
 'use strict';
 
-
-const P = require('bluebird');
 const sUtil = require('../lib/util');
-// shortcut
-// const HTTPError = sUtil.HTTPError;
 
 const _        = require('lodash');
-
-const kafka = require('../lib/kafka');
-const eUtil = require('../lib/eventbus-utils');
-const {
-    EventInvalidError,
-    EventValidator
-} = require('../lib/validator');
-
+const wikimedia = require('../lib/wikimedia');
 
 /**
  * The main router object
@@ -26,107 +15,25 @@ const router = sUtil.router();
  */
 let app;
 
-
-function produceEvent(event, topicField, kafkaProducer) {
-    // TODO: support configurable keys / partitioners?
-    return kafkaProducer.produce(
-        eUtil.getTopic(topicField, null, event),
-        undefined,
-        Buffer.from(JSON.stringify(event)),
-        undefined
-    );
-}
-
-
-// TODO: Not sure if this should be a class at all.  Probably not?
-class EventError extends Error {
-    constructor(originalError, originalEvent, errorTopic = 'eventbus.event-error') {
-        super(originalError.message);
-        this.stack = originalError.stack;
-        this.event = {
-            meta: {
-                schema_uri: 'error/2',
-                // TODO this is no good!  Gotta figure out how
-                // to make configurable and smart events.
-                topic: errorTopic,
-            },
-            emitter_id: 'eventbus',  // TODO: ?
-            raw_event: _.isString(originalEvent) ? originalEvent : JSON.stringify(originalEvent)
-        };
-
-        if (originalError instanceof EventInvalidError) {
-            this.event.message = originalError.errorsText;
-        } else if (_.isError(originalError)) {
-            this.event.message = originalError.message;
-            this.event.stack = originalError.stack;
-        } else {
-            this.event.message = originalError;
-        }
-    }
-}
-
-
-// TODO full event error creation, using event-errors error schema.
-// Would be good to make this a pluggable function to decouple from our error schema.
-
-// function createErrorEvent(error, event, req) {
-//     const eventError = {
-//         meta: {
-//             schema_uri: 'error/2',
-//         },
-//         emitter_id: 'eventbus',
-//         raw_event: _.isString ? event : JSON.stringify(event)
-//     };
-
-//     if (error instanceof EventInvalidError) {
-//         eventError.message = error.errorsText;
-//     }
-//     else if (_.isError(error)) {
-//         eventError.message = error.message;
-//         eventError.stack = error.stack;
-//     }
-//     else {
-//         eventError.message = error;
-//     }
-
-//     return eventError;
-// }
-
-
 module.exports = function(appObj) {
 
     app = appObj;
 
-    // Create a new function that will be used by EventValidator to extract
-    // schema URIs given an event to validate using the app configuration.
-    const schemaUrlExtractor = eUtil.getSchemaUrl.bind(
-        null,
-        app.conf.schema_field,
-        app.conf.schema_base_uri,
-        app.conf.schema_file_extension
-    );
+    /**
+     * A new function that converts errors and events into
+     * event error objects suitable for reproducing to a configured
+     * error topic.
+     */
+    const createEventError =
+        app.conf.error_stream ? wikimedia.createEventErrorFunction(app.conf) : undefined;
 
-    // TODO event (id) stringifier function for logging and errors?
+    // Create the eventbus instance with a connected Producer.
+    wikimedia.createEventBus(app.logger._logger, app.conf)
+    .then((eventbus) => {
 
-    // This validator will be used to extract schema URLs from events with
-    // the schemaUrlExtractor function, and then to validate those events
-    // with the schemas found at those URLs.
-    const validator = new EventValidator(schemaUrlExtractor);
-
-
-    // If in mock/testing mode, use a mock Kafka Producer.
-    const createKafkaProducer =
-        app.conf.mock_kafka ? kafka.createMockKafkaProducer : kafka.createKafkaProducer;
-
-    // Create a Kafka Producer using the app configuration.  Once the
-    // Kafka Producer is ready, create the /events route.
-    createKafkaProducer(
-        app.conf.kafka.conf,
-        app.conf.kafka.topic_conf
-    ).then((kafkaProducer) => {
-
+        // Now that everything is ready, we can accept events at this route.
         router.post('/events', (req, res) => {
-            // console.log('body is ', req.body);
+
             // If empty body, return 400 now.
             if (_.isEmpty(req.body)) {
                 res.statusMessage = 'Must provide JSON encoded events in request body.';
@@ -139,7 +46,6 @@ module.exports = function(appObj) {
             // Make sure events is an array, even if we were given only one event.
             const events = _.isArray(req.body) ? req.body : [req.body];
 
-            // console.log("events are ", events);
             // TODO: bikeshed this query param name.
             // If the requester wants a hasty response, return now!
             if (req.query.hasty) {
@@ -149,46 +55,19 @@ module.exports = function(appObj) {
                 res.end();
             }
 
-            return P.map(events, (event) => {
-                // validate() will validate event against the schema found at the
-                // schema URL returned by schemaUrlExtractor, and then return the event.
-                // The event may be modified; e.g. if the schema has a default for a field
-                // but the event doesn't have it set. If the event failed validation,
-                // an EventInvalidError will be thrown.
-                return validator.validate(event)
-                // If we are in this block, the event is valid, produce it.
-                .then((event) => {
-                    req.logger.log('trace/events', {
-                        event,
-                        message: 'Passed schema validation'
-                    });
+            // Process events (validate and produce)
+            return eventbus.process(events)
+            .then((results) => {
 
-                    return produceEvent(event, app.conf.stream_field, kafkaProducer);
-                })
-                // Convert any errors to EventErrors;
-                // These will be produced to the Kafka error topic if set.
-                .catch((err) => {
-                    // return createEventError(err, event, req);
-                    return new EventError(err, event);
-                    // return err;
-                });
-            })
-            // statuses will be a list of either node-rdkafka produce reports or Errors.
-            .then((statuses) => {
-                // Group event validation and production by status.
-                // Some could succeed and some fail.
-                const grouped = _.groupBy(statuses, (status) => {
-                    return _.isError(status) ? 'failed' : 'success';
-                });
-                const eventFailures    = _.get(grouped, 'failed',   []);
-                const eventSuccesses = _.get(grouped, 'success', []);
+                const successCount = results.success.length;
+                const invalidCount = results.invalid.length;
+                const errorCount = results.error.length;
+                const failureCount = results.invalid.length + results.error.length;
 
-                // console.log('failures: ', eventFailures);
-                // console.log('successes: ', eventSuccesses);
-
-                // No errors, all events produced successfully.
-                if (eventFailures.length === 0) {
-                    const statusMessage = `All ${events.length} events were accepted.`;
+                if (failureCount === 0) {
+                    // No failures, all events produced successfully: 204
+                    const statusMessage =
+                        `All ${successCount} out of ${events.length} events were accepted.`;
                     req.logger.log('debug/events', statusMessage);
 
                     // Only set response if it hasn't yet finished,
@@ -198,53 +77,82 @@ module.exports = function(appObj) {
                         res.status(204);
                         res.end();
                     }
-                } else if (eventFailures.length !== events.length) {
-                    const statusMessage = `${eventSuccesses.length} out of ${events.length} ` +
-                        `events were accepted, but ${eventFailures.length} failed.`;
-
-                    // const eventErrors = eventFailures.map(err => createEventError(err, event))
+                } else if (invalidCount === events.length) {
+                    // All events were invalid: 400
+                    const statusMessage = `${invalidCount} out of ${events.length} ` +
+                        `events were invalid and not accepted.`;
                     req.logger.log(
                         'warn/events',
-                        { errors: eventFailures, message: statusMessage }
-                    );
-
-                    if (!res.finished) {
-                        res.statusMessage = statusMessage;
-                        res.status(207);
-                        res.json({ errors: eventFailures });
-                    }
-                } else {
-                    const statusMessage = `${eventSuccesses.length} out of ${events.length} ` +
-                        `events were accepted.`;
-                    req.logger.log(
-                        'warn/events',
-                        { errors: eventFailures, message: statusMessage }
+                        { invalid: results.invalid, message: statusMessage }
                     );
 
                     if (!res.finished) {
                         res.statusMessage = statusMessage;
                         res.status(400);
-                        res.json({ errors: eventFailures });
+                        res.json({ invalid: results.invalid });
+                    }
+                } else if (failureCount !== events.length) {
+                    // Some successes, but also some failures (invalid or errored): 207
+                    const statusMessage = `${results.success.length} out of ${events.length} ` +
+                        `events were accepted, but ${failureCount} failed (${invalidCount} ` +
+                        `invalid and ${errorCount} errored).`;
+
+                    req.logger.log(
+                        'warn/events',
+                        { error: results.error, invalid: results.invalid, message: statusMessage }
+                    );
+
+                    if (!res.finished) {
+                        res.statusMessage = statusMessage;
+                        res.status(207);
+                        res.json({ invalid: results.invalid, error: results.error });
+                    }
+                } else {
+                    // All events had some failure eith at least one error
+                    // (some might have been invalid): 500
+                    const statusMessage = `${failureCount} out of ${events.length} ` +
+                        `events had failures and were not accepted. (${invalidCount} ` +
+                        `invalid and ${errorCount} errored).`;
+                    req.logger.log(
+                        'error/events',
+                        { errors: results.error, message: statusMessage }
+                    );
+
+                    if (!res.finished) {
+                        res.statusMessage = statusMessage;
+                        res.status(500);
+                        res.json({ invalid: results.invalid, error: results.error });
                     }
                 }
 
-                return eventFailures;
+                return results;
             })
-            // finally convert eventFailures to error events and produce them
+            // finally convert any failed events to error events and produce them
             // to the error topic (if given).
-            .then((eventFailures) => {
-                if (app.conf.error_topic) {
-                    const errorTopic = app.conf.error_topic;
+            // TODO: if we encounter Kafka errors...what then?
+            .then((results) => {
+                const failedResults = results.invalid.concat(results.error);
+                if (createEventError && !_.isEmpty(failedResults)) {
                     req.logger.log(
                         'info/events',
-                        `Producing ${eventFailures.length} error events to topic ${errorTopic}`
+                        `Producing ${failedResults.length} failed events to topic ` +
+                        `${app.conf.error_stream}`
                     );
-                    return _.map(eventFailures, (eventError) => {
-                        return produceEvent(eventError.event, app.conf.stream_field, kafkaProducer);
+
+                    const eventErrors = _.map(failedResults, (failedResult) => {
+                        console.log("FAILED R", failedResult);
+                        return createEventError(
+                            // context will be the error that caused the failure.
+                            failedResult.context,
+                            failedResult.event
+                        );
                     });
+                    console.log('PRODUINT ', eventErrors);
+                    return eventbus.process(eventErrors);
+                } else {
+                    return results;
                 }
             });
-            // TODO: catch failed event error production?
         });
     });
 
@@ -259,4 +167,3 @@ module.exports = function(appObj) {
     };
 
 };
-

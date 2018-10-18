@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: warn
+  level: trace
 #  streams:
 #  # Use gelf-stream -> logstash
 #  - type: gelf
@@ -68,7 +68,11 @@ services:
       # function is configured.  If using topic transformation, the value extracted
       # from this field will be passed to the topic transformation function.
       stream_field: meta.topic
+      id_field: meta.id
+      topic_prefix: 'test.'
 
+      error_schema_uri: error/2
+      error_stream: eventbus.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
       schema_field: meta.schema_uri
