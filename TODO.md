@@ -3,11 +3,11 @@
 - Tests for schemas, validators and routes
 - topic -> schema mapping config reading?  from local config files and remote service too?
 - monitoring/metrics
-
+- tests using eventbus_init_module instead of kafka.js MockKafkaProducer
+- separate out wikimedia Eventbus instantiation and its utility functions, most
+  of the functions there (like schema lookup, etc.) can be more generic.
+  
 # Questions:
-- How to deal with message keys?
-- How to deal with partitioners?
-
 - we should leave off file extensions from versioned schemas in the schema repo, so they work
   without appending them to the schema uris
 

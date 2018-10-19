@@ -1,6 +1,6 @@
-# EventBus - HTTP JSONSchema event validation and production to Kafka
+# Eventbus - HTTP JSONSchema event validation and production to Kafka
 
-EventBus takes in JSON events via HTTP POST, validates them according to
+Eventbus takes in JSON events via HTTP POST, validates them according to
 JSONSchemas discovered via URLs, and produces them to the configured backends,
 usually Kafka.
 
@@ -14,9 +14,16 @@ TODO
 
 # Architecture
 
+Eventbus attempts to be a generic HTTP POST event intake, event schema validation
+and event 'produce' service.  The schema validation and event produce implementation
+is left up to the user.  This service ships with a schema URL based
+validation and Kafka produce implementation, but you can plug in your own
+by implementing a module that returns an instantiated `Eventbus` and use it
+via `eventbus_init_module` application config.
+
 ## Event Schema URLs
 
-While the `EventBus` class that handles event validation and production can
+While the `Eventbus` class that handles event validation and production can
 be configured to do validation in any way, this library was designed with the
 idea that event schemas should be identifiable and addressable via
 URL syntax.  If your each of your events contain a URI to the JSONSchema
@@ -26,16 +33,16 @@ simple paths on the local filesystem with `file://` or an `http://` based
 URI.
 
 
-## EventBus
+## Eventbus
 
-The `EventBus` class in lib/eventbus.js handles event validation and produce logic.
+The `Eventbus` class in lib/eventbus.js handles event validation and produce logic.
 It is instantiated with `validate` and a `produce` functions that each take a single
 event.  `validate` should either return a Promise of the validated event
 (possibly augmented, e.g. field defaults populated) or throw an `EventInvalidError`.
 `produce` is expected to return a Promise of the `produce` result, or throw an
 `Error`.
 
-Once instantiated with these injected functions, an `EventBus` instance can be used
+Once instantiated with these injected functions, an `Eventbus` instance can be used
 by calling `process` function with an array of parsed events.  This function will
 catch both validation and produce errors, and will return an object with errors
 for each event grouped by the type of error.  E.g. if you passed in 3 events,
