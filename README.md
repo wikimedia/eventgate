@@ -51,6 +51,28 @@ will return an object like:
 ```
 with each array containing an `EventStatus` instance representing the event's process result.
 
+## HTTP Event intake configuration
+
+The EventBus class is generic enough to be used with any type of JSON validation and event production via its
+function injection.  However, the HTTP route that handles POSTing of events needs to have an instantiated
+EventBus instance.  To make this configurable (without actually editing the route code), the route in
+routes/events.js will look for `app.conf.eventbus_init_module` and require it.  This module is expected to
+export a single function that takes a `conf` object and a bunyan `logger`.  The function will return
+an object with a Promise of an instantiated Eventbus in the `eventbus` key, and an optional `createEventError`
+function.
+
+Once the `eventbus` Promise resolves, the `/v1/events` route will be added and will use the instantiated
+Eventbus to validate and produce incoming events.
+
+
+If `createEventError` is returned from the require of eventbus_init_module, it should be a function that
+takes an `error` and an `event` and returns a new error event representing `error` that is suitable
+for producing through the instantiated `Eventbus`.  If it is defined and any incoming events fail
+for any reason, those errors will be converted to event errors via this function, and then produced.
+There should be no difference between the kind of events that `createEventError` returns and the kind
+of events that your instantiated `Eventbus` can handle.  I.e. eventbus.produce([errorEvents]) should work.
+
+
 ## HTTP API
 
 
