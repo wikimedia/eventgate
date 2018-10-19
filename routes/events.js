@@ -3,7 +3,7 @@
 const sUtil = require('../lib/util');
 
 const _        = require('lodash');
-const wikimedia = require('../lib/wikimedia');
+const EventBus = require('../lib/eventbus').EventBus;
 
 /**
  * The main router object
@@ -19,18 +19,32 @@ module.exports = function(appObj) {
 
     app = appObj;
 
+    let eventbusPromise;
+    let createEventError;
+
     /**
-     * A new function that converts errors and events into
-     * event error objects suitable for reproducing to a configured
-     * error topic.
+     * If eventbus_init_module is set in app.conf, the require it to get
+     * a Promise of an instantiated EventBus, as well as a function that
+     * can create error events suitable for producing errors via the
+     * instantiated EventBus.
      */
-    const createEventError =
-        app.conf.error_stream ? wikimedia.createEventErrorFunction(app.conf) : undefined;
+    if (_.has(app.conf, 'eventbus_init_module')) {
+        app.logger.log(
+            'info/events',
+            `Requiring EventBus instance from ${app.conf.eventbus_init_module}`
+        );
+        const module = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
+        eventbusPromise = module.eventbus;
+        createEventError = module.createEventError;
+    } else {
+        app.logger('info/events', 'app.conf.eventbus_module not set, using default Eventbus.');
+        eventbusPromise = Promise.resolve(new EventBus());
+        createEventError = undefined;
+    }
 
     // Create the eventbus instance with a connected Producer.
-    wikimedia.createEventBus(app.logger._logger, app.conf)
-    .then((eventbus) => {
-
+    // wikimedia.createEventBus(app.logger._logger, app.conf)
+    eventbusPromise.then((eventbus) => {
         // Now that everything is ready, we can accept events at this route.
         router.post('/events', (req, res) => {
 

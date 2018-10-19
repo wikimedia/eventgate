@@ -10,6 +10,7 @@ worker_heap_limit_mb: 250
 # Logger info
 logging:
   level: info
+
 #  streams:
 #  # Use gelf-stream -> logstash
 #  - type: gelf
@@ -62,11 +63,12 @@ services:
       # the user agent to use when issuing requests
       user_agent: eventbus
 
+      eventbus_module: '../lib/wikimedia'
       # TODO: Figure out best name for this settting. Test mode?
       # mock_kafka: true
 
       # This field in each event will be used to extract a destination 'stream' name.
-      # This will equal the destination Kafka topic, unless a topic tranformation
+      # This will equal the destination Kafka topic, unless a topic transformation
       # function is configured.  If using topic transformation, the value extracted
       # from this field will be passed to the topic transformation function.
       
