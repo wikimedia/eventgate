@@ -125,7 +125,7 @@ paths:
               content-type: application/json
             body:
               meta:
-                topic: throw_error
+                topic: __throw_error__
                 schema_uri: test/1
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
@@ -185,7 +185,7 @@ paths:
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
               - meta:
-                  topic: throw_error
+                  topic: __throw_error__
                   schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
@@ -217,12 +217,12 @@ paths:
               content-type: application/json
             body:
               - meta:
-                  topic: throw_error
+                  topic: __throw_error__
                   schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: test_value
               - meta:
-                  topic: throw_error
+                  topic: __throw_error__
                   schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1

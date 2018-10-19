@@ -60,9 +60,12 @@ services:
       #   - user-agent
       #   - x-request-id
       # the user agent to use when issuing requests
-      user_agent: eventbus
+      user_agent: eventbus_test
 
-      mock_kafka: true
+      # Configure the EventBus test instance similar to one that might be used
+      # in production, but with a mock producer and a mock event error create function.
+      eventbus_init_module: '../test/utils/eventbus_test_init'
+
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic tranformation
       # function is configured.  If using topic transformation, the value extracted
@@ -71,27 +74,15 @@ services:
       id_field: meta.id
       topic_prefix: 'test.'
 
-      error_schema_uri: error/2
+      error_schema_uri: error/1
       error_stream: eventbus.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
       schema_field: meta.schema_uri
-
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
+      # TODO: use project path instead of hardcoded otto path
       schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas
-      # schema_base_uri: file:///vagrant/srv/event-schemas/jsonschema/
-      #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema
-
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
       schema_file_extension: .yaml
-
-
-
-      # kafka configs go here.
-      kafka:
-        conf:
-          metadata.broker.list: '10.11.12.13:9092'
-        # kafka topic conf goes here
-        topic_conf: {}

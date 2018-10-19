@@ -3,7 +3,6 @@
 const sUtil = require('../lib/util');
 
 const _        = require('lodash');
-const EventBus = require('../lib/eventbus').EventBus;
 
 /**
  * The main router object
@@ -19,28 +18,25 @@ module.exports = function(appObj) {
 
     app = appObj;
 
-    let eventbusPromise;
-    let createEventError;
-
-    /**
-     * If eventbus_init_module is set in app.conf, the require it to get
-     * a Promise of an instantiated EventBus, as well as a function that
-     * can create error events suitable for producing errors via the
-     * instantiated EventBus.
-     */
-    if (_.has(app.conf, 'eventbus_init_module')) {
+    // Make sure eventbus_init_module is set in app.conf. It will be required to get
+    // a Promise of an instantiated EventBus, as well as a function that
+    // can create error events suitable for producing errors via the
+    // instantiated EventBus.
+    if (!_.has(app.conf, 'eventbus_init_module')) {
         app.logger.log(
-            'info/events',
-            `Requiring EventBus instance from ${app.conf.eventbus_init_module}`
+            'fatal/events',
+            `Must set conf.eventbus_init_module to configure Eventbus instance.`
         );
-        const module = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
-        eventbusPromise = module.eventbus;
-        createEventError = module.createEventError;
-    } else {
-        app.logger('info/events', 'app.conf.eventbus_module not set, using default Eventbus.');
-        eventbusPromise = Promise.resolve(new EventBus());
-        createEventError = undefined;
+        process.exit(1);
     }
+
+    app.logger.log(
+        'info/events',
+        `Requiring EventBus instance from ${app.conf.eventbus_init_module}`
+    );
+    const module = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
+    const eventbusPromise = module.eventbus;
+    const createEventError = module.createEventError;
 
     // Create the eventbus instance with a connected Producer.
     // wikimedia.createEventBus(app.logger._logger, app.conf)
