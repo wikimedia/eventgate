@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: trace
+  level: debug
 #  streams:
 #  # Use gelf-stream -> logstash
 #  - type: gelf
@@ -82,7 +82,7 @@ services:
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
       # TODO: use project path instead of hardcoded otto path
-      schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas
+      schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas/
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
       schema_file_extension: .yaml
