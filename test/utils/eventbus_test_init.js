@@ -87,14 +87,12 @@ function createMockEventbus(conf, logger) {
             initUtils.createValidateFunction(conf),
             createMockProduceFunction(conf),
             initUtils.createEventReprFunction(conf),
-            logger
+            logger,
+            createMockErrorEventFunction(conf)
         )
     );
 }
 
 module.exports = (conf, logger) => {
-    return {
-        eventbus: createMockEventbus(conf, logger),
-        createEventError: createMockErrorEventFunction(conf)
-    }
-}
+    return createMockEventbus(conf, logger);
+};

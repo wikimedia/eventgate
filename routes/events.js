@@ -34,9 +34,7 @@ module.exports = function(appObj) {
         'info/events',
         `Requiring EventBus instance from ${app.conf.eventbus_init_module}`
     );
-    const module = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
-    const eventbusPromise = module.eventbus;
-    // const createEventError = module.createEventError;
+    const eventbusPromise = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
 
     // Create the eventbus instance with a connected Producer.
     // wikimedia.createEventBus(app.logger._logger, app.conf)
@@ -137,7 +135,6 @@ module.exports = function(appObj) {
                     }
                 }
 
-                return results;
             });
         });
     });
