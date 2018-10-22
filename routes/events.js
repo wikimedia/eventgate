@@ -36,7 +36,7 @@ module.exports = function(appObj) {
     );
     const module = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
     const eventbusPromise = module.eventbus;
-    const createEventError = module.createEventError;
+    // const createEventError = module.createEventError;
 
     // Create the eventbus instance with a connected Producer.
     // wikimedia.createEventBus(app.logger._logger, app.conf)
@@ -113,6 +113,8 @@ module.exports = function(appObj) {
                     );
 
                     if (!res.finished) {
+                        req.logger.log('info/events', 'FINISHING REQ');
+
                         res.statusMessage = statusMessage;
                         res.status(207);
                         res.json({ invalid: results.invalid, error: results.error });
@@ -136,30 +138,6 @@ module.exports = function(appObj) {
                 }
 
                 return results;
-            })
-            // finally convert any failed events to error events and produce them
-            // to the error topic (if given).
-            // TODO: if we encounter Kafka errors...what then?
-            .then((results) => {
-                const failedResults = results.invalid.concat(results.error);
-                if (createEventError && !_.isEmpty(failedResults)) {
-                    req.logger.log(
-                        'info/events',
-                        `Producing ${failedResults.length} failed events to topic ` +
-                        `${app.conf.error_stream}`
-                    );
-
-                    const eventErrors = _.map(failedResults, (failedResult) => {
-                        return createEventError(
-                            // context will be the error that caused the failure.
-                            failedResult.context,
-                            failedResult.event
-                        );
-                    });
-                    return eventbus.process(eventErrors);
-                } else {
-                    return results;
-                }
             });
         });
     });
