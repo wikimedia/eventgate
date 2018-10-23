@@ -140,3 +140,29 @@ Property                    |         Default | Description
 `schema_file_extension`     |       undefined | If given, this will be appendede to every extracted schema URI unless the filename in the URI already has an extension.
 `kafka.conf`                |                 | node-rdkafka (and librdkafka) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
+
+
+# service-template-node
+
+This service is based on Wikimedia's [service-tempate-node](https://github.com/wikimedia/service-template-node).  It is a fork of that 'template'
+repository.  See also the [ServiceTemplateNode documentation](https://www.mediawiki.org/wiki/ServiceTemplateNode).
+
+
+# TODO
+
+- Tests for utils, validators, producer, eventbus, etc.
+- topic (stream) -> schema mapping config reading?  from local config files and remote service too?
+- monitoring/metrics (for kafka, etc.)
+- name bikeshedding, probably won't use 'Eventbus' name.
+  
+## Questions/Thoughts:
+- We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
+
+- Should we configure schemas for topics by final topic or by un prefixed stream name?  -- by stream!  topic should be abstracted.
+
+- Should we have a query param to allow/disallow partial batch production on any error?
+  i.e. should remaining events be produced if one fails?  This is the default behavior,
+  but maybe users want to configure this.
+
+- Should `?hasty=true` (fire and forget) mode use a non guarunteed Kafka producer?
+
