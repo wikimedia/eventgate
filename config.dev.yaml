@@ -35,32 +35,7 @@ services:
       # interface: localhost # uncomment to only listen on localhost
       # more per-service config settings
       # the location of the spec, defaults to spec.yaml if not specified
-      spec: ./spec.yaml
-      # allow cross-domain requests to the API (default '*')
-      cors: '*'
-      # to disable use:
-      # cors: false
-      # to restrict to a particular domain, use:
-      # cors: restricted.domain.org
-      # content for the CSP headers
-      # csp: false  # uncomment this line to disable sending them
-      # URL of the outbound proxy to use (complete with protocol)
-      # proxy: http://my.proxy.org:8080
-      # the list of domains for which not to use the proxy defined above
-      # no_proxy_list:
-      #   - domain1.com
-      #   - domain2.org
-      # the list of incoming request headers that can be logged; if left empty,
-      # the following headers are allowed: cache-control, content-length,
-      # content-type, if-match, user-agent, x-request-id
-      # log_header_whitelist:
-      #   - cache-control
-      #   - content-length
-      #   - content-type
-      #   - if-match
-      #   - user-agent
-      #   - x-request-id
-      # the user agent to use when issuing requests
+      # spec: ./spec.yaml
       user_agent: eventbus
 
       eventbus_init_module: '../lib/wikimedia-eventbus'
@@ -80,20 +55,16 @@ services:
       error_stream: eventbus.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
-      schema_field: meta.schema_uri
+      schema_uri_field: meta.schema_uri
 
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
-      # schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/eventbus2/test/schemas
-      schema_base_uri: file:///Users/otto/Projects/wm/analytics/v/mw/srv/event-schemas/jsonschema/
-      # schema_base_uri: file:///vagrant/srv/event-schemas/jsonschema/
+      schema_base_uri: ../event-schemas/jsonschema/
       #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema
 
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
       schema_file_extension: .yaml
-
-
 
       # kafka configs go here.
       kafka:
