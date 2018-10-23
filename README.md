@@ -125,6 +125,11 @@ The following values in `conf` will be used to instantiate an Eventbus
 that extracts JSONSchemas from schema URIs, validates events using those
 schemas, and then produces them to Kafka.
 
+Note that all `*_field` configs
+point to a field in an event, and uses dotted notation to access sub-objects.
+E.g. "value" will be extracted from `{ meta: { schema_uri: "value" } }` if
+`schema_uri_field` is set to 'meta.schema_uri'.
+
 Property                    |         Default | Description              
 ----------------------------|-----------------|--------------------------
 `port`                      |            6927 | port on which the service will listen
