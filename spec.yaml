@@ -1,17 +1,12 @@
 swagger: '2.0'
 info:
   version: 0.4.0
-  title: EventBus
-  description: Event Produce Service
+  title: Eventbus
+  description: Validates and produces events
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
-  contact:
-    name: the Wikimedia Services team
-    url: http://mediawiki.org/wiki/Services
   license:
-    name: Apache2
+    name: Apache2 License
     url: http://www.apache.org/licenses/LICENSE-2.0
-x-default-params:
-  domain: en.wikipedia.org
 
 paths:
   # from routes/root.js

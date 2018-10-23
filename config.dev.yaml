@@ -24,7 +24,7 @@ metrics:
   #port: 8125
 
 services:
-  - name: service-template-node
+  - name: eventbus
     # a relative path or the name of an npm package, if different from name
     module: ./app.js
     # optionally, a version constraint of the npm package
@@ -32,10 +32,9 @@ services:
     # per-service config
     conf:
       port: 6927
-      # interface: localhost # uncomment to only listen on localhost
+      # uncomment to only listen on localhost
+      #interface: localhost 
       # more per-service config settings
-      # the location of the spec, defaults to spec.yaml if not specified
-      # spec: ./spec.yaml
       user_agent: eventbus
 
       eventbus_init_module: '../lib/wikimedia-eventbus'
