@@ -18,23 +18,24 @@ module.exports = function(appObj) {
 
     app = appObj;
 
-    // Make sure eventbus_init_module is set in app.conf. It will be required to get
-    // a Promise of an instantiated EventBus, as well as a function that
-    // can create error events suitable for producing errors via the
-    // instantiated EventBus.
-    if (!_.has(app.conf, 'eventbus_init_module')) {
+    // Instantiate Eventbus from app.conf.  If eventbus_init_module, require it
+    // to create a custom Eventbus instance.  Otherwise, use the default Kafka producing
+    // Eventbus configured with app.conf from eventbus-init-utils createKafkaEventbus.
+    let eventbusPromise;
+    if (_.has(app.conf, 'eventbus_init_module')) {
         app.logger.log(
-            'fatal/events',
-            `Must set conf.eventbus_init_module to configure Eventbus instance.`
+            'info/events',
+            `Requiring EventBus instance from ${app.conf.eventbus_init_module}`
         );
-        process.exit(1);
+        eventbusPromise = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
+    } else {
+        app.logger.log(
+            'info/events',
+            'Requiring default Kafka EventBus instance using app.conf'
+        );
+        eventbusPromise = require('../lib/eventbus-init-utils')
+            .createKafkaEventbus(app.conf, app.logger._logger);
     }
-
-    app.logger.log(
-        'info/events',
-        `Requiring EventBus instance from ${app.conf.eventbus_init_module}`
-    );
-    const eventbusPromise = require(app.conf.eventbus_init_module)(app.conf, app.logger._logger);
 
     // Create the eventbus instance with a connected Producer.
     // wikimedia.createEventBus(app.logger._logger, app.conf)
