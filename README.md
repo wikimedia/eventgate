@@ -159,6 +159,10 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - topic (stream) -> schema mapping config reading?  from local config files and remote service too?
 - monitoring/metrics (for kafka, etc.)
 - name bikeshedding, probably won't use 'Eventbus' name.
+- security review of AJV
+- switch to Eventbus inheritance model
+- Use named ajv addSchema instead of ValidatorCache
+- Use AJV async compile/validate?
   
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
