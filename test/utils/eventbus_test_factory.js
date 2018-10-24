@@ -3,7 +3,7 @@
 const _        = require('lodash');
 const P        = require('bluebird');
 
-const initUtils = require('../../lib/eventbus-init-utils');
+const initUtils = require('../../lib/eventbus-factory-utils');
 const EventInvalidError = require('../../lib/validator').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
 

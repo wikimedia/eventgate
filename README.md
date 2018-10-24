@@ -21,7 +21,7 @@ and event 'produce' service.  The schema validation and event produce implementa
 is left up to the user.  This service ships with a schema URL based
 validator and Kafka produce implementation (using node-rdkafka), but you can
 plug in your own by implementing a module that returns an instantiated `Eventbus` and use it
-via `eventbus_init_module` application config.  See documentation below for more on
+via `eventbus_factory_module` application config.  See documentation below for more on
 the default Kafka Eventbus.
 
 
@@ -30,7 +30,7 @@ the default Kafka Eventbus.
 The Eventbus class is generic enough to be used with any type of validation and event production via
 function injection.  The HTTP route that handles POSTing of events needs to have an instantiated
 Eventbus instance.  To make this configurable (without actually editing the route code), the route in
-routes/events.js will look for `app.conf.eventbus_init_module` and require it.  This module is expected to
+routes/events.js will look for `app.conf.eventbus_factory_module` and require it.  This module is expected to
 export a single function that takes a `conf` object and a bunyan `logger`.  The function will return
 a Promise of an instantiated Eventbus.
 
@@ -74,7 +74,7 @@ events that your instantiated `Eventbus` can handle. I.e. eventbus.produce([erro
 
 # Default Kafka Eventbus
 
-If `eventbus_init_module` is not specified, this service will use provided configruation
+If `eventbus_factory_module` is not specified, this service will use provided configruation
 to instantiate and use an Eventbus that validates events with JSONSchemas discovered via
 schema URLs, and produces valid events to Kafka.
 
@@ -114,8 +114,8 @@ See `spec.yaml`.
 
 Configuration is passed to the service via the `config.yaml` file, which
 has a `services` object.  This object contains a service named `eventbus`.
-The `conf` object of this service will be passed to the `eventbus_init_module`.
-To use a custom Eventbus implementation, set `eventbus_init_module` to your
+The `conf` object of this service will be passed to the `eventbus_factory_module`.
+To use a custom Eventbus implementation, set `eventbus_factory_module` to your
 javascript module that exports a function to instantiate an Eventbus with `conf`.
 See the section above entitled 'Eventbus implementation configuration'.
 

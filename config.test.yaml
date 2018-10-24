@@ -38,7 +38,7 @@ services:
 
       # Configure the EventBus test instance similar to one that might be used
       # in production, but with a mock producer and a mock event error create function.
-      eventbus_init_module: '../test/utils/eventbus_test_init'
+      eventbus_factory_module: '../test/utils/eventbus_test_factory'
 
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic tranformation
