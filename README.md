@@ -92,7 +92,13 @@ but every event must contain this field.  When an event is received, the
 schema URI will be extracted from the `schema_uri_field`.  The JSONSchema at the
 URI will be downloaded used to validate the event.  The extracted schema URI
 can configurable be prefixed with `schema_base_uri` and suffixed with
-`schema_file_extension`.
+`schema_file_extension`.  The default `schema_uri_field` is '$schema'.  If you
+use this default, all of your events should have a `$schema` field set to
+a resolvable schema URI.  IMPORTANT: The event's schema URI should match
+EXACTLY what is set for the schema's `$id`. The event validator implementation
+will cache compiled schemas by the value of the schema's `$id`.  If this is not
+set properly, schemas may not be cached, and each event will result in
+schema URI lookup and validator compilation.
 
 ## Streams
 A 'stream' here refers to a logical destination of an event.  It is closely related
@@ -135,12 +141,12 @@ Property                    |         Default | Description
 `port`                      |            6927 | port on which the service will listen
 `interface`                 |       localhost | hostname on which to listen
 `user_agent`                |        eventbus | The UserAgent seen when making remote http requests (e.g. for remote schemas)
-`stream_field`              |     meta.stream | The name of the stream this event belongs to.  This will be used with `topic_prefix` to build the destination Kafka topic name.
+`stream_field`              |         $schema | The name of the stream this event belongs to.  This will be used with `topic_prefix` to build the destination Kafka topic name.
 `topic_prefix`              |       undefined | If given, destinaton Kafka topics will be this + the stream name extracted using `stream_field`.
-`id_field`                  |         meta.id | This is mainly used for logging.  If given, this will be extracted from each event to build an event id that will be added to log messages dealing with the event.
+`id_field`                  |       undefined | This is mainly used for logging.  If given, this will be extracted from each event to build an event id that will be added to log messages dealing with the event.
 `key_field`                 |       undefined | If given, the value extracted from this field will be used as the Kafka message key.
 `partition_field`           |       undefined | If given, the value extracted from this field will be used as the Kafka message partition.
-`schema_uri_field`          | meta.schema_uri | The value extracted from this field will be used (with `schema_base_uri` and `schema_file_extension`) to download the event's JSONSchema for validation.
+`schema_uri_field`          | $schema         | The value extracted from this field will be used (with `schema_base_uri` and `schema_file_extension`) to download the event's JSONSchema for validation.
 `schema_base_uri`           |       undefined | If given, this will be prefixed to every extracted schema URI.
 `schema_file_extension`     |       undefined | If given, this will be appendede to every extracted schema URI unless the filename in the URI already has an extension.
 `kafka.conf`                |                 | node-rdkafka (and librdkafka) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
@@ -160,9 +166,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - monitoring/metrics (for kafka, etc.)
 - name bikeshedding, probably won't use 'Eventbus' name.
 - security review of AJV
-- switch to Eventbus inheritance model
-- Use named ajv addSchema instead of ValidatorCache
-- Use AJV async compile/validate?
   
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
