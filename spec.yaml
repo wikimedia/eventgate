@@ -93,9 +93,9 @@ paths:
             headers:
               content-type: application/json            
             body:
+              $schema: /test/0.0.1
               meta:
                 topic: test.event
-                schema_uri: test/1
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
@@ -106,9 +106,9 @@ paths:
             headers:
               content-type: application/json
             body:
+              $schema: /test/0.0.1
               meta:
                 topic: test.event
-                schema_uri: test/1
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: 0.01
           response:
@@ -119,9 +119,9 @@ paths:
             headers:
               content-type: application/json
             body:
+              $schema: /test/0.0.1
               meta:
                 topic: __throw_error__
-                schema_uri: test/1
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
@@ -133,14 +133,14 @@ paths:
             headers:
               content-type: application/json
             body:
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: test_value0
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
@@ -151,14 +151,14 @@ paths:
             headers:
               content-type: application/json
             body:
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
@@ -169,19 +169,19 @@ paths:
             headers:
               content-type: application/json
             body:
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: __throw_error__
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
@@ -192,14 +192,14 @@ paths:
             headers:
               content-type: application/json
             body:
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
                 test_default: 67890
@@ -211,14 +211,14 @@ paths:
             headers:
               content-type: application/json
             body:
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: __throw_error__
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: test_value
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: __throw_error__
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
                 test_default: test_value
@@ -232,14 +232,14 @@ paths:
             headers:
               content-type: application/json
             body:
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
-              - meta:
+              - $schema: /test/0.0.1
+                meta:
                   topic: test.event
-                  schema_uri: test/1
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
                 test_default: 67890

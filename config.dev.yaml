@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -50,20 +50,21 @@ services:
       id_field: meta.id
       topic_prefix: 'test.'
 
-      error_schema_uri: error/2
+      error_schema_uri: /error/0.0.2
       error_stream: eventbus.event-error
       # This field in each event will be used to extract a
-      # (possibly relative) schema uri.
-      schema_uri_field: meta.schema_uri
+      # (possibly relative) schema uri.  The default is $schema.
+      #schema_uri_field: $schema
 
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
-      schema_base_uri: ../event-schemas/jsonschema/
+      #schema_base_uri: ../event-schemas/jsonschema/
+      schema_base_uri: ../event-schemas/schemas/
       #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema
 
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
-      schema_file_extension: .yaml
+      #schema_file_extension: .yaml
 
       # kafka configs go here.
       kafka:

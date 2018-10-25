@@ -4,6 +4,7 @@ const _        = require('lodash');
 const P        = require('bluebird');
 
 const initUtils = require('../../lib/eventbus-factory-utils');
+const EventValidator = require('../../lib/validator').EventValidator;
 const EventInvalidError = require('../../lib/validator').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
 
@@ -13,8 +14,8 @@ const Eventbus = require('../../lib/eventbus').Eventbus;
  * in a delivery callback.  Used for testing only!
  *
  * This function uses app.conf to extract details from an incoming event.
- * @param conf
- * @returns {function(*=): *}
+ * @param {Object} conf
+ * @return {function(*=): *}
  */
 function createMockProduceFunction(conf) {
 
@@ -37,13 +38,13 @@ function createMockProduceFunction(conf) {
             throw new Error(`Event's topic was ${topic}. This error should be handled!`);
         }
 
-        const partition = extractTopic(event);
+        const partition = extractPartition(event);
         const key = extractKey(event);
 
         return P.resolve([
             {
                 topic,
-                partition: partition,
+                partition,
                 offset: 1,
                 key,
                 opaque: { },
@@ -51,7 +52,7 @@ function createMockProduceFunction(conf) {
                 size: JSON.stringify(event).length
             }
         ]);
-    }
+    };
 }
 
 
@@ -82,9 +83,12 @@ function createMockErrorEventFunction(conf) {
 }
 
 function createMockEventbus(conf, logger) {
+
+    const eventValidator = EventValidator.createFromConf(conf, logger);
+
     return P.resolve(
         new Eventbus(
-            initUtils.createValidateFunction(conf),
+            eventValidator.validate.bind(eventValidator),
             createMockProduceFunction(conf),
             initUtils.createEventReprFunction(conf),
             logger,
