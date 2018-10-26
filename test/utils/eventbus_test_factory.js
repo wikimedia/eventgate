@@ -59,11 +59,11 @@ function createMockProduceFunction(conf) {
 function createMockErrorEventFunction(conf) {
     return (error, event) => {
         const eventError = {
+            '$schema': conf.error_schema_uri,
             meta: {
-                schema_uri: conf.error_schema_uri,
                 topic: conf.error_stream,
                 // TODO:
-                id: event.meta.id,
+                id: '12345'
             },
             emitter_id: 'eventbus_test',  // TODO: ?
             raw_event: _.isString(event) ? event : JSON.stringify(event)
