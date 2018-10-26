@@ -8,13 +8,10 @@ num_workers: 0
 worker_heap_limit_mb: 250
 
 # Logger info
-logging:
-  level: debug
-#  streams:
-#  # Use gelf-stream -> logstash
-#  - type: gelf
-#    host: logstash1003.eqiad.wmnet
-#    port: 12201
+# npm tests are configured to suppress logging output into an in memory logger.
+# If you want them in normal place, uncomment This section.
+# logging:
+#   level: debug
 
 # Statsd metrics reporter
 metrics:

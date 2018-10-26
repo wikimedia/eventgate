@@ -23,11 +23,13 @@ config.service = myService;
 // no forking, run just one process when testing
 config.conf.num_workers = 0;
 // have a separate, in-memory logger only
-config.conf.logging = {
-    name: 'test-log',
-    level: 'trace',
-    stream: logStream()
-};
+if (!config.conf.logging) {
+    config.conf.logging = {
+        name: 'test-log',
+        level: 'trace',
+        stream: logStream()
+    };
+}
 // make a deep copy of it for later reference
 const origConfig = extend(true, {}, config);
 
