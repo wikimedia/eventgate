@@ -37,7 +37,7 @@ services:
       # more per-service config settings
       user_agent: eventbus
 
-      eventbus_factory_module: '../lib/wikimedia-eventbus'
+      eventbus_factory_module: '../lib/factories/wikimedia-eventbus'
 
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic transformation

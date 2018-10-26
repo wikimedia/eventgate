@@ -3,10 +3,12 @@
 const _        = require('lodash');
 const P        = require('bluebird');
 
-const initUtils = require('../../lib/eventbus-factory-utils');
-const EventValidator = require('../../lib/validator').EventValidator;
-const EventInvalidError = require('../../lib/validator').EventInvalidError;
+// const initUtils = require('../../lib/default-eventbus-factory');
+const EventInvalidError = require('../../lib/EventValidator').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
+
+const eventValidate = require('../../lib/factories/event-validate');
+const kafkaProduce = require('../../lib/factories/kafka-produce');
 
 /**
  * Returns a mock produce function that returns a result
@@ -26,9 +28,9 @@ function createMockProduceFunction(conf) {
 
     // Create new functions that use static configuration
     // to extract Kafka produce() params from an event.
-    const extractTopic = initUtils.createExtractTopicFunction(conf);
-    const extractPartition = initUtils.createExtractPartitionFunction(conf);
-    const extractKey = initUtils.createExtractKeyFunction(conf);
+    const extractTopic = kafkaProduce.createExtractTopicFunction(conf);
+    const extractPartition = kafkaProduce.createExtractPartitionFunction(conf);
+    const extractKey = kafkaProduce.createExtractKeyFunction(conf);
 
     return (event) => {
         const topic = extractTopic(event);
@@ -82,21 +84,20 @@ function createMockErrorEventFunction(conf) {
     };
 }
 
+
+
 function createMockEventbus(conf, logger) {
-
-    const eventValidator = EventValidator.createFromConf(conf, logger);
-
     return P.resolve(
         new Eventbus(
-            eventValidator.validate.bind(eventValidator),
+            eventValidate.factory(conf, logger),
             createMockProduceFunction(conf),
-            initUtils.createEventReprFunction(conf),
+            event => 'TEST EVENT',
             logger,
             createMockErrorEventFunction(conf)
         )
     );
 }
 
-module.exports = (conf, logger) => {
-    return createMockEventbus(conf, logger);
+module.exports = {
+    factory: createMockEventbus
 };

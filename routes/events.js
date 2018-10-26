@@ -21,22 +21,14 @@ module.exports = function(appObj) {
     // Instantiate Eventbus from app.conf.  If eventbus_factory_module, require it
     // to create a custom Eventbus instance.  Otherwise, use the default Kafka producing
     // Eventbus configured with app.conf from eventbus-factory-utils createKafkaEventbus.
-    let eventbusPromise;
-    if (_.has(app.conf, 'eventbus_factory_module')) {
-        app.logger.log(
-            'info/events',
-            `Requiring EventBus instance from ${app.conf.eventbus_factory_module}`
-        );
-        eventbusPromise = require(app.conf.eventbus_factory_module)(app.conf, app.logger._logger);
-    } else {
-        app.logger.log(
-            'info/events',
-            'Requiring default Kafka EventBus instance using app.conf'
-        );
-        eventbusPromise = require('../lib/eventbus-factory-utils')
-            .createKafkaEventbus(app.conf, app.logger._logger);
-    }
-
+    const eventbusFactoryModule = _.get(
+        app.conf, 'eventbus_factory_module', '../lib/factories/default-eventbus'
+    );
+    app.logger.log(
+        'info/events',
+        `Instantiating Eventbus from ${eventbusFactoryModule}`
+    );
+    const eventbusPromise = require(eventbusFactoryModule).factory(app.conf, app.logger._logger);
     // Create the eventbus instance with a connected Producer.
     // wikimedia.createEventBus(app.logger._logger, app.conf)
     eventbusPromise.then((eventbus) => {
