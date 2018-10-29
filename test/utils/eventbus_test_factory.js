@@ -4,7 +4,7 @@ const _        = require('lodash');
 const P        = require('bluebird');
 
 // const initUtils = require('../../lib/default-eventbus-factory');
-const EventInvalidError = require('../../lib/EventValidator').EventInvalidError;
+const EventInvalidError = require('../../lib/errors').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
 
 const eventValidate = require('../../lib/factories/event-validate');
@@ -83,7 +83,6 @@ function createMockErrorEventFunction(conf) {
         return eventError;
     };
 }
-
 
 
 function createMockEventbus(conf, logger) {

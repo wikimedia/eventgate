@@ -126,6 +126,19 @@ paths:
               test: test_value
           response:
             status: 500
+
+        - title: Produce a single event that encounters an EventSchemaLoadError
+          request:
+            headers:
+              content-type: application/json
+            body:
+              $schema: bad uri right here@@@
+              meta:
+                topic: test.event
+                id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
+              test: test_value
+          response:
+            status: 500
         # TODO: add response body testing on errors too.
 
         - title: Produce a batch valid events
