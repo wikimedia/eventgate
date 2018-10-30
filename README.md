@@ -166,8 +166,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - name bikeshedding, probably won't use 'Eventbus' name.
 - security review of AJV
 - close() method for Eventbus.
-- Use options{} for  constructor param instead of positional params.  Will make it easier
-  to instantiate custom classes.
 - convert to async/await instead of promises?
 - what do do about kafka errors and error event production?
 - set defaults on conf after loading if not set
