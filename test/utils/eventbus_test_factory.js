@@ -19,7 +19,7 @@ const kafkaProduce = require('../../lib/factories/kafka-produce');
  * @param {Object} conf
  * @return {function(*=): *}
  */
-function createMockProduceFunction(conf) {
+function mockKafkaProduceFromConf(conf) {
 
     // If an extracted topic contains this string,
     // an Error will be thrown.  This can be used to test
@@ -28,27 +28,25 @@ function createMockProduceFunction(conf) {
 
     // Create new functions that use static configuration
     // to extract Kafka produce() params from an event.
-    const extractTopic = kafkaProduce.createExtractTopicFunction(conf);
-    const extractPartition = kafkaProduce.createExtractPartitionFunction(conf);
-    const extractKey = kafkaProduce.createExtractKeyFunction(conf);
+    // Create new functions that use static configuration
+    // to extract Kafka produce() params from an event.
+    const extractTopic      = kafkaProduce.extractTopicFromConf(conf);
+    const extractPartition  = kafkaProduce.extractPartitionFromConf(conf);
+    const extractKey        = kafkaProduce.extractKeyFromConf(conf);
 
     return (event) => {
         const topic = extractTopic(event);
-
 
         if (topic.includes(throwErrorIfTopic)) {
             throw new Error(`Event's topic was ${topic}. This error should be handled!`);
         }
 
-        const partition = extractPartition(event);
-        const key = extractKey(event);
-
         return P.resolve([
             {
                 topic,
-                partition,
+                partition: extractPartition(event),
                 offset: 1,
-                key,
+                key: extractKey(event),
                 opaque: { },
                 timestamp: 1539629252472,
                 size: JSON.stringify(event).length
@@ -58,7 +56,7 @@ function createMockProduceFunction(conf) {
 }
 
 
-function createMockErrorEventFunction(conf) {
+function mockMapToErrorEventFromConf(conf) {
     return (error, event) => {
         const eventError = {
             '$schema': conf.error_schema_uri,
@@ -89,10 +87,10 @@ function createMockEventbus(conf, logger) {
     return P.resolve(
         new Eventbus({
             validate: eventValidate.factory(conf, logger),
-            produce: createMockProduceFunction(conf),
+            produce: mockKafkaProduceFromConf(conf),
             eventRepr: event => 'TEST EVENT',
             log: logger,
-            mapToEventError: createMockErrorEventFunction(conf)
+            mapToEventError: mockMapToErrorEventFromConf(conf)
         })
     );
 }
