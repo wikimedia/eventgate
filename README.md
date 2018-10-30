@@ -160,7 +160,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 # TODO
 
-- Tests for utils, validators, produanncer, eventbus, etc.
+- Tests for utils, validators, producer, eventbus, etc.
 - topic (stream) -> schema mapping config reading?  from local config files and remote service too?
 - monitoring/metrics (for kafka, etc.)
 - name bikeshedding, probably won't use 'Eventbus' name.
@@ -169,6 +169,8 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - Use options{} for  constructor param instead of positional params.  Will make it easier
   to instantiate custom classes.
 - convert to async/await instead of promises?
+- what do do about kafka errors and error event production?
+- set defaults on conf after loading if not set
 
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
