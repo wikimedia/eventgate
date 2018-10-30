@@ -7,9 +7,9 @@ properties:
   meta:
     type: object
     properties:
-      topic:
+      stream_name:
         type: string
-        description: the queue topic name this message belongs to
+        description: the stream name this message should be produced to.
         minLength: 1
       schema_uri:
         type: string
@@ -19,7 +19,7 @@ properties:
           URI path.  e.g. schema_name/12345 is acceptable. This field is not
           required.
     required:
-    - topic
+    - stream_name
   # event-specific fields
   raw_event:
     type: string

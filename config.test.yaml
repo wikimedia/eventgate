@@ -30,6 +30,10 @@ services:
       port: 6937
       # interface: localhost # uncomment to only listen on localhost
       # more per-service config settings
+
+      # the location of the spec, defaults to spec.yaml if not specified
+      spec: ./spec.test.yaml
+
       # the user agent to use when issuing requests
       user_agent: eventbus_test
 
@@ -38,10 +42,10 @@ services:
       eventbus_factory_module: '../test/utils/eventbus_test_factory'
 
       # This field in each event will be used to extract a destination 'stream' name.
-      # This will equal the destination Kafka topic, unless a topic tranformation
-      # function is configured.  If using topic transformation, the value extracted
-      # from this field will be passed to the topic transformation function.
-      stream_field: meta.topic
+      # This will equal the destination Kafka topic, unless a topic prefix
+      #  is configured.  If using topic prefix, the value extracted
+      # from this field will be prefixed with it and used as the Kafka topic.
+      stream_field: meta.stream_name
       id_field: meta.id
       topic_prefix: 'test.'
 
@@ -50,6 +54,7 @@ services:
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
       schema_uri_field: $schema
+
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
       schema_base_uri: test/schemas/

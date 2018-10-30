@@ -160,15 +160,18 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 # TODO
 
+- Separate out library code (Eventbus, EventValidator, etc.) into a separate repo?
 - Tests for utils, validators, producer, eventbus, etc.
 - topic (stream) -> schema mapping config reading?  from local config files and remote service too?
 - monitoring/metrics (for kafka, etc.)
 - name bikeshedding, probably won't use 'Eventbus' name.
 - security review of AJV
-- close() method for Eventbus.
+- close() method for Eventbus. ? graceful kafka shutdown?
 - convert to async/await instead of promises?
 - what do do about kafka errors and error event production?
 - set defaults on conf after loading if not set
+- Fix up logger/log stuff throughout codebase.
+- Fix eslint so that it doesn't error on async/await stuff
 
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
@@ -181,3 +184,4 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 - Should `?hasty=true` (fire and forget) mode use a non guarunteed Kafka producer?
 
+- Should stream_name be part of API and not part of event???? probably!!!

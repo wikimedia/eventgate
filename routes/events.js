@@ -19,8 +19,7 @@ module.exports = async (appObj) => {
     app = appObj;
 
     // Instantiate Eventbus from app.conf.  If eventbus_factory_module, require it
-    // to create a custom Eventbus instance.  Otherwise, use the default Kafka producing
-    // Eventbus configured with app.conf from eventbus-factory-utils createKafkaEventbus.
+    // to create a custom Eventbus instance.  Otherwise, use the default-eventbus factory.
     const eventbusFactoryModule = _.get(
         app.conf, 'eventbus_factory_module', '../lib/factories/default-eventbus'
     );
@@ -70,7 +69,7 @@ async function handleEvents(eventbus, req, res) {
     }
 
     // Process events (validate and produce)
-    const results = await eventbus.process(events)
+    const results = await eventbus.process(events);
 
     const successCount = results.success.length;
     const invalidCount = results.invalid.length;

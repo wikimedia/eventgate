@@ -7,9 +7,9 @@ properties:
   meta:
     type: object
     properties:
-      topic:
+      stream_name:
         type: string
-        description: the queue topic name this message belongs to
+        description: the stream name this message should be produced to.
       schema_uri:
         type: string
         description: >
@@ -36,7 +36,7 @@ properties:
         type: string
         description: the domain the event pertains to
     required:
-      - topic
+      - stream_name
       - id
   # event-specific fields
   test:
