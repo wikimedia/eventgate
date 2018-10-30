@@ -87,13 +87,13 @@ function createMockErrorEventFunction(conf) {
 
 function createMockEventbus(conf, logger) {
     return P.resolve(
-        new Eventbus(
-            eventValidate.factory(conf, logger),
-            createMockProduceFunction(conf),
-            event => 'TEST EVENT',
-            logger,
-            createMockErrorEventFunction(conf)
-        )
+        new Eventbus({
+            validate: eventValidate.factory(conf, logger),
+            produce: createMockProduceFunction(conf),
+            eventRepr: event => 'TEST EVENT',
+            log: logger,
+            mapToEventError: createMockErrorEventFunction(conf)
+        })
     );
 }
 
