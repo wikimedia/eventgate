@@ -168,6 +168,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - close() method for Eventbus.
 - Use options{} for  constructor param instead of positional params.  Will make it easier
   to instantiate custom classes.
+- convert to async/await instead of promises?
 
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
