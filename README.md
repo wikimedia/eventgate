@@ -55,7 +55,7 @@ will return an object like:
 {
     'success': [{ ... }],
     'invalid': [{ ... }],
-    'error': [{ ... }]
+    'error':   [{ ... }]
 }
 ```
 with each array containing an `EventStatus` instance representing the event's process result.
