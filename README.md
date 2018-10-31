@@ -69,7 +69,10 @@ instantiated `Eventbus`.  If `mapToErrorEvent` is provided and event processing 
 reason, those errors will be converted to event errors via this function, and then produced.
 There should be no difference between the kind of events that `mapToErrorEvent` returns and
 the kind of events that your instantiated `Eventbus` can handle.
-`eventbus.produce([errorEvents])` should work.
+`eventbus.produce([errorEvents])` should work.  If your `mapToErrorEvent` implementation
+returns  null for any given `event`, `error`, no error event for that pair will be
+produced.  This allows `mapToErrorEvent` implementations to decide what types of
+Errors should be produced.
 
 # Default Eventbus - Schema URI validation & producing with Kafka
 
@@ -183,4 +186,9 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 - Should `?hasty=true` (fire and forget) mode use a non guarunteed Kafka producer?
 
-- Should stream_name be part of API and not part of event???? probably!!!
+- Should `stream_name` be part of API and not part of event???? probably!!!
+--  PROBLEM: If it is part of the API, how can we dynamically produce to error topic?
+    Currently this is set by mapping the event to a new error Event object that has
+    `stream_name` (AKA `meta.topic`) set.  If it is part of the HTTP API, we would also
+    need some kind of `extractEventErrorTopic` or something, which starts making Eventbus
+    more opinionated.  :/  Perhaps we should just keep `stream_name` in the event after all.
