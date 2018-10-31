@@ -3,23 +3,26 @@
 const _        = require('lodash');
 const P        = require('bluebird');
 
-// const initUtils = require('../../lib/default-eventbus-factory');
+const {
+    makeExtractTopic,
+    makeExtractPartition,
+    makeExtractKey,
+    makeValidate
+} = require('../../lib/factories/default-eventbus');
+
 const EventInvalidError = require('../../lib/errors').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
-
-const eventValidate = require('../../lib/factories/event-validate');
-const kafkaProduce = require('../../lib/factories/kafka-produce');
 
 /**
  * Returns a mock produce function that returns a result
  * similar to what node-rdkafka's KafkaProducer produce returns
  * in a delivery callback.  Used for testing only!
  *
- * This function uses app.conf to extract details from an incoming event.
- * @param {Object} conf
+ * This function uses options to extract details from an incoming event.
+ * @param {Object} options
  * @return {function(*=): *}
  */
-function mockKafkaProduceFromConf(conf) {
+function makeMockProduce(options) {
 
     // If an extracted topic contains this string,
     // an Error will be thrown.  This can be used to test
@@ -28,11 +31,9 @@ function mockKafkaProduceFromConf(conf) {
 
     // Create new functions that use static configuration
     // to extract Kafka produce() params from an event.
-    // Create new functions that use static configuration
-    // to extract Kafka produce() params from an event.
-    const extractTopic      = kafkaProduce.extractTopicFromConf(conf);
-    const extractPartition  = kafkaProduce.extractPartitionFromConf(conf);
-    const extractKey        = kafkaProduce.extractKeyFromConf(conf);
+    const extractTopic      = makeExtractTopic(options);
+    const extractPartition  = makeExtractPartition(options);
+    const extractKey        = makeExtractKey(options);
 
     return (event) => {
         const topic = extractTopic(event);
@@ -41,12 +42,15 @@ function mockKafkaProduceFromConf(conf) {
             throw new Error(`Event's topic was ${topic}. This error should be handled!`);
         }
 
+        const partition = extractPartition ? extractPartition(event) : undefined;
+        const key = extractKey ? extractKey(event): undefined;
+
         return P.resolve([
             {
                 topic,
-                partition: extractPartition(event),
+                partition,
                 offset: 1,
-                key: extractKey(event),
+                key,
                 opaque: { },
                 timestamp: 1539629252472,
                 size: JSON.stringify(event).length
@@ -56,12 +60,12 @@ function mockKafkaProduceFromConf(conf) {
 }
 
 
-function mockMapToErrorEventFromConf(conf) {
+function makeMapToErrorEvent(options) {
     return (error, event) => {
         const eventError = {
-            '$schema': conf.error_schema_uri,
+            '$schema': options.error_schema_uri,
             meta: {
-                topic: conf.error_stream,
+                topic: options.error_stream,
                 // TODO:
                 id: '12345'
             },
@@ -83,18 +87,18 @@ function mockMapToErrorEventFromConf(conf) {
 }
 
 
-function createMockEventbus(conf, logger) {
+function mockEventbusFactory(options, logger) {
     return P.resolve(
         new Eventbus({
-            validate: eventValidate.factory(conf, logger),
-            produce: mockKafkaProduceFromConf(conf),
+            validate: makeValidate(options, logger),
+            produce: makeMockProduce(options),
             eventRepr: event => 'TEST EVENT',
             log: logger,
-            mapToEventError: mockMapToErrorEventFromConf(conf)
+            mapToEventError: makeMapToErrorEvent(options)
         })
     );
 }
 
 module.exports = {
-    factory: createMockEventbus
+    factory: mockEventbusFactory
 };
