@@ -63,14 +63,28 @@ async function handleEvents(eventbus, req, res) {
     // If the requester wants a hasty response, return now!
     if (req.query.hasty) {
         res.statusMessage = `${events.length} events hastily received.`;
-        req.logger.log('debug/events', res.statusMessage);
         res.status(204);
         res.end();
     }
 
-    // Process events (validate and produce)
-    const results = await eventbus.process(events);
+    let results;
+    try {
+        // Process events (validate and produce)
+        results = await eventbus.process(events);
+    }
+    catch (err) {
+        // Error and end response now if we encounter anything unexpected.
+        // This probably shouldn't happen, as eventbus.process should catch Errors
+        // and reform them into error EventStatuses.
+        res.statusMessage =
+            `Encountered an unexpected error while processing events: ${err.message}`;
+        req.logger.log('error/events', { error: err, message: res.statusMessage});
+        res.status(500);
+        res.end();
+        throw err;
+    }
 
+    // Respond with appropriate HTTP status based on status of processing all events.
     const successCount = results.success.length;
     const invalidCount = results.invalid.length;
     const errorCount = results.error.length;

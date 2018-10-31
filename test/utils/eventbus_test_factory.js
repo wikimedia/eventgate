@@ -13,6 +13,8 @@ const {
 const EventInvalidError = require('../../lib/errors').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
 
+const eUtil = require('../../lib/event-utils');
+
 /**
  * Returns a mock produce function that returns a result
  * similar to what node-rdkafka's KafkaProducer produce returns
