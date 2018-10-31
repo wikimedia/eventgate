@@ -160,7 +160,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 # TODO
 
-- set defaults on conf after loading if not set
 - Fix up logger/log stuff throughout codebase.
 - Fix eslint so that it doesn't error on async/await stuff
 
@@ -171,8 +170,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - name bikeshedding, probably won't use 'Eventbus' name.
 - security review of AJV
 - close() method for Eventbus. ? graceful kafka shutdown?
-- convert to async/await instead of promises?
-- what do do about kafka errors and error event production?
 
 
 ## Questions/Thoughts:

@@ -15,6 +15,12 @@ const Eventbus = require('../../lib/eventbus').Eventbus;
 
 const eUtil = require('../../lib/event-utils');
 
+// Errors of this type should be produced as error events.
+class MockErrorEventProducableError extends Error {}
+
+// Errors of this type should NOT be produced as error events.
+class MockErrorEventUnproducableError extends Error {}
+
 /**
  * Returns a mock produce function that returns a result
  * similar to what node-rdkafka's KafkaProducer produce returns
@@ -29,7 +35,8 @@ function makeMockProduce(options) {
     // If an extracted topic contains this string,
     // an Error will be thrown.  This can be used to test
     // upstream Eventbus error handling.
-    const throwErrorIfTopic = '__throw_error__';
+    const unproducableErrorEventTopic = '__throw_unproduceable_error__';
+    const producableErrorEventTopic = '__throw_produceable_error__';
 
     // Create new functions that use static configuration
     // to extract Kafka produce() params from an event.
@@ -40,8 +47,17 @@ function makeMockProduce(options) {
     return (event) => {
         const topic = extractTopic(event);
 
-        if (topic.includes(throwErrorIfTopic)) {
-            throw new Error(`Event's topic was ${topic}. This error should be handled!`);
+        if (topic.includes(unproducableErrorEventTopic)) {
+            throw new MockErrorEventUnproducableError(
+                `Event's topic was ${topic}. This error should be handled, ` +
+                'but not produced as an error event'
+            );
+        }
+        if (topic.includes(producableErrorEventTopic)) {
+            throw new MockErrorEventProducableError(
+                `Event's topic was ${topic}. This error should be handled, ` +
+                'and should be produced as an error event'
+            );
         }
 
         const partition = extractPartition ? extractPartition(event) : undefined;
@@ -75,8 +91,13 @@ function makeMapToErrorEvent(options) {
             raw_event: _.isString(event) ? event : JSON.stringify(event)
         };
 
-        if (error instanceof EventInvalidError) {
+        // TODO: How to test that some get error-produced and some don't?
+        if (error instanceof EventInvalidError || error instanceof MockErrorEventProducableError) {
             eventError.message = error.errorsText;
+        } else if (error instanceof MockErrorEventUnproducableError) {
+            // By returning null, we ensure that this error will not
+            // be produced by Eventbus to the event error topic.
+            return null;
         } else if (_.isError(error)) {
             eventError.message = error.message;
             eventError.stack = error.stack;
