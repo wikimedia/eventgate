@@ -1,7 +1,6 @@
 # Eventbus - HTTP JSONSchema event validation and production to Kafka
 
-Eventbus takes in JSON events via HTTP POST, validates and then produces them
-using the configurable logic.
+Eventbus takes in JSON events via HTTP POST, validates and then produces them.
 
 Throughout this code, an 'event' is meant to refer to a parsed JSON object with
 a strict JSONSchema, and a 'schema' refers to an instance of a JSONSchema for
@@ -24,16 +23,18 @@ plug in your own by implementing a factory module that returns an instantiated `
 and use it via `eventbus_factory_module` application config. See documentation below for more on
 the default Kafka Eventbus.
 
-
 ## Eventbus implementation configuration
 
-The Eventbus class is generic enough to be used with any type of validation and event production via
-function injection.  The HTTP route that handles POSTing of events needs to have an instantiated
-Eventbus instance.  To make this configurable (without editing the route code), the route in
-routes/events.js will look for `app.conf.eventbus_factory_module` and require it.  This module is expected to export a function called `factory` that takes a `conf` object and a bunyan `logger`.
-The function should return a Promise of an instantiated Eventbus.
+The Eventbus class is generic enough to be used with any type of validation and event production
+via function injection.  The HTTP route that handles POSTing of events needs to have an
+instantiated Eventbus instance.  To make this configurable (without editing the route code), the
+route in routes/events.js will look for `app.conf.eventbus_factory_module` and require it.
+This module is expected to export a function called `factory` that takes a `conf` object and a
+bunyan `logger`. The function should return a Promise of an instantiated Eventbus.
 
-Once the `eventbus` Promise resolves, the `/v1/events` route will be added and will use the instantiated Eventbus to validate and produce incoming events.
+Once the `eventbus` Promise resolves, the `/v1/events` route will be added and will use the
+instantiated Eventbus to validate and produce incoming events.
+
 
 ## Eventbus
 
@@ -60,6 +61,37 @@ will return an object like:
 ```
 with each array containing an `EventStatus` instance representing the event's process result.
 
+Throughout the code, functions that are injected into to constructors are expected
+to take a single event object.  E.g. validate(event), produce(event), etc.  These
+functions are expected to be able to do their job with only a single `event` argument.
+Any additional context should be bound into the function, either by partially applying
+or creating a closure.  Example:
+
+If you wanted to write all incoming events to a file based on some field in the event, you
+could write an Eventbus `produce` function like this:
+
+```javascript
+const writeFileAsync = promisify(fs.writeFile);
+/**
+ * @return a function that writes event to the file at event[file_path_field]
+ */
+function makeProduceFunction(file_path_field) {
+    return (event) => {
+        const path = _.get(event, file_path_field);
+        return writeFileAsync(path, JSON.stringify(event));
+    }
+}
+
+// Instantiate a new Eventbus using this configured produce function closure:
+const eventbus = new Eventbus({
+    // ...,
+    produce: makeProduceFunction(conf.file_path_field);
+    // ...,
+})
+
+// This eventbus will produce every event by calling the function returned by makeProduceFunction.
+```
+
 ### Error events
 
 The Eventbus constructor also takes an optional `mapToErrorEvent` function.
@@ -70,13 +102,13 @@ reason, those errors will be converted to event errors via this function, and th
 There should be no difference between the kind of events that `mapToErrorEvent` returns and
 the kind of events that your instantiated `Eventbus` can handle.
 `eventbus.produce([errorEvents])` should work.  If your `mapToErrorEvent` implementation
-returns  null for any given `event`, `error`, no error event for that pair will be
+returns  null for any given failed `event`, no error event for that pair will be
 produced.  This allows `mapToErrorEvent` implementations to decide what types of
 Errors should be produced.
 
 # Default Eventbus - Schema URI validation & producing with Kafka
 
-If `eventbus_factory_module` is not specified, this service will use provided configruation
+If `eventbus_factory_module` is not specified, this service will use provided configuration
 to instantiate and use an Eventbus that validates events with JSONSchemas discovered via
 schema URLs, and produces valid events to Kafka.
 
@@ -88,12 +120,12 @@ be configured to do validation in any way, the default Eventbus uses the
 schema URIs in the events themselves. Every event should contain a URI
 to the JSONSchema for the event.  `EventValidator` will extract and use those URIs to look up
 (and cache) those schemas to use for event validation.  The `EventValidator` instance
-used by the default Eventbus can request schcema URIs from the local filesystem with
+used by the default Eventbus can request schema URIs from the local filesystem with
 `file://` or an `http://` based URIs. The field in the each event where the schema URI is
 located is configurable with the `schema_uri_field` config.  When an event is received, the
 schema URI will be extracted from the `schema_uri_field`. The JSONSchema at the
-URI will be downloaded used to validate the event.  The extracted schema URI
-can configurable be prefixed with `schema_base_uri` and suffixed with
+URI will be downloaded and used to validate the event.  The extracted schema URI
+can optionally be prefixed with `schema_base_uri` and suffixed with
 `schema_file_extension`.  The default `schema_uri_field` is '$schema'.  If you
 use the defaults, all of your events should have a `$schema` field set to
 a resolvable schema URI.  IMPORTANT: The event's schema URI should match
@@ -105,8 +137,8 @@ schema URI lookup and validator compilation.
 ## Streams
 A 'stream' here refers to the destination of an event.  It is closely related
 to Kafka's concept of a topic. Much of the time, a stream might correspond 1:1 with
-a Kafka topic.  The default Kafka Eventbus extracts a stream name out of the event
-using the configurable `stream_field`, and then prefixes it with `topic_prefix` to
+a Kafka topic.  The default Kafka Eventbus produce function extracts a stream name out of
+the event using the configurable `stream_field`, and then prefixes it with `topic_prefix` to
 build the destination Kafka topic.
 
 This allows for more flexible constrol of the actual produce destination of events,
@@ -114,17 +146,13 @@ without requiring the events themselves to encode their final destination.
 Wikimedia uses this feature to prefix topics with source datacenter names.
 Event creators shouldn't need to know which datacenter they are operating in.
 
-# HTTP API
-
-See `spec.yaml`.
-
 # Configuration
 
 Configuration is passed to the service via the `config.yaml` file, which
 has a `services` object.  This object contains a service named `eventbus`.
 The `conf` object of this service will be passed to the `eventbus_factory_module`.
 To use a custom Eventbus implementation, set `eventbus_factory_module` to your
-javascript module that exports a function to instantiate an Eventbus with `conf`.
+javascript module that exports a `factory` function that instantiate an Eventbus with `conf`.
 See the section above entitled 'Eventbus implementation configuration'.
 
 ## Default Kafka Eventbus configuration
@@ -163,8 +191,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 # TODO
 
-- Fix up logger/log stuff throughout codebase.
-
 - Separate out library code (Eventbus, EventValidator, etc.) into a separate repo?
 - Tests for utils, validators, producer, eventbus, etc.
 - topic (stream) -> schema mapping config reading?  from local config files and remote service too?
@@ -177,17 +203,15 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
 
-- Should we configure schemas for topics by final topic or by un prefixed stream name?  -- by stream!  topic should be abstracted.
-
 - Should we have a query param to allow/disallow partial batch production on any error?
   i.e. should remaining events be produced if one fails?  This is the default behavior,
   but maybe users want to configure this.
 
-- Should `?hasty=true` (fire and forget) mode use a non guarunteed Kafka producer?
+- Should `?hasty=true` (fire and forget) mode use a non 'guarunteed' (async no ack) Kafka producer?
 
-- Should `stream_name` be part of API and not part of event???? probably!!!
+- Should `stream_name` be part of API and not part of event????
 --  PROBLEM: If it is part of the API, how can we dynamically produce to error topic?
     Currently this is set by mapping the event to a new error Event object that has
-    `stream_name` (AKA `meta.topic`) set.  If it is part of the HTTP API, we would also
-    need some kind of `extractEventErrorTopic` or something, which starts making Eventbus
+    `stream_name` (AKA `meta.topic`) set.  If it is part of the HTTP API, Eventbus would also
+    need some kind of `extractErrorEventTopic` function, which starts making Eventbus
     more opinionated.  :/  Perhaps we should just keep `stream_name` in the event after all.
