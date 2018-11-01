@@ -9,7 +9,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -33,7 +33,7 @@ services:
     conf:
       port: 6927
       # uncomment to only listen on localhost
-      #interface: localhost 
+      #interface: localhost
       # more per-service config settings
       user_agent: eventbus
 
@@ -43,7 +43,7 @@ services:
       # This will equal the destination Kafka topic, unless a topic transformation
       # function is configured.  If using topic transformation, the value extracted
       # from this field will be passed to the topic transformation function.
-      
+
       #  TODO change this to meta.stream and fill in meta.topic from prefixed value?
       # stream != topic!
       stream_field: meta.topic

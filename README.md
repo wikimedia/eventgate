@@ -138,7 +138,7 @@ point to a field in an event, and uses dotted notation to access sub-objects.
 E.g. "value" will be extracted from `{ meta: { schema_uri: "value" } }` if
 `schema_uri_field` is set to 'meta.schema_uri'.
 
-Property                    |         Default | Description              
+Property                    |         Default | Description
 ----------------------------|-----------------|--------------------------
 `port`                      |            6927 | port on which the service will listen
 `interface`                 |       localhost | hostname on which to listen
@@ -164,7 +164,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 # TODO
 
 - Fix up logger/log stuff throughout codebase.
-- Fix eslint so that it doesn't error on async/await stuff
 
 - Separate out library code (Eventbus, EventValidator, etc.) into a separate repo?
 - Tests for utils, validators, producer, eventbus, etc.
