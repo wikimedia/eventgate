@@ -14,37 +14,12 @@ const router = sUtil.router();
  */
 let app;
 
-module.exports = async (appObj) => {
-
-    app = appObj;
-
-    // Instantiate Eventbus from app.conf.  If eventbus_factory_module, require it
-    // to create a custom Eventbus instance.  Otherwise, use the default-eventbus factory.
-    const eventbusFactoryModule = _.get(
-        app.conf, 'eventbus_factory_module', '../lib/factories/default-eventbus'
-    );
-    app.logger.log(
-        'info/events',
-        `Instantiating Eventbus from ${eventbusFactoryModule}`
-    );
-
-    const eventbus = await require(eventbusFactoryModule).factory(app.conf, app.logger._logger);
-    router.post('/events', (req, res) => {
-        handleEvents(eventbus, req, res);
-    });
-
-    // the returned object mounts the routes on
-    // /{domain}/vX/mount/path
-    return {
-        path: '/v1',
-        api_version: 1,  // must be a number!
-        router,
-        skip_domain: true
-    };
-
-};
-
-
+/**
+ * Handles incoming JSON events in req.body with the eventbus instance.
+ * @param {Eventbus} eventbus
+ * @param {http.ClientRequest} req
+ * @param {http.ServerResponse} res
+ */
 async function handleEvents(eventbus, req, res) {
 
     // If empty body, return 400 now.
@@ -71,14 +46,13 @@ async function handleEvents(eventbus, req, res) {
     try {
         // Process events (validate and produce)
         results = await eventbus.process(events);
-    }
-    catch (err) {
+    } catch (err) {
         // Error and end response now if we encounter anything unexpected.
         // This probably shouldn't happen, as eventbus.process should catch Errors
         // and reform them into error EventStatuses.
         res.statusMessage =
             `Encountered an unexpected error while processing events: ${err.message}`;
-        req.logger.log('error/events', { error: err, message: res.statusMessage});
+        req.logger.log('error/events', { error: err, message: res.statusMessage });
         res.status(500);
         res.end();
         throw err;
@@ -153,3 +127,34 @@ async function handleEvents(eventbus, req, res) {
         }
     }
 }
+
+
+module.exports = async(appObj) => {
+
+    app = appObj;
+
+    // Instantiate Eventbus from app.conf.  If eventbus_factory_module, require it
+    // to create a custom Eventbus instance.  Otherwise, use the default-eventbus factory.
+    const eventbusFactoryModule = _.get(
+        app.conf, 'eventbus_factory_module', '../lib/factories/default-eventbus'
+    );
+    app.logger.log(
+        'info/events',
+        `Instantiating Eventbus from ${eventbusFactoryModule}`
+    );
+
+    const eventbus = await require(eventbusFactoryModule).factory(app.conf, app.logger._logger);
+    router.post('/events', (req, res) => {
+        handleEvents(eventbus, req, res);
+    });
+
+    // the returned object mounts the routes on
+    // /{domain}/vX/mount/path
+    return {
+        path: '/v1',
+        api_version: 1,  // must be a number!
+        router,
+        skip_domain: true
+    };
+
+};
