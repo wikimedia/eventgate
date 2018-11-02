@@ -215,3 +215,5 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
     `stream_name` (AKA `meta.topic`) set.  If it is part of the HTTP API, Eventbus would also
     need some kind of `extractErrorEventTopic` function, which starts making Eventbus
     more opinionated.  :/  Perhaps we should just keep `stream_name` in the event after all.
+
+- Ask Petr: What is best practice for requiring relative library module files? ../../lib???

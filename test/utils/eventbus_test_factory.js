@@ -10,7 +10,7 @@ const {
     makeValidate
 } = require('../../lib/factories/default-eventbus');
 
-const EventInvalidError = require('../../lib/errors').EventInvalidError;
+const EventInvalidError = require('../../lib/error').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
 
 const eUtil = require('../../lib/event-util');
