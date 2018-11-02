@@ -1,8 +1,7 @@
 'use strict';
 
 const sUtil = require('../lib/util');
-
-const _        = require('lodash');
+const _     = require('lodash');
 
 /**
  * The main router object

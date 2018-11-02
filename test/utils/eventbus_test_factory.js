@@ -1,7 +1,7 @@
 'use strict';
 
-const _        = require('lodash');
-const P        = require('bluebird');
+const _ = require('lodash');
+const P = require('bluebird');
 
 const {
     makeExtractTopic,
