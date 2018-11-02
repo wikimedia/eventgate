@@ -17,7 +17,6 @@ const testObjectJson = JSON.stringify(testObject);
 const testObjectYaml = yaml.safeDump(testObject);
 
 function writeTempFile() {
-    console.log('writeing', filePath);
     fs.writeFileSync(filePath, testObjectYaml);
 }
 
