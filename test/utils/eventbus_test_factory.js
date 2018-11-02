@@ -13,8 +13,6 @@ const {
 const EventInvalidError = require('../../lib/error').EventInvalidError;
 const Eventbus = require('../../lib/eventbus').Eventbus;
 
-const eUtil = require('../../lib/event-util');
-
 // Errors of this type should be produced as error events.
 class MockErrorEventProducableError extends Error {}
 
