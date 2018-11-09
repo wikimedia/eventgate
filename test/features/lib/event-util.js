@@ -1,11 +1,10 @@
 'use strict';
 
-const fs = require('fs');
-const yaml     = require('js-yaml');
-const path     = require('path');
-
+const fs     = require('fs');
+const yaml   = require('js-yaml');
+const path   = require('path');
 const assert = require('assert');
-const eUtil = require('../../../lib/event-util');
+const eUtil  = require('../../../lib/event-util');
 
 
 const filePath = '/tmp/_mocha_test_file.yaml';
