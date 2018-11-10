@@ -1,0 +1,49 @@
+title: test/event
+description: Schema used for simple tests
+$schema: http://json-schema.org/draft-07/schema#
+$id: /test/0.0.2
+type: object
+properties:
+  # global event fields
+  meta:
+    type: object
+    properties:
+      stream_name:
+        type: string
+        description: the stream name this message should be produced to.
+      schema_uri:
+        type: string
+        description: >
+          The URI identifying the jsonschema for this event.  This may be just
+          a short uri containing only the name and revision at the end of the
+          URI path.  e.g. schema_name/12345 is acceptable.  This field
+          is not required.
+      uri:
+        type: string
+        format: uri
+        description: the unique URI identifying the event
+      request_id:
+        type: string
+        description: The unique ID of the request that caused the event.
+      id:
+        type: string
+        pattern: '^[a-fA-F0-9]{8}(-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$'
+        description: the unique ID of this event; should match the dt field
+      dt:
+        type: string
+        format: date-time
+        description: the time stamp of the event, in ISO8601 format
+      domain:
+        type: string
+        description: the domain the event pertains to
+    required:
+      - stream_name
+      - id
+  # event-specific fields
+  test:
+    type: string
+  test_default:
+    type: string
+    default: default_value
+  test_new_field:
+    type: string
