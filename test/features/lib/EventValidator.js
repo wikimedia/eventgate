@@ -1,10 +1,10 @@
 'use strict';
 
-const bunyan         = require('bunyan');
-const assert         = require('assert');
-const eUtil          = require('../../../lib/event-util');
-const EventValidator = require('../../../lib/EventValidator');
-const EventInvalidError         = require('../../../lib/error').EventInvalidError;
+const bunyan            = require('bunyan');
+const assert            = require('assert');
+const eUtil             = require('../../../lib/event-util');
+const EventValidator    = require('../../../lib/EventValidator');
+const EventInvalidError = require('../../../lib/error').EventInvalidError;
 
 const schemaUri = '/test/0.0.1';
 const baseSchemaUri = './test/schemas';
