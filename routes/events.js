@@ -60,7 +60,7 @@ async function handleEvents(eventbus, req, res) {
     // Respond with appropriate HTTP status based on status of processing all events.
     const successCount = results.success.length;
     const invalidCount = results.invalid.length;
-    const errorCount = results.error.length;
+    const errorCount   = results.error.length;
     const failureCount = results.invalid.length + results.error.length;
 
     if (failureCount === 0) {

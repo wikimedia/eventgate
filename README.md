@@ -128,7 +128,7 @@ URI will be downloaded and used to validate the event.  The extracted schema URI
 can optionally be prefixed with `schema_base_uri` and suffixed with
 `schema_file_extension`.  The default `schema_uri_field` is '$schema'.  If you
 use the defaults, all of your events should have a `$schema` field set to
-a resolvable schema URI.  IMPORTANT: The event's schema URI should match
+a resolvable schema URI.  *IMPORTANT*: The event's schema URI should match
 EXACTLY what is set for the JSONSchema `$id`. The event validator implementation
 will cache compiled schemas by the value of the schema's `$id`.  If this is not
 set properly, schemas may not be cached, and each event will result in
@@ -137,14 +137,22 @@ schema URI lookup and validator compilation.
 ## Streams
 A 'stream' here refers to the destination of an event.  It is closely related
 to Kafka's concept of a topic. Much of the time, a stream might correspond 1:1 with
-a Kafka topic.  The default Kafka Eventbus produce function extracts a stream name out of
-the event using the configurable `stream_field`, and then prefixes it with `topic_prefix` to
-build the destination Kafka topic.
+a Kafka topic and possibly event with a particular event schema.  If you don't care
+about the topic name that is used for a any given event, you don't need to configure
+this.  The default behavior is to sanitize an event's schema URI and use it for
+the Kafka topic name.  E.g. if an event's schema URI is `ui/element/button-pushed`,
+the topic name will end up being `ui_button-pushed`.
 
-This allows for more flexible constrol of the actual produce destination of events,
-without requiring the events themselves to encode their final destination.
-Wikimedia uses this feature to prefix topics with source datacenter names.
-Event creators shouldn't need to know which datacenter they are operating in.
+However, if you need more specific control over the final topic name, you can use
+the `stream_field` and optionally the `topic_prefix` configurations.
+If `stream_field` is configured, the default Kafka Eventbus produce function will
+extract a stream name out of the event from `stream_field` and then (optionally)
+prefixes it with `topic_prefix` to build the destination Kafka topic.
+
+`topic_prefix` allows for more flexible control of the destination
+of events without requiring the events themselves to encode their final topic name.
+(Wikimedia uses this feature to prefix topics with source datacenter names.
+Event creators shouldn't need to know which datacenter they are operating in.)
 
 # Configuration
 
@@ -161,24 +169,24 @@ The following values in `conf` will be used to instantiate a a default Eventbus
 that extracts JSONSchemas from schema URIs, validates events using those
 schemas, and then produces them to Kafka.
 
-Note that all `*_field` configs
-point to a field in an event, and uses dotted notation to access sub-objects.
-E.g. "value" will be extracted from `{ meta: { schema_uri: "value" } }` if
-`schema_uri_field` is set to 'meta.schema_uri'.
+Note that all `*_field` configs point to a field in an event, and use
+dotted notation to access sub-objects.
+E.g. "value" will be extracted from `{ meta: { stream_name: "value" } }` if
+`stream_field` is set to 'meta.stream_name'.
 
 Property                    |         Default | Description
 ----------------------------|-----------------|--------------------------
 `port`                      |            6927 | port on which the service will listen
 `interface`                 |       localhost | hostname on which to listen
 `user_agent`                |        eventbus | The UserAgent seen when making remote http requests (e.g. for remote schemas)
-`stream_field`              |         $schema | The name of the stream this event belongs to.  This will be used with `topic_prefix` to build the destination Kafka topic name.
-`topic_prefix`              |       undefined | If given, destinaton Kafka topics will be this + the stream name extracted using `stream_field`.
-`id_field`                  |       undefined | This is mainly used for logging.  If given, this will be extracted from each event to build an event id that will be added to log messages dealing with the event.
-`key_field`                 |       undefined | If given, the value extracted from this field will be used as the Kafka message key.
-`partition_field`           |       undefined | If given, the value extracted from this field will be used as the Kafka message partition.
-`schema_uri_field`          | $schema         | The value extracted from this field will be used (with `schema_base_uri` and `schema_file_extension`) to download the event's JSONSchema for validation.
+`schema_uri_field`          |         $schema | The value extracted from this field will be used (with `schema_base_uri` and `schema_file_extension`) to download the event's JSONSchema for validation.
 `schema_base_uri`           |       undefined | If given, this will be prefixed to every extracted schema URI.
 `schema_file_extension`     |       undefined | If given, this will be appendede to every extracted schema URI unless the filename in the URI already has an extension.
+`stream_field`              |       undefined | The name of the stream this event belongs to.  This will be used with `topic_prefix` to build the destination Kafka topic name. If not set, `schema_uri_field` will be used (and sanitized) instead.
+`topic_prefix`              |       undefined | If given, destinaton Kafka topics will be this + the stream name extracted using `stream_field`.
+`id_field`                  |       undefined | This is mainly used for logging.  If given, this will be extracted from each event to build an event id that will be added to relevant log messages.
+`key_field`                 |       undefined | If given, the value extracted from this field will be used as the Kafka message key.
+`partition_field`           |       undefined | If given, the value extracted from this field will be used as the Kafka message partition.
 `kafka.conf`                |                 | node-rdkafka (and librdkafka) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
 
@@ -191,8 +199,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 # TODO
 
-- Separate out library code (Eventbus, EventValidator, etc.) into a separate repo?
-- Tests for utils, validators, producer, eventbus, etc.
+- Tests for eventbus, default-eventbus, wikimedia-eventbus, etc.
 - topic (stream) -> schema mapping config reading?  from local config files and remote service too?
 - monitoring/metrics (for kafka, etc.)
 - name bikeshedding, probably won't use 'Eventbus' name.
@@ -208,12 +215,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
   but maybe users want to configure this.
 
 - Should `?hasty=true` (fire and forget) mode use a non 'guarunteed' (async no ack) Kafka producer?
-
-- Should `stream_name` be part of API and not part of event????
---  PROBLEM: If it is part of the API, how can we dynamically produce to error topic?
-    Currently this is set by mapping the event to a new error Event object that has
-    `stream_name` (AKA `meta.topic`) set.  If it is part of the HTTP API, Eventbus would also
-    need some kind of `extractErrorEventTopic` function, which starts making Eventbus
-    more opinionated.  :/  Perhaps we should just keep `stream_name` in the event after all.
+- Should default eventbus have a setting to skip validation?  This might be useful for
+  schemaless JSON produce over HTTP.
 
 - Ask Petr: What is best practice for requiring relative library module files? ../../lib???
