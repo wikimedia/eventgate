@@ -45,7 +45,7 @@ const testEvent_v2_0 = {
 };
 
 function extractSchemaUri(event) {
-    return event['$schema'];
+    return event.$schema;
 }
 
 function resolveSchemaUri(uri) {
