@@ -137,17 +137,17 @@ schema URI lookup and validator compilation.
 ## Streams
 A 'stream' here refers to the destination of an event.  It is closely related
 to Kafka's concept of a topic. Much of the time, a stream might correspond 1:1 with
-a Kafka topic and possibly event with a particular event schema.  If you don't care
+a Kafka topic and possibly even with a particular event schema name.  If you don't care
 about the topic name that is used for a any given event, you don't need to configure
 this.  The default behavior is to sanitize an event's schema URI and use it for
-the Kafka topic name.  E.g. if an event's schema URI is `ui/element/button-pushed`,
-the topic name will end up being `ui_button-pushed`.
+the Kafka topic name.  E.g. if an event's schema URI is `ui/element/button-push`,
+the topic name will end up being `ui_element_button-push`.
 
 However, if you need more specific control over the final topic name, you can use
 the `stream_field` and optionally the `topic_prefix` configurations.
 If `stream_field` is configured, the default Kafka Eventbus produce function will
 extract a stream name out of the event from `stream_field` and then (optionally)
-prefixes it with `topic_prefix` to build the destination Kafka topic.
+prefix it with `topic_prefix` to build the destination Kafka topic.
 
 `topic_prefix` allows for more flexible control of the destination
 of events without requiring the events themselves to encode their final topic name.
