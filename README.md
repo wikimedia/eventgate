@@ -187,7 +187,7 @@ Property                    |         Default | Description
 `id_field`                  |       undefined | This is mainly used for logging.  If given, this will be extracted from each event to build an event id that will be added to relevant log messages.
 `key_field`                 |       undefined | If given, the value extracted from this field will be used as the Kafka message key.
 `partition_field`           |       undefined | If given, the value extracted from this field will be used as the Kafka message partition.
-`kafka.conf`                |                 | node-rdkafka (and librdkafka) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
+`kafka.conf`                |                 | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
 
 
@@ -213,9 +213,5 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - Should we have a query param to allow/disallow partial batch production on any error?
   i.e. should remaining events be produced if one fails?  This is the default behavior,
   but maybe users want to configure this.
-
-- Should `?hasty=true` (fire and forget) mode use a non 'guarunteed' (async no ack) Kafka producer?
-- Should default eventbus have a setting to skip validation?  This might be useful for
-  schemaless JSON produce over HTTP.
 
 - Ask Petr: What is best practice for requiring relative library module files? ../../lib???
