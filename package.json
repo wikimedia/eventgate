@@ -40,8 +40,6 @@
     "express": "^4.16.3",
     "http-shutdown": "^1.2.0",
     "js-yaml": "^3.12.0",
-    "json-schema-migrate": "^0.2.0",
-    "kad": "^2.5.1",
     "lodash": "^4.17.11",
     "node-rdkafka": "^2.4.2",
     "preq": "^0.5.6",
