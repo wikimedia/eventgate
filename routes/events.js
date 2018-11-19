@@ -16,10 +16,11 @@ let app;
 /**
  * Handles incoming JSON events in req.body with the eventbus instance.
  * @param {Eventbus} eventbus
+ * @param {Object} conf config object to provide in eventbus.process context.
  * @param {http.ClientRequest} req
  * @param {http.ServerResponse} res
  */
-async function handleEvents(eventbus, req, res) {
+async function handleEvents(eventbus, conf, req, res) {
 
     // If empty body, return 400 now.
     if (_.isEmpty(req.body)) {
@@ -31,7 +32,14 @@ async function handleEvents(eventbus, req, res) {
     }
 
     // Make sure events is an array, even if we were given only one event.
+    // For possible usage of future
     const events = _.isArray(req.body) ? req.body : [req.body];
+
+    // Provide this conf and request context to eventbus.process
+    const context = {
+        req,
+        conf
+    };
 
     // TODO: bikeshed this query param name.
     // If the requester wants a hasty response, return now!
@@ -44,7 +52,7 @@ async function handleEvents(eventbus, req, res) {
     let results;
     try {
         // Process events (validate and produce)
-        results = await eventbus.process(events);
+        results = await eventbus.process(events, context);
     } catch (err) {
         // Error and end response now if we encounter anything unexpected.
         // This probably shouldn't happen, as eventbus.process should catch Errors
@@ -144,7 +152,7 @@ module.exports = async(appObj) => {
 
     const eventbus = await require(eventbusFactoryModule).factory(app.conf, app.logger._logger);
     router.post('/events', (req, res) => {
-        handleEvents(eventbus, req, res);
+        handleEvents(eventbus, app.conf, req, res);
     });
 
     // the returned object mounts the routes on
