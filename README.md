@@ -129,11 +129,7 @@ URI will be downloaded and used to validate the event.  The extracted schema URI
 can optionally be prefixed with `schema_base_uri` and suffixed with
 `schema_file_extension`.  The default `schema_uri_field` is '$schema'.  If you
 use the defaults, all of your events should have a `$schema` field set to
-a resolvable schema URI.  *IMPORTANT*: The event's schema URI should match
-EXACTLY what is set for the JSONSchema `$id`. The event validator implementation
-will cache compiled schemas by the value of the schema's `$id`.  If this is not
-set properly, schemas may not be cached, and each event will result in
-schema URI lookup and validator compilation.
+a resolvable schema URI.
 
 ## Streams
 A 'stream' here refers to the destination of an event.  It is closely related
