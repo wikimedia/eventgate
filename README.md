@@ -15,7 +15,7 @@ body should be an array of JSON event objects.
 
 # Architecture
 
-Eventbus attempts to be a generic HTTP POST event intake, event schema validation
+The Eventbus service attempts to be a generic HTTP POST event intake, event schema validation
 and event producing service.  The schema validation and event produce implementation
 is left up to the user.  This service ships with a schema URL based
 validator and Kafka produce implementation (using node-rdkafka), but you can
@@ -25,7 +25,7 @@ the default Kafka Eventbus.
 
 ## Eventbus implementation configuration
 
-The Eventbus class is generic enough to be used with any type of validation and event production
+The `Eventbus` class is generic enough to be used with any type of validation and event production
 via function injection.  The HTTP route that handles POSTing of events needs to have an
 instantiated Eventbus instance.  To make this configurable (without editing the route code), the
 route in routes/events.js will look for `app.conf.eventbus_factory_module` and require it.
@@ -40,15 +40,15 @@ instantiated Eventbus to validate and produce incoming events.
 
 The `Eventbus` class in lib/eventbus.js handles event validation and produce logic.
 It is instantiated with `validate` and a `produce` functions that each take a single
-event.  `validate` should either return a Promise of the validated event
-(possibly augmented, e.g. field defaults populated) or throw an `EventInvalidError`.
+`event` and extra `context`.  `validate` should either return a Promise of the validated
+event (possibly augmented, e.g. field defaults populated) or throw an `EventInvalidError`.
 `produce` is expected to return a Promise of the `produce` result, or throw an
 `Error`.
 
 Once instantiated with these injected functions, an `Eventbus` instance can be used
-by calling the `process` function with an array of events.  `process` will
-catch both validation and produce errors, and will return an object with errors
-for each event grouped by the type of error.  E.g. if you passed in 3 events,
+by calling the `process` function with an array of events and any extra `context`.
+`process` will catch both validation and produce errors, and will return an object
+with errors for each event grouped by the type of error.  E.g. if you passed in 3 events,
 and 1 was valid, 1 was invalid, and another encountered an unknown error, `process`
 will return an object like:
 
@@ -62,9 +62,10 @@ will return an object like:
 with each array containing an `EventStatus` instance representing the event's process result.
 
 Throughout the code, functions that are injected into to constructors are expected
-to take a single event object.  E.g. validate(event), produce(event), etc.  These
-functions are expected to be able to do their job with only a single `event` argument.
-Any additional context should be bound into the function, either by partially applying
+to take a single `event` object and a `context` object.
+E.g. `validate(event, context)`, `produce(event, context)`, etc.  These
+functions are expected to be able to do their job with only these arguments.
+Any additional logic or context should be bound into the function, either by partially applying
 or creating a closure.  Example:
 
 If you wanted to write all incoming events to a file based on some field in the event, you
@@ -76,7 +77,7 @@ const writeFileAsync = promisify(fs.writeFile);
  * @return a function that writes event to the file at event[file_path_field]
  */
 function makeProduceFunction(file_path_field) {
-    return (event) => {
+    return (event, context = {}) => {
         const path = _.get(event, file_path_field);
         return writeFileAsync(path, JSON.stringify(event));
     }
@@ -141,18 +142,11 @@ a Kafka topic and possibly even with a particular event schema name.  If you don
 about the topic name that is used for a any given event, you don't need to configure
 this.  The default behavior is to sanitize an event's schema URI and use it for
 the Kafka topic name.  E.g. if an event's schema URI is `ui/element/button-push`,
-the topic name will end up being `ui_element_button-push`.
-
-However, if you need more specific control over the final topic name, you can use
-the `stream_field` and optionally the `topic_prefix` configurations.
-If `stream_field` is configured, the default Kafka Eventbus produce function will
-extract a stream name out of the event from `stream_field` and then (optionally)
-prefix it with `topic_prefix` to build the destination Kafka topic.
-
-`topic_prefix` allows for more flexible control of the destination
-of events without requiring the events themselves to encode their final topic name.
-(Wikimedia uses this feature to prefix topics with source datacenter names.
-Event creators shouldn't need to know which datacenter they are operating in.)
+the topic name will end up being `ui_element_button-push`.  However, if `stream_field`
+is configured and present in an event, its value will be used as the destination
+Kafka topic of that event. If you need finer control over event -> Kafka topic
+mapping, you should implement your own Kafka produce function (see, e.g.
+wikimedia-eventbus) that does so.
 
 # Configuration
 
@@ -182,11 +176,7 @@ Property                    |         Default | Description
 `schema_uri_field`          |         $schema | The value extracted from this field will be used (with `schema_base_uri` and `schema_file_extension`) to download the event's JSONSchema for validation.
 `schema_base_uri`           |       undefined | If given, this will be prefixed to every extracted schema URI.
 `schema_file_extension`     |       undefined | If given, this will be appendede to every extracted schema URI unless the filename in the URI already has an extension.
-`stream_field`              |       undefined | The name of the stream this event belongs to.  This will be used with `topic_prefix` to build the destination Kafka topic name. If not set, `schema_uri_field` will be used (and sanitized) instead.
-`topic_prefix`              |       undefined | If given, destinaton Kafka topics will be this + the stream name extracted using `stream_field`.
-`id_field`                  |       undefined | This is mainly used for logging.  If given, this will be extracted from each event to build an event id that will be added to relevant log messages.
-`key_field`                 |       undefined | If given, the value extracted from this field will be used as the Kafka message key.
-`partition_field`           |       undefined | If given, the value extracted from this field will be used as the Kafka message partition.
+`stream_field`              |       undefined | The name of the stream this event belongs to. If not set, `schema_uri_field` will be used (and sanitized) instead.
 `kafka.conf`                |                 | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
 
@@ -213,5 +203,3 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - Should we have a query param to allow/disallow partial batch production on any error?
   i.e. should remaining events be produced if one fails?  This is the default behavior,
   but maybe users want to configure this.
-
-- Ask Petr: What is best practice for requiring relative library module files? ../../lib???

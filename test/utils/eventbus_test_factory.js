@@ -4,9 +4,7 @@ const _ = require('lodash');
 const P = require('bluebird');
 
 const {
-    makeExtractTopic,
-    makeExtractPartition,
-    makeExtractKey,
+    makeExtractStreamName,
     makeValidate
 } = require('../../lib/factories/default-eventbus');
 
@@ -36,11 +34,8 @@ function makeMockProduce(options) {
     const unproducableErrorEventTopic = '__throw_unproduceable_error__';
     const producableErrorEventTopic = '__throw_produceable_error__';
 
-    // Create new functions that use static configuration
-    // to extract Kafka produce() params from an event.
-    const extractTopic      = makeExtractTopic(options);
-    const extractPartition  = makeExtractPartition(options);
-    const extractKey        = makeExtractKey(options);
+    // Use the extracted event stream_name as the topic
+    const extractTopic      = makeExtractStreamName(options);
 
     return (event) => {
         const topic = extractTopic(event);
@@ -58,15 +53,12 @@ function makeMockProduce(options) {
             );
         }
 
-        const partition = extractPartition ? extractPartition(event) : undefined;
-        const key = extractKey ? extractKey(event): undefined;
-
         return P.resolve([
             {
                 topic,
-                partition,
+                partition: 0,
                 offset: 1,
-                key,
+                undefined,
                 opaque: { },
                 timestamp: 1539629252472,
                 size: JSON.stringify(event).length
@@ -77,7 +69,7 @@ function makeMockProduce(options) {
 
 
 function makeMapToErrorEvent(options) {
-    return (error, event) => {
+    return (error, event, context = {}) => {
         const eventError = {
             '$schema': options.error_schema_uri,
             meta: {
