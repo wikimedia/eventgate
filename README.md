@@ -195,7 +195,3 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
-
-- Should we have a query param to allow/disallow partial batch production on any error?
-  i.e. should remaining events be produced if one fails?  This is the default behavior,
-  but maybe users want to configure this.
