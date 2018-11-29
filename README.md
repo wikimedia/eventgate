@@ -186,7 +186,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 # TODO
 
 - Tests for eventbus, default-eventbus, wikimedia-eventbus, etc.
-- topic (stream) -> schema mapping config reading?  from local config files and remote service too?
 - monitoring/metrics (for kafka, etc.)
 - name bikeshedding, probably won't use 'Eventbus' name.
 - security review of AJV
