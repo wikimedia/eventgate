@@ -60,7 +60,7 @@ services:
       #   - user-agent
       #   - x-request-id
       # the user agent to use when issuing requests
-      user_agent: eventbus
+      user_agent: eventgate
 
       # kafka configs go here.
       kafka:

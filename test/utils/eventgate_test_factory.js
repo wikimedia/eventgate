@@ -6,10 +6,10 @@ const P = require('bluebird');
 const {
     makeExtractStreamName,
     makeValidate
-} = require('../../lib/factories/default-eventbus');
+} = require('../../lib/factories/default-eventgate');
 
 const EventInvalidError = require('../../lib/error').EventInvalidError;
-const Eventbus = require('../../lib/eventbus').Eventbus;
+const EventGate = require('../../lib/eventgate').EventGate;
 
 // Errors of this type should be produced as error events.
 class MockErrorEventProducableError extends Error {}
@@ -30,7 +30,7 @@ function makeMockProduce(options) {
 
     // If an extracted topic contains this string,
     // an Error will be thrown.  This can be used to test
-    // upstream Eventbus error handling.
+    // upstream EventGate error handling.
     const unproducableErrorEventTopic = '__throw_unproduceable_error__';
     const producableErrorEventTopic = '__throw_produceable_error__';
 
@@ -77,7 +77,7 @@ function makeMapToErrorEvent(options) {
                 // TODO:
                 id: '12345'
             },
-            emitter_id: 'eventbus_test',  // TODO: ?
+            emitter_id: 'eventgate_test',  // TODO: ?
             raw_event: _.isString(event) ? event : JSON.stringify(event)
         };
 
@@ -86,7 +86,7 @@ function makeMapToErrorEvent(options) {
             eventError.message = error.errorsText;
         } else if (error instanceof MockErrorEventUnproducableError) {
             // By returning null, we ensure that this error will not
-            // be produced by Eventbus to the event error topic.
+            // be produced by EventGate to the event error topic.
             return null;
         } else if (_.isError(error)) {
             eventError.message = error.message;
@@ -100,9 +100,9 @@ function makeMapToErrorEvent(options) {
 }
 
 
-function mockEventbusFactory(options, logger) {
+function mockEventGateFactory(options, logger) {
     return P.resolve(
-        new Eventbus({
+        new EventGate({
             validate: makeValidate(options, logger),
             produce: makeMockProduce(options),
             eventRepr: event => 'TEST EVENT',
@@ -113,5 +113,5 @@ function mockEventbusFactory(options, logger) {
 }
 
 module.exports = {
-    factory: mockEventbusFactory
+    factory: mockEventGateFactory
 };

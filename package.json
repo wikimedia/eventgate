@@ -1,5 +1,5 @@
 {
-  "name": "service-template-node",
+  "name": "EventGate",
   "version": "0.5.6",
   "description": "A blueprint for MediaWiki REST API services",
   "main": "./app.js",
@@ -23,10 +23,10 @@
     "MediaWiki"
   ],
   "author": "Wikimedia Service Team <services@wikimedia.org>",
-  "contributors": [],
+  "contributors": ["Andrew Otto <otto@wikimedia.org>", "Petr Pchelko <ppchelko@wikimedia.org>"],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://phabricator.wikimedia.org/tag/service-template-node/"
+    "url": "https://phabricator.wikimedia.org/tag/wikimedia-stream/"
   },
   "homepage": "https://github.com/wikimedia/service-template-node",
   "dependencies": {

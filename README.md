@@ -1,6 +1,6 @@
-# Eventbus - HTTP JSONSchema event validation and production to Kafka
+# EventGate - HTTP JSONSchema event validation and production to Kafka
 
-Eventbus takes in JSON events via HTTP POST, validates and then produces them.
+EventGate takes in JSON events via HTTP POST, validates and then produces them.
 
 Throughout this code, an 'event' is meant to refer to a parsed JSON object with
 a strict JSONSchema, and a 'schema' refers to an instance of a JSONSchema for
@@ -8,44 +8,44 @@ an event.
 
 # Usage
 
-For configuration of the default Eventbus implementation (see below), edit
+For configuration of the default EventGate implementation (see below), edit
 config.yaml and run `npm start`.  The service will listen for HTTP POST
 requests with Content-Type set to `application/json` at `/v1/events`.  The POST
 body should be an array of JSON event objects.
 
 # Architecture
 
-The Eventbus service attempts to be a generic HTTP POST event intake, event schema validation
+The EventGate service attempts to be a generic HTTP POST event intake, event schema validation
 and event producing service.  The schema validation and event produce implementation
 is left up to the user.  This service ships with a schema URL based
 validator and Kafka produce implementation (using node-rdkafka), but you can
-plug in your own by implementing a factory module that returns an instantiated `Eventbus`
-and use it via `eventbus_factory_module` application config. See documentation below for more on
-the default Kafka Eventbus.
+plug in your own by implementing a factory module that returns an instantiated `EventGate`
+and use it via `eventgate_factory_module` application config. See documentation below for more on
+the default Kafka EventGate.
 
-## Eventbus implementation configuration
+## EventGate implementation configuration
 
-The `Eventbus` class is generic enough to be used with any type of validation and event production
+The `EventGate` class is generic enough to be used with any type of validation and event production
 via function injection.  The HTTP route that handles POSTing of events needs to have an
-instantiated Eventbus instance.  To make this configurable (without editing the route code), the
-route in routes/events.js will look for `app.conf.eventbus_factory_module` and require it.
+instantiated EventGate instance.  To make this configurable (without editing the route code), the
+route in routes/events.js will look for `app.conf.eventgate_factory_module` and require it.
 This module is expected to export a function called `factory` that takes a `conf` object and a
-bunyan `logger`. The function should return a Promise of an instantiated Eventbus.
+bunyan `logger`. The function should return a Promise of an instantiated EventGate.
 
-Once the `eventbus` Promise resolves, the `/v1/events` route will be added and will use the
-instantiated Eventbus to validate and produce incoming events.
+Once the EventGate Promise resolves, the `/v1/events` route will be added and will use the
+instantiated EventGate to validate and produce incoming events.
 
 
-## Eventbus
+## EventGate
 
-The `Eventbus` class in lib/eventbus.js handles event validation and produce logic.
+The `EventGate` class in lib/eventgate.js handles event validation and produce logic.
 It is instantiated with `validate` and a `produce` functions that each take a single
 `event` and extra `context`.  `validate` should either return a Promise of the validated
 event (possibly augmented, e.g. field defaults populated) or throw an `EventInvalidError`.
 `produce` is expected to return a Promise of the `produce` result, or throw an
 `Error`.
 
-Once instantiated with these injected functions, an `Eventbus` instance can be used
+Once instantiated with these injected functions, an `EventGate` instance can be used
 by calling the `process` function with an array of events and any extra `context`.
 `process` will catch both validation and produce errors, and will return an object
 with errors for each event grouped by the type of error.  E.g. if you passed in 3 events,
@@ -69,7 +69,7 @@ Any additional logic or context should be bound into the function, either by par
 or creating a closure.  Example:
 
 If you wanted to write all incoming events to a file based on some field in the event, you
-could write an Eventbus `produce` function like this:
+could write an EventGate `produce` function like this:
 
 ```javascript
 const writeFileAsync = promisify(fs.writeFile);
@@ -83,45 +83,45 @@ function makeProduceFunction(file_path_field) {
     }
 }
 
-// Instantiate a new Eventbus using this configured produce function closure:
-const eventbus = new Eventbus({
+// Instantiate a new EventGate using this configured produce function closure:
+const eventGate = new EventGate({
     // ...,
     produce: makeProduceFunction(conf.file_path_field);
     // ...,
 })
 
-// This eventbus will produce every event by calling the function returned by makeProduceFunction.
+// This eventGate will produce every event by calling the function returned by makeProduceFunction.
 ```
 
 ### Error events
 
-The Eventbus constructor also takes an optional `mapToErrorEvent` function.
+The EventGate constructor also takes an optional `mapToErrorEvent` function.
 `mapToErrorEvent` takes an `event` and an `error` and returns a new error event representing
 the error.  This new error event should be suitable for producing through the same
-instantiated `Eventbus`.  If `mapToErrorEvent` is provided and event processing fails for any
+instantiated `EventGate`.  If `mapToErrorEvent` is provided and event processing fails for any
 reason, those errors will be converted to event errors via this function, and then produced.
 There should be no difference between the kind of events that `mapToErrorEvent` returns and
-the kind of events that your instantiated `Eventbus` can handle.
-`eventbus.produce([errorEvents])` should work.  If your `mapToErrorEvent` implementation
+the kind of events that your instantiated `EventGate` can handle.
+`eventGate.produce([errorEvents])` should work.  If your `mapToErrorEvent` implementation
 returns  null for any given failed `event`, no error event for that pair will be
 produced.  This allows `mapToErrorEvent` implementations to decide what types of
 Errors should be produced.
 
-# Default Eventbus - Schema URI validation & producing with Kafka
+# Default EventGate - Schema URI validation & producing with Kafka
 
-If `eventbus_factory_module` is not specified, this service will use provided configuration
-to instantiate and use an Eventbus that validates events with JSONSchemas discovered via
+If `eventgate_factory_module` is not specified, this service will use provided configuration
+to instantiate and use an EventGate that validates events with JSONSchemas discovered via
 schema URLs, and produces valid events to Kafka.
 
 ## EventValidator & Event Schema URLs
 
-While the `Eventbus` class that handles event validation and production can
-be configured to do validation in any way, the default Eventbus uses the
+While the `EventGate` class that handles event validation and production can
+be configured to do validation in any way, the default EventGate uses the
 `EventValidator` class to validate events with schemas obtained from
 schema URIs in the events themselves. Every event should contain a URI
 to the JSONSchema for the event.  `EventValidator` will extract and use those URIs to look up
 (and cache) those schemas to use for event validation.  The `EventValidator` instance
-used by the default Eventbus can request schema URIs from the local filesystem with
+used by the default EventGate can request schema URIs from the local filesystem with
 `file://` or an `http://` based URIs. The field in the each event where the schema URI is
 located is configurable with the `schema_uri_field` config.  When an event is received, the
 schema URI will be extracted from the `schema_uri_field`. The JSONSchema at the
@@ -142,20 +142,20 @@ the topic name will end up being `ui_element_button-push`.  However, if `stream_
 is configured and present in an event, its value will be used as the destination
 Kafka topic of that event. If you need finer control over event -> Kafka topic
 mapping, you should implement your own Kafka produce function (see, e.g.
-wikimedia-eventbus) that does so.
+wikimedia-eventgate) that does so.
 
 # Configuration
 
 Configuration is passed to the service via the `config.yaml` file, which
-has a `services` object.  This object contains a service named `eventbus`.
-The `conf` object of this service will be passed to the `eventbus_factory_module`.
-To use a custom Eventbus implementation, set `eventbus_factory_module` to your
-javascript module that exports a `factory` function that instantiate an Eventbus with `conf`.
-See the section above entitled 'Eventbus implementation configuration'.
+has a `services` object.  This object contains a service named `eventgate`.
+The `conf` object of this service will be passed to the `eventgate_factory_module`.
+To use a custom EventGate implementation, set `eventgate_factory_module` to your
+javascript module that exports a `factory` function that instantiate an EventGate with `conf`.
+See the section above entitled 'EventGate implementation configuration'.
 
-## Default Kafka Eventbus configuration
+## Default Kafka EventGate configuration
 
-The following values in `conf` will be used to instantiate a a default Eventbus
+The following values in `conf` will be used to instantiate a a default EventGate
 that extracts JSONSchemas from schema URIs, validates events using those
 schemas, and then produces them to Kafka.
 
@@ -168,7 +168,7 @@ Property                    |         Default | Description
 ----------------------------|-----------------|--------------------------
 `port`                      |            6927 | port on which the service will listen
 `interface`                 |       localhost | hostname on which to listen
-`user_agent`                |        eventbus | The UserAgent seen when making remote http requests (e.g. for remote schemas)
+`user_agent`                |        eventgate | The UserAgent seen when making remote http requests (e.g. for remote schemas)
 `schema_uri_field`          |         $schema | The value extracted from this field will be used (with `schema_base_uri` and `schema_file_extension`) to download the event's JSONSchema for validation.
 `schema_base_uri`           |       undefined | If given, this will be prefixed to every extracted schema URI.
 `schema_file_extension`     |       undefined | If given, this will be appendede to every extracted schema URI unless the filename in the URI already has an extension.
@@ -185,11 +185,11 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 # TODO
 
-- Tests for eventbus, default-eventbus, wikimedia-eventbus, etc.
+- Tests for eventgate, default-eventgate, wikimedia-eventgate, etc.
 - monitoring/metrics (for kafka, etc.)
-- name bikeshedding, probably won't use 'Eventbus' name.
+- name bikeshedding, probably won't use 'EventGate' name.
 - security review of AJV
-- close() method for Eventbus. ? graceful kafka shutdown?
+- close() method for EventGate. ? graceful kafka shutdown?
 
 
 ## Questions/Thoughts:

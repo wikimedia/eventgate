@@ -24,7 +24,7 @@ metrics:
   #port: 8125
 
 services:
-  - name: eventbus
+  - name: EventGate
     # a relative path or the name of an npm package, if different from name
     module: ./app.js
     # optionally, a version constraint of the npm package
@@ -35,9 +35,9 @@ services:
       # uncomment to only listen on localhost
       #interface: localhost
       # more per-service config settings
-      user_agent: eventbus
+      user_agent: eventgate
 
-      eventbus_factory_module: '../lib/factories/wikimedia-eventbus'
+      eventgate_factory_module: '../lib/factories/wikimedia-eventgate'
 
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic transformation
@@ -51,7 +51,7 @@ services:
       topic_prefix: 'test.'
 
       error_schema_uri: /error/0.0.2
-      error_stream: eventbus.event-error
+      error_stream: eventgate.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.  The default is $schema.
       #schema_uri_field: $schema

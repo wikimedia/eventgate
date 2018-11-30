@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 0.4.0
-  title: Eventbus
+  title: EventGate
   description: Validates and produces events
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
   license:

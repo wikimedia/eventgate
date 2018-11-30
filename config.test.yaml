@@ -20,7 +20,7 @@ metrics:
   #port: 8125
 
 services:
-  - name: eventbus
+  - name: eventgate
     # a relative path or the name of an npm package, if different from name
     module: ./app.js
     # optionally, a version constraint of the npm package
@@ -35,11 +35,11 @@ services:
       spec: ./spec.test.yaml
 
       # the user agent to use when issuing requests
-      user_agent: eventbus_test
+      user_agent: eventgate_test
 
-      # Configure the EventBus test instance similar to one that might be used
+      # Configure the EventGate test service similar to one that might be used
       # in production, but with a mock producer and a mock event error create function.
-      eventbus_factory_module: '../test/utils/eventbus_test_factory'
+      eventgate_factory_module: '../test/utils/eventgate_test_factory'
 
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic prefix
@@ -50,7 +50,7 @@ services:
       topic_prefix: 'test.'
 
       error_schema_uri: /error/0.0.1
-      error_stream: eventbus.event-error
+      error_stream: eventgate.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.
       schema_uri_field: $schema

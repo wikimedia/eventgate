@@ -14,13 +14,13 @@ const router = sUtil.router();
 let app;
 
 /**
- * Handles incoming JSON events in req.body with the eventbus instance.
- * @param {Eventbus} eventbus
- * @param {Object} conf config object to provide in eventbus.process context.
+ * Handles incoming JSON events in req.body with the EventGate instance.
+ * @param {EventGate} eventGate
+ * @param {Object} conf config object to provide in eventGate.process context.
  * @param {http.ClientRequest} req
  * @param {http.ServerResponse} res
  */
-async function handleEvents(eventbus, conf, req, res) {
+async function handleEvents(eventGate, conf, req, res) {
 
     // If empty body, return 400 now.
     if (_.isEmpty(req.body)) {
@@ -35,7 +35,7 @@ async function handleEvents(eventbus, conf, req, res) {
     // For possible usage of future
     const events = _.isArray(req.body) ? req.body : [req.body];
 
-    // Provide this conf and request context to eventbus.process
+    // Provide this conf and request context to eventGate.process
     const context = {
         req,
         conf
@@ -52,10 +52,10 @@ async function handleEvents(eventbus, conf, req, res) {
     let results;
     try {
         // Process events (validate and produce)
-        results = await eventbus.process(events, context);
+        results = await eventGate.process(events, context);
     } catch (err) {
         // Error and end response now if we encounter anything unexpected.
-        // This probably shouldn't happen, as eventbus.process should catch Errors
+        // This probably shouldn't happen, as eventGate.process should catch Errors
         // and reform them into error EventStatuses.
         res.statusMessage =
             `Encountered an unexpected error while processing events: ${err.message}`;
@@ -140,19 +140,19 @@ module.exports = async(appObj) => {
 
     app = appObj;
 
-    // Instantiate Eventbus from app.conf.  If eventbus_factory_module, require it
-    // to create a custom Eventbus instance.  Otherwise, use the default-eventbus factory.
-    const eventbusFactoryModule = _.get(
-        app.conf, 'eventbus_factory_module', '../lib/factories/default-eventbus'
+    // Instantiate EventGate from app.conf.  If eventgate_factory_module, require it
+    // to create a custom EventGate instance.  Otherwise, use the default-eventgate factory.
+    const eventGateFactoryModule = _.get(
+        app.conf, 'eventgate_factory_module', '../lib/factories/default-eventgate'
     );
     app.logger.log(
         'info/events',
-        `Instantiating Eventbus from ${eventbusFactoryModule}`
+        `Instantiating EventGate from ${eventGateFactoryModule}`
     );
 
-    const eventbus = await require(eventbusFactoryModule).factory(app.conf, app.logger._logger);
+    const eventGate = await require(eventGateFactoryModule).factory(app.conf, app.logger._logger);
     router.post('/events', (req, res) => {
-        handleEvents(eventbus, app.conf, req, res);
+        handleEvents(eventGate, app.conf, req, res);
     });
 
     // the returned object mounts the routes on
