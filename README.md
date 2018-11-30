@@ -192,7 +192,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 - Tests for eventgate, default-eventgate, wikimedia-eventgate, etc.
 - monitoring/metrics (for kafka, etc.)
-- name bikeshedding, probably won't use 'EventGate' name.
 - security review of AJV
 - close() method for EventGate. ? graceful kafka shutdown?
 
