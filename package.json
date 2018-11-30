@@ -23,7 +23,10 @@
     "MediaWiki"
   ],
   "author": "Wikimedia Service Team <services@wikimedia.org>",
-  "contributors": ["Andrew Otto <otto@wikimedia.org>", "Petr Pchelko <ppchelko@wikimedia.org>"],
+  "contributors": [
+    "Andrew Otto <otto@wikimedia.org>",
+    "Petr Pchelko <ppchelko@wikimedia.org>"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://phabricator.wikimedia.org/tag/wikimedia-stream/"
