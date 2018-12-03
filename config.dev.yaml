@@ -54,7 +54,9 @@ services:
       error_stream: eventgate.event-error
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.  The default is $schema.
-      # schema_uri_field: meta.schema_uri
+      # An array of field names will cause EventGate to search for
+      # fields by these names in each event, using the first match.
+      schema_uri_field: [$schema, meta.schema_uri]
 
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
