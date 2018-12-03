@@ -3,6 +3,8 @@
 const _ = require('lodash');
 const P = require('bluebird');
 
+const uuid = require('cassandra-uuid').TimeUuid;
+
 const {
     makeExtractStreamName,
     makeValidate
@@ -67,19 +69,18 @@ function makeMockProduce(options) {
     };
 }
 
-
 function makeMapToErrorEvent(options) {
     return (error, event, context = {}) => {
         const eventError = {
             '$schema': options.error_schema_uri,
             meta: {
-                topic: options.error_stream,
-                // TODO:
-                id: '12345'
+                stream_name: options.error_stream,
+                id:         'ea262403-f707-11e8-a892-c2baac54c6bc',
+                dt:         '2018-12-03T14:30:00.000Z'
             },
-            emitter_id: 'eventgate_test',  // TODO: ?
             raw_event: _.isString(event) ? event : JSON.stringify(event)
         };
+        console.log("made event error", error, event);
 
         // TODO: How to test that some get error-produced and some don't?
         if (error instanceof EventInvalidError || error instanceof MockErrorEventProducableError) {

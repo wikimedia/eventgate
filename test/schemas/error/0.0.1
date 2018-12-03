@@ -4,23 +4,32 @@ $schema: http://json-schema.org/draft-07/schema#
 $id: /error/0.0.1
 type: object
 properties:
+  $schema:
+    type: string
+    description: >
+      The URI identifying the jsonschema for this event. This may be just
+      a short uri containing only the name and revision at the end of the
+      URI path.  e.g. /schema_name/12345 is acceptable.
   # global event fields
   meta:
     type: object
     properties:
       stream_name:
         type: string
-        description: the stream name this message should be produced to.
+        description: The stream name this message should be produced to.
         minLength: 1
-      schema_uri:
+      id:
         type: string
-        description: >
-          The URI identifying the jsonschema for this event. This may be just
-          a short uri containing only the name and revision at the end of the
-          URI path.  e.g. schema_name/12345 is acceptable. This field is not
-          required.
+        pattern: '^[a-fA-F0-9]{8}(-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$'
+        description: the unique ID of this event; should match the dt field
+      dt:
+        type: string
+        format: date-time
+        description: the time stamp of the event, in ISO8601 format
     required:
     - stream_name
+    - id
+    - dt
   # event-specific fields
   raw_event:
     type: string
@@ -31,13 +40,7 @@ properties:
   stack:
     type: string
     description: stack trace of the error (optional)
-  triggered_by:
-    type: string
-    description: >
-      comma-separated list of event descriptions in `<topic>:<uri>` format,
-      that represent a chain of events that caused this event to be emitted.
 required:
 - meta
-- emitter_id
 - raw_event
 - message
