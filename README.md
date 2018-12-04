@@ -194,7 +194,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 - monitoring/metrics (for kafka, etc.)
 - security review of AJV
 - close() method for EventGate. ? graceful kafka shutdown?
-
+- schema and stream config reload on SIGHUP
 
 ## Questions/Thoughts:
 - We should leave off file extensions from versioned schemas in the schema repo, so they work without appending them to the schema uris
