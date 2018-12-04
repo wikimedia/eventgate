@@ -10,8 +10,8 @@ worker_heap_limit_mb: 250
 # Logger info
 # NOTE: Tests are configured to suppress logging output into an in memory logger.
 # If you want them in normal place, uncomment this section.
-# logging:
-#   level: debug
+logging:
+  level: warn
 
 # Statsd metrics reporter
 metrics:

@@ -1,8 +1,11 @@
 swagger: '2.0'
 info:
   version: 0.4.0
-  title: EventGate
-  description: Validates and produces events
+  title: EventGate Test Spec
+  description: >
+    This spec is used for testing only. It specifies the same routes
+    as the main spec.yaml, but also includes many x-ample requests
+    and responses that can only be used witih test/utils/eventgate_test_factory.js.
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
   license:
     name: Apache2 License
@@ -115,13 +118,8 @@ paths:
             status: 400
             body:
               invalid:
-                - status: invalid
-                  event:
-                    $schema: /error/0.0.1
-                    meta:
-                      stream_name: eventgate.event-error
-                      id: ea262403-f707-11e8-a892-c2baac54c6bc
-                      dt: 2018-12-03T14:30:00.000Z
+                - context:
+                    errorsText: "'.test' should be string"
 
         - title: Produce a single event that encounters an error that should not be produced as an event error
           request:
@@ -135,6 +133,10 @@ paths:
               test: test_value
           response:
             status: 500
+            body:
+              error:
+                - context:
+                    message: "Event's topic was __throw_unproduceable_error__. This error should be handled, but not produced as an error event"
 
         - title: Produce a single event that encounters an error that should be produced as an event error
           request:
@@ -148,20 +150,28 @@ paths:
               test: test_value
           response:
             status: 500
+            body:
+              error:
+                - context:
+                    message: "Event's topic was __throw_produceable_error__. This error should be handled, and should be produced as an error event"
 
         - title: Produce a single event that encounters an EventSchemaLoadError
           request:
             headers:
               content-type: application/json
             body:
-              $schema: bad uri right here@@@
+              $schema: bad/uri/right/here@@@
               meta:
                 stream_name: test.event
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
             status: 500
-        # TODO: add response body testing on errors too.
+            body:
+              error:
+                - context:
+                    message: "Failed loading schema at bad/uri/right/here@@@"
+
 
         - title: Produce a batch valid events
           request:
@@ -221,6 +231,13 @@ paths:
                 test: test_value1
           response:
             status: 207
+            body:
+              invalid:
+                - context:
+                    errorsText: "'.test' should be string"
+              error:
+                - context:
+                    message: "Event's topic was __throw_unproduceable_error__. This error should be handled, but not produced as an error event"
 
         - title: Produce batch events, all invalid
           request:
@@ -240,6 +257,12 @@ paths:
                 test_default: 67890
           response:
             status: 400
+            body:
+              invalid:
+                - context:
+                    errorsText: "'.test' should be string"
+                - context:
+                    errorsText: "'.test_default' should be string"
 
         - title: Produce batch events, all errored
           request:
@@ -259,6 +282,12 @@ paths:
                 test_default: test_value
           response:
             status: 500
+            body:
+              error:
+                - context:
+                    message: "Event's topic was __throw_unproduceable_error__. This error should be handled, but not produced as an error event"
+                - context:
+                    message: "Event's topic was __throw_unproduceable_error__. This error should be handled, but not produced as an error event"
 
         - title: Produce batch events, all invalid, fire and forget
           request:
@@ -280,3 +309,4 @@ paths:
                 test_default: 67890
           response:
             status: 204
+            body: ""
