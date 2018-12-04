@@ -91,6 +91,10 @@ describe('fileExtension', () => {
         assert.equal('', eUtil.fileExtension('path/to/file'));
     });
 
+    it('should return empty if numeric end of file name', () => {
+        assert.equal('', eUtil.fileExtension('path/to/file/0.0.3'));
+    });
+
     it('should return file extension', () => {
         assert.equal('yaml', eUtil.fileExtension('path/to/file.yaml'));
     });
