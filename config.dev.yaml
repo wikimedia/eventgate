@@ -46,7 +46,7 @@ services:
 
       #  TODO change this to meta.stream and fill in meta.topic from prefixed value?
       # stream != topic!
-      stream_field: meta.topic
+      stream_field: [meta.stream, meta.topic]
       id_field: meta.id
       topic_prefix: 'test.'
 
@@ -67,7 +67,7 @@ services:
       stream_config_uri: ../event-schemas/schemas/eventbus-topics.yaml
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
-      schema_file_extension: .yaml
+      # schema_file_extension: .yaml
 
       # kafka configs go here.
       kafka:
