@@ -101,6 +101,20 @@ describe('urlGetObject', () => {
     // TODO test urlGet and urlGetObject from http url?  set up test http server?
 });
 
+describe('stringMatches', () => {
+    it('should return true if string matches string', () => {
+        assert.equal(true, eUtil.stringMatches('a', 'a'));
+    });
+
+    it('should return true if string matches string regex', () => {
+        assert.equal(true, eUtil.stringMatches('a', '/^a$/'));
+    });
+
+    it('should return true if string matches RegExp', () => {
+        assert.equal(true, eUtil.stringMatches('a', new RegExp('^a$')));
+    });
+});
+
 describe('fileExtension', () => {
     it('should return empty if no file extension', () => {
         assert.equal('', eUtil.fileExtension('path/to/file'));
