@@ -44,8 +44,6 @@ describe('objectFactory', () => {
 });
 
 describe('objectGet', () => {
-    // const o = { a0: { a1: { v: 123 } } };
-
     it('should lookup value by dotted path', () => {
         assert.equal(testObject.a0.a1.v, eUtil.objectGet(testObject, 'a0.a1.v'));
     });
@@ -53,6 +51,23 @@ describe('objectGet', () => {
     it('should throw PropertyNotFoundError', () => {
         assert.throws(() => {
             eUtil.objectGet(testObject, 'not.a.path');
+        });
+    });
+});
+
+describe('objectFindAndGet', () => {
+
+    it('should lookup value by string dotted path', () => {
+        assert.equal(testObject.a0.a1.v, eUtil.objectFindAndGet(testObject, 'a0.a1.v'));
+    });
+
+    it('should lookup value by first found dotted path', () => {
+        assert.equal(testObject.b, eUtil.objectFindAndGet(testObject, ['nope', 'b']));
+    });
+
+    it('should throw PropertyNotFoundError', () => {
+        assert.throws(() => {
+            eUtil.objectGet(testObject, ['nope', 'not.a.path']);
         });
     });
 });
