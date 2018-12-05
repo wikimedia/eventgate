@@ -60,7 +60,7 @@ function makeMockProduce(options) {
                 topic,
                 partition: 0,
                 offset: 1,
-                undefined,
+                key: undefined,
                 opaque: { },
                 timestamp: 1539629252472,
                 size: JSON.stringify(event).length
