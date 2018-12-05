@@ -189,9 +189,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 
 # TODO
-
 - Tests for eventgate, default-eventgate, wikimedia-eventgate, etc.
 - monitoring/metrics (for kafka, etc.)
 - security review of AJV
 - close() method for EventGate. ? graceful kafka shutdown?
-- schema and stream config reload on SIGHUP
