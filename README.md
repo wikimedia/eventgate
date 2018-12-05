@@ -166,8 +166,8 @@ schemas, and then produces them to Kafka.
 
 All `*_field` configs point to a field in an event, and use
 dotted path notation to access sub-objects.
-E.g. "value" will be extracted from `{ meta: { stream_name: "value" } }` if
-`stream_field` is set to 'meta.stream_name'.
+E.g. "value" will be extracted from `{ meta: { stream: "value" } }` if
+`stream_field` is set to 'meta.stream'.
 
 Property                    |         Default | Description
 ----------------------------|-----------------|--------------------------
