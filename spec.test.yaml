@@ -98,7 +98,7 @@ paths:
             body:
               $schema: test/0.0.1
               meta:
-                stream_name: test.event
+                stream: test.event
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
@@ -111,7 +111,7 @@ paths:
             body:
               $schema: /test/0.0.1
               meta:
-                stream_name: test.event
+                stream: test.event
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: 0.01
           response:
@@ -128,7 +128,7 @@ paths:
             body:
               $schema: /test/0.0.1
               meta:
-                stream_name: __throw_unproduceable_error__
+                stream: __throw_unproduceable_error__
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
@@ -145,7 +145,7 @@ paths:
             body:
               $schema: /test/0.0.1
               meta:
-                stream_name: __throw_produceable_error__
+                stream: __throw_produceable_error__
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
@@ -162,7 +162,7 @@ paths:
             body:
               $schema: bad/uri/right/here@@@
               meta:
-                stream_name: test.event
+                stream: test.event
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
@@ -180,12 +180,12 @@ paths:
             body:
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: test_value0
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
@@ -198,12 +198,12 @@ paths:
             body:
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
@@ -216,17 +216,17 @@ paths:
             body:
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: __throw_unproduceable_error__
+                  stream: __throw_unproduceable_error__
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
@@ -246,12 +246,12 @@ paths:
             body:
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
                 test_default: 67890
@@ -271,12 +271,12 @@ paths:
             body:
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: __throw_unproduceable_error__
+                  stream: __throw_unproduceable_error__
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: test_value
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: __throw_unproduceable_error__
+                  stream: __throw_unproduceable_error__
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
                 test_default: test_value
@@ -298,12 +298,12 @@ paths:
             body:
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1280"
                 test: 12345
               - $schema: /test/0.0.1
                 meta:
-                  stream_name: test.event
+                  stream: test.event
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
                 test_default: 67890

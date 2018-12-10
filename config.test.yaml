@@ -45,7 +45,7 @@ services:
       # This will equal the destination Kafka topic, unless a topic prefix
       #  is configured.  If using topic prefix, the value extracted
       # from this field will be prefixed with it and used as the Kafka topic.
-      stream_field: meta.stream_name
+      stream_field: meta.stream
       id_field: meta.id
       topic_prefix: 'test.'
 

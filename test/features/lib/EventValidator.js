@@ -13,7 +13,7 @@ const logger = bunyan.createLogger({ name: 'test/EventValidator', level: 'fatal'
 const testEvent_v1_0 = {
     '$schema': '/test/0.0.1',
     meta: {
-        stream_name: 'test.event',
+        stream: 'test.event',
         id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
     },
     test: 'test_value_0'
@@ -21,7 +21,7 @@ const testEvent_v1_0 = {
 const testEvent_v1_1 = {
     '$schema': '/test/0.0.1',
     meta: {
-        stream_name: 'test.event',
+        stream: 'test.event',
         id: '5e1dd101-641c-11e8-ab6c-b083fecf1288',
     },
     test: 'test_value_1'
@@ -29,7 +29,7 @@ const testEvent_v1_1 = {
 const testInvalidEvent = {
     '$schema': '/test/0.0.1',
     meta: {
-        stream_name: 'test.event',
+        stream: 'test.event',
         id: '5e1dd101-641c-11e8-ab6c-b083fecf1289',
     },
     test: 1234
@@ -38,7 +38,7 @@ const testInvalidEvent = {
 const testEvent_v2_0 = {
     '$schema': '/test/0.0.2',
     meta: {
-        stream_name: 'test.event',
+        stream: 'test.event',
         id: '5e1dd101-641c-11e8-ab6c-b083fecf1290',
     },
     test: 'test_value_0'

@@ -4,17 +4,18 @@ $schema: http://json-schema.org/draft-07/schema#
 $id: /error/0.0.1
 type: object
 properties:
+  # global event fields
   $schema:
     type: string
     description: >
       The URI identifying the jsonschema for this event. This may be just
       a short uri containing only the name and revision at the end of the
-      URI path.  e.g. /schema_name/12345 is acceptable.
-  # global event fields
+      URI path.  e.g. /schema_name/12345 is acceptable. This often will
+      (and should) match the schema's $id field.
   meta:
     type: object
     properties:
-      stream_name:
+      stream:
         type: string
         description: The stream name this message should be produced to.
         minLength: 1
@@ -27,7 +28,7 @@ properties:
         format: date-time
         description: the time stamp of the event, in ISO8601 format
     required:
-    - stream_name
+    - stream
     - id
     - dt
   # event-specific fields
