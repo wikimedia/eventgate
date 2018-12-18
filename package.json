@@ -5,7 +5,7 @@
   "main": "./app.js",
   "scripts": {
     "start": "service-runner",
-    "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && npm run lint && nsp check",
+    "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && npm run lint",
     "lint": "eslint --cache --max-warnings 0 --ext .js --ext .json lib routes app.js",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
@@ -45,7 +45,7 @@
     "lodash": "^4.17.11",
     "node-rdkafka": "^2.4.2",
     "preq": "^0.5.6",
-    "service-runner": "^2.6.3",
+    "service-runner": "^2.6.8",
     "swagger-router": "^0.7.1",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
   },
@@ -57,7 +57,6 @@
     "eslint-plugin-json": "^1.2.0",
     "extend": "^3.0.1",
     "mocha": "^5.2.0",
-    "nsp": "^3.2.1",
     "nyc": "^13.1.0"
   },
   "deploy": {
