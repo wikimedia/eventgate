@@ -1,0 +1,83 @@
+# Number of worker processes to spawn.
+# Set to 0 to run everything in a single process without clustering.
+# Use 'ncpu' to run as many workers as there are CPU units
+num_workers: 0
+
+# Log error messages and gracefully restart a worker if v8 reports that it
+# uses more heap (note: not RSS) than this many mb.
+worker_heap_limit_mb: 250
+
+# Logger info
+logging:
+  level: debug
+
+#  streams:
+#  # Use gelf-stream -> logstash
+#  - type: gelf
+#    host: logstash1003.eqiad.wmnet
+#    port: 12201
+
+# Statsd metrics reporter
+metrics:
+  #type: log
+  #host: localhost
+  #port: 8125
+
+services:
+  - name: EventGate
+    # a relative path or the name of an npm package, if different from name
+    module: ./app.js
+    # optionally, a version constraint of the npm package
+    # version: ^0.4.0
+    # per-service config
+    conf:
+      port: 6927
+      # uncomment to only listen on localhost
+      #interface: localhost
+
+      # more per-service config settings
+      user_agent: eventgate
+
+      eventgate_factory_module: '../lib/factories/wikimedia-eventgate'
+
+      # Mapping of stream names to allowed schemas
+      stream_config_uri: ../event-schemas/config/stream-config.yaml
+
+      # This field in each event will be used to extract a
+      # (possibly relative) schema uri.  The default is $schema.
+      # An array of field names will cause EventGate to search for
+      # fields by these names in each event, using the first match.
+      schema_uri_field: [$schema, meta.schema_uri]
+
+      # If set, this URI will be prepended to any relative schema URI
+      # extracted from each event's schema_field./
+      # This should be the path to the local checkout of
+      # https://github.com/wikimedia/mediawiki-event-schemas
+
+      schema_base_uri: ../event-schemas/jsonschema/
+      # You can alteratively use a remote HTTP base URI. 
+      #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema/
+
+      # If set, this will be appended to every extracted schema_uri if that schema_uri
+      # does not already end with a file extension.
+      #schema_file_extension: .yaml
+
+      # This field in each event will be used to extract a destination 'stream' name.
+      # This will equal the destination Kafka topic, unless a topic prefix
+      # is also configured.
+      stream_field: [meta.stream, meta.topic]
+      topic_prefix: 'datacenter1.'
+
+      # This field will be used in log messages to uniquely ID each event.
+      id_field: meta.id
+
+      # If a validation error is encountered, a validation error event 
+      # will be produced to this stream.
+      error_stream: eventgate.error.validation
+
+      # kafka configs go here.
+      kafka:
+        conf:
+          metadata.broker.list: 'localhost:9092'
+        # kafka topic conf goes here
+        topic_conf: {}

@@ -1,3 +1,7 @@
+# service-runner config file.
+# Configures the service-runner as well as the EventGate application.
+# See: https://github.com/wikimedia/service-runner#config-loading
+
 # Number of worker processes to spawn.
 # Set to 0 to run everything in a single process without clustering.
 # Use 'ncpu' to run as many workers as there are CPU units
@@ -9,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -18,6 +22,7 @@ logging:
 #    port: 12201
 
 # Statsd metrics reporter
+# See: https://github.com/wikimedia/service-runner#config-loading
 metrics:
   #type: log
   #host: localhost
@@ -38,20 +43,18 @@ services:
       # more per-service config settings
       user_agent: eventgate
 
-      eventgate_factory_module: '../lib/factories/wikimedia-eventgate'
-
-      # Mapping of stream names to allowed schemas
-      stream_config_uri: ../event-schemas/config/stream-config.yaml
+      eventgate_factory_module: '../lib/factories/default-eventgate'
 
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.  The default is $schema.
       # An array of field names will cause EventGate to search for
       # fields by these names in each event, using the first match.
-      schema_uri_field: [$schema, meta.schema_uri]
+      schema_uri_field: $schema
 
       # If set, this URI will be prepended to any relative schema URI
-      # extracted from each event's schema_field
-      schema_base_uri: ../event-schemas/jsonschema/
+      # extracted from each event's schema_field.  Change this
+      # to match your path to your schema repository.
+      schema_base_uri: ./test/schemas
       #schema_base_uri: https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema
 
       # If set, this will be appended to every extracted schema_uri if that schema_uri
@@ -61,19 +64,11 @@ services:
       # This field in each event will be used to extract a destination 'stream' name.
       # This will equal the destination Kafka topic, unless a topic prefix
       # is also configured.
-      stream_field: [meta.stream, meta.topic]
-      topic_prefix: 'datacenter1.'
-
-      # This field will be used in log messages to uniquely ID each event.
-      id_field: meta.id
-
-      # If a validation error is encountered, a validation error event 
-      # will be produced to this stream.
-      error_stream: eventgate.error.validation
+      stream_field: meta.stream
 
       # kafka configs go here.
       kafka:
         conf:
-          metadata.broker.list: '10.11.12.13:9092'
+          metadata.broker.list: 'localhost:9092'
         # kafka topic conf goes here
         topic_conf: {}
