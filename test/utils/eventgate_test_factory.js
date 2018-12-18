@@ -6,7 +6,7 @@ const P = require('bluebird');
 const uuid = require('cassandra-uuid').TimeUuid;
 
 const {
-    makeExtractStreamName,
+    makeExtractStream,
     makeValidate
 } = require('../../lib/factories/default-eventgate');
 
@@ -37,7 +37,7 @@ function makeMockProduce(options) {
     const producableErrorEventTopic = '__throw_produceable_error__';
 
     // Use the extracted event stream_name as the topic
-    const extractTopic      = makeExtractStreamName(options);
+    const extractTopic      = makeExtractStream(options);
 
     return (event) => {
         const topic = extractTopic(event);

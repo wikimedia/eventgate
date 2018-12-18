@@ -54,9 +54,9 @@ describe('default-eventgate makeExtractSchemaUri', () => {
 });
 
 
-describe('default-eventgate makeExtractStreamName', () => {
+describe('default-eventgate makeExtractStream', () => {
     it('Should make function that extracts stream name', () => {
-        const extractStreamName = eventgateModule.makeExtractStreamName({
+        const extractStream = eventgateModule.makeExtractStream({
             schema_uri_field: 'meta.schema_uri',
             stream_field: 'meta.stream'
         });
@@ -64,20 +64,20 @@ describe('default-eventgate makeExtractStreamName', () => {
         const event0 = { name: 'event0', meta: { stream: 'cool_stream' } };
         const event1 = { name: 'event1', meta: { } };
 
-        assert.equal(extractStreamName(event0), 'cool_stream');
+        assert.equal(extractStream(event0), 'cool_stream');
         assert.throws(() => {
-            extractStreamName(event1);
+            extractStream(event1);
         });
     });
 
     it('Should make function that extracts stream name from schema_uri', () => {
-        const extractStreamName = eventgateModule.makeExtractStreamName({
+        const extractStream = eventgateModule.makeExtractStream({
             schema_uri_field: 'meta.schema_uri'
         });
 
         const event0 = { name: 'event0', meta: { schema_uri: 'cool/schema' } };
 
-        assert.equal(extractStreamName(event0), 'cool_schema');
+        assert.equal(extractStream(event0), 'cool_schema');
     });
 });
 
