@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/wikimedia/eventgate.svg?branch=master)](https://travis-ci.org/wikimedia/eventgate)
+
 # EventGate
 
 EventGate takes in JSON events via HTTP POST, validates and then produces them
