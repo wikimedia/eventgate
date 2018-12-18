@@ -1,0 +1,4 @@
+
+# Only test/event events are allowed in the test.event stream.
+test.event:
+  schema_title: test/event
