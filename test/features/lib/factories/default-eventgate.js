@@ -7,6 +7,10 @@ const eventgateModule = require('../../../../lib/factories/default-eventgate');
 
 const logger = bunyan.createLogger({ name: 'test/EventValidator', level: 'fatal' });
 
+const {
+    EventInvalidError
+} = require('../../../../lib/error');
+
 
 describe('default-eventgate makeExtractSchemaUri', () => {
 
@@ -77,52 +81,51 @@ describe('default-eventgate makeExtractStream', () => {
 
 describe('default-eventgate makeValidate', () => {
 
-    const testEvent_v1_0 = {
-        '$schema': '/test/0.0.1',
-        meta: {
-            stream: 'test.event',
-            id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
-        },
-        test: 'test_value_0'
-    };
-    const testInvalidEvent = {
-        '$schema': '/test/0.0.1',
-        meta: {
-            stream: 'test.event',
-            id: '5e1dd101-641c-11e8-ab6c-b083fecf1289',
-        },
-        test: 1234
+    const options = {
+        // TODO change these when we have a new draft 7 schema in event-schemas repo
+        schema_base_uri: 'test/schemas/',
+        schema_uri_field: '$schema',
+        stream_field: 'meta.stream'
     };
 
-    it('Should make function that resolves schema uris and validates events', (done) => {
-        const validate = eventgateModule.makeValidate({
-            schema_base_uri: 'test/schemas/',
-            schema_uri_field: '$schema',
-            stream_field: 'meta.stream',
-        }, logger);
+    it('Should make function that resolves schema uris and validates events', async() => {
+        const validate = await eventgateModule.makeValidate(options, logger);
 
-        validate(testEvent_v1_0)
-            .catch((err) => {
-                assert.fail(`Event should have validated: ${err.message}`);
-            })
-            .then((validEvent) => {
-                assert.deepEqual(validEvent, testEvent_v1_0);
-            })
-            .finally(() => done());
+        const testEvent_v1_0 = {
+            '$schema': '/test/0.0.1',
+            meta: {
+                stream: 'test.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+            },
+            test: 'test_value_0'
+        };
+
+        const validEvent = await validate(testEvent_v1_0);
+        assert.deepEqual(validEvent, testEvent_v1_0);
     });
 
-    it('Should throw an error for invalid event', (done) => {
-        const validate = eventgateModule.makeValidate({
-            schema_base_uri: 'test/schemas/',
-            schema_uri_field: '$schema',
-            stream_field: 'meta.stream',
-        }, logger);
+    it('Should throw an error for invalid event', async() => {
+        const validate = await eventgateModule.makeValidate(options, logger);
 
-        validate(testInvalidEvent)
-            .catch((err) => {
-                assert.ok(err);
-            })
-            .finally(() => done());
+        const testInvalidEvent = {
+            '$schema': '/test/0.0.1',
+            meta: {
+                stream: 'test.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1289',
+            },
+            test: 1234
+        };
+
+        let threwError = false;
+        try {
+            await validate(testInvalidEvent);
+        } catch (err) {
+            assert(err instanceof EventInvalidError);
+            threwError = true;
+        }
+        if (!threwError) {
+            assert.fail(`Event should have have thrown error`);
+        }
     });
 
 });
