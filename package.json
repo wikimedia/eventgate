@@ -5,8 +5,8 @@
   "main": "./app.js",
   "scripts": {
     "start": "service-runner",
-    "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && nsp check",
-    "lint": "eslint --cache --max-warnings 0 --ext .js --ext .json .",
+    "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && npm run lint && nsp check",
+    "lint": "eslint --cache --max-warnings 0 --ext .js --ext .json lib routes app.js",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
     "test-build": "service-runner docker-test && service-runner build --deploy-repo --force"
@@ -50,14 +50,13 @@
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
   },
   "devDependencies": {
-    "eslint": "^5.8.0",
+    "eslint": "^5.9.0",
     "eslint-config-node-services": "^2.2.5",
     "eslint-config-wikimedia": "^0.5.0",
     "eslint-plugin-jsdoc": "^3.7.1",
     "eslint-plugin-json": "^1.2.0",
     "extend": "^3.0.1",
     "mocha": "^5.2.0",
-    "mocha-eslint": "^4.1.0",
     "nsp": "^3.2.1",
     "nyc": "^13.1.0"
   },
