@@ -1,1 +1,4 @@
 extends: 'eslint-config-node-services'
+
+parserOptions:
+  ecmaVersion: 10
