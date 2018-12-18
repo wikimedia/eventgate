@@ -1,14 +1,7 @@
 'use strict';
 
 const bunyan = require('bunyan');
-const P = require('bluebird');
 const assert = require('assert');
-// const {
-//     EventGate,
-//     EventStatus
-// } = require('../../../../lib/eventgate');
-
-// const EventInvalidError = require('../\../../lib/error').EventInvalidError;
 
 const eventgateModule = require('../../../../lib/factories/default-eventgate');
 
