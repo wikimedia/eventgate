@@ -108,7 +108,7 @@ instantiated `EventGate`.  If `mapToErrorEvent` is provided and event processing
 reason, those errors will be converted to event errors via this function, and then produced.
 There should be no difference between the kind of events that `mapToErrorEvent` returns and
 the kind of events that your instantiated `EventGate` can handle.
-`eventGate.produce([errorEvents])` should work.  If your `mapToErrorEvent` implementation
+`eventGate.process([errorEvents])` should work.  If your `mapToErrorEvent` implementation
 returns `null` for any given failed `event`, no error event for that error will be
 produced.  This allows `mapToErrorEvent` implementations to decide what types of
 Errors should be produced.
@@ -189,7 +189,7 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 
 # TODO
-- Tests for eventgate, default-eventgate, wikimedia-eventgate, etc.
+- Tests for wikimedia-eventgate.
 - monitoring/metrics (for kafka, etc.)
 - security review of AJV
 - close() method for EventGate. ? graceful kafka shutdown?

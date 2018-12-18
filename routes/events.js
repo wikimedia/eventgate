@@ -45,7 +45,7 @@ async function handleEvents(eventGate, conf, req, res) {
     // If the requester wants a hasty response, return now!
     if (req.query.hasty) {
         res.statusMessage = `${events.length} events hastily received.`;
-        res.status(204);
+        res.status(202);
         res.end();
     }
 
@@ -117,7 +117,7 @@ async function handleEvents(eventGate, conf, req, res) {
             res.json({ invalid: results.invalid, error: results.error });
         }
     } else {
-        // All events had some failure eith at least one error
+        // All events had some failure with at least one error
         // (some might have been invalid): 500
         const statusMessage = `${failureCount} out of ${events.length} ` +
             `events had failures and were not accepted. (${invalidCount} ` +

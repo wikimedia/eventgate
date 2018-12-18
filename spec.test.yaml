@@ -94,7 +94,7 @@ paths:
         - title: Produce a single valid event
           request:
             headers:
-              content-type: application/json            
+              content-type: application/json
             body:
               $schema: test/0.0.1
               meta:
@@ -308,5 +308,5 @@ paths:
                 test: test_value1
                 test_default: 67890
           response:
-            status: 204
+            status: 202
             body: ""
