@@ -142,7 +142,7 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
             threwError = true;
         }
         if (!threwError) {
-            assert.fail(`Event should have have thrown error`);
+            assert.fail(`Event validation should have have thrown EventInvalidError`);
         }
     });
 
@@ -166,7 +166,7 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
             threwError = true;
         }
         if (!threwError) {
-            assert.fail(`Event should have have thrown error`);
+            assert.fail(`Event validation should have have thrown UnauthorizedSchemaForStreamError`);
         }
     });
 
@@ -190,7 +190,7 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
             threwError = true;
         }
         if (!threwError) {
-            assert.fail(`Event should have have thrown error`);
+            assert.fail(`Event validation should have have thrown UnauthorizedSchemaForStreamError`);
         }
     });
 });
