@@ -39,7 +39,7 @@ function makeMockProduce(options) {
     // Use the extracted event stream_name as the topic
     const extractTopic      = makeExtractStream(options);
 
-    return (event) => {
+    return (event, context) => {
         const topic = extractTopic(event);
 
         if (topic.includes(unproducableErrorEventTopic)) {
@@ -114,5 +114,6 @@ function mockEventGateFactory(options, logger) {
 }
 
 module.exports = {
-    factory: mockEventGateFactory
+    factory: mockEventGateFactory,
+    makeMockProduce
 };

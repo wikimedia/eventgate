@@ -2,6 +2,7 @@
 
 const bunyan = require('bunyan');
 const assert = require('assert');
+const P = require('bluebird');
 
 const eventgateModule = require('../../../../lib/factories/default-eventgate');
 
@@ -20,7 +21,7 @@ describe('default-eventgate makeExtractSchemaUri', () => {
         });
 
 
-        const expectedSchemaUri = 'cool/schema';
+        const expectedSchemaUri = '/cool/schema';
         const event0 = { name: 'event0', meta: { schema_uri: expectedSchemaUri } };
         const event1 = { name: 'event1', meta: { } };
 
@@ -35,7 +36,7 @@ describe('default-eventgate makeExtractSchemaUri', () => {
             schema_uri_field: ['$schema', 'meta.schema_uri']
         });
 
-        const expectedSchemaUri = 'cool/schema';
+        const expectedSchemaUri = '/cool/schema';
         const event0 = { name: 'event0', meta: { schema_uri: expectedSchemaUri } };
         const event1 = { name: 'event1', meta: { } };
         const event2 = { name: 'event2', $schema: expectedSchemaUri };
@@ -72,7 +73,7 @@ describe('default-eventgate makeExtractStream', () => {
             schema_uri_field: 'meta.schema_uri'
         });
 
-        const event0 = { name: 'event0', meta: { schema_uri: 'cool/schema' } };
+        const event0 = { name: 'event0', meta: { schema_uri: '/cool/schema' } };
 
         assert.equal(extractStream(event0), 'cool_schema');
     });
@@ -126,6 +127,85 @@ describe('default-eventgate makeValidate', () => {
         if (!threwError) {
             assert.fail(`Event should have have thrown error`);
         }
+    });
+
+
+    describe('default-eventgate makeProduce', () => {
+
+        it('Should make a function that uses stream for topic from event and produces', async() => {
+
+            const testEvent_v1_0 = {
+                '$schema': '/test/0.0.1',
+                meta: {
+                    stream: 'test.event',
+                    id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+                },
+                test: 'test_value_0'
+            };
+
+            const options = {
+                schema_uri_field: '$schema',
+                stream_field: 'meta.stream',
+                topic_prefix: 'test_it',
+            };
+
+            const mocKafkaProducer = {
+                produce: (topic, partition, message, key) => {
+                    return P.resolve([{
+                        topic,
+                        partition: 0,
+                        offset: 1,
+                        key: key,
+                        opaque: { },
+                        timestamp: 1539629252472,
+                        size: message.length
+                    }]);
+                }
+            };
+
+            const produce = eventgateModule.makeProduce(options, mocKafkaProducer);
+
+            const produceResult = await produce(testEvent_v1_0);
+            assert.strictEqual(produceResult[0].topic, 'test.event');
+        });
+    });
+
+    it('Should make a function that uses schema_uri for topic from event and produces', async() => {
+
+        const testEvent_v1_0 = {
+            '$schema': '/test/0.0.1',
+            meta: {
+                stream: 'test.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+            },
+            test: 'test_value_0'
+        };
+
+        // stream_field not set in options, makeProduce should fallback to
+        // sanitizing and using schema_uri.
+        const options = {
+            schema_uri_field: '$schema',
+            topic_prefix: 'test_it',
+        };
+
+        const mocKafkaProducer = {
+            produce: (topic, partition, message, key) => {
+                return P.resolve([{
+                    topic,
+                    partition: 0,
+                    offset: 1,
+                    key: key,
+                    opaque: { },
+                    timestamp: 1539629252472,
+                    size: message.length
+                }]);
+            }
+        };
+
+        const produce = eventgateModule.makeProduce(options, mocKafkaProducer);
+
+        const produceResult = await produce(testEvent_v1_0);
+        assert.strictEqual(produceResult[0].topic, 'test_0.0.1');
     });
 
 });

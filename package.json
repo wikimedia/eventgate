@@ -10,7 +10,7 @@
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
     "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",

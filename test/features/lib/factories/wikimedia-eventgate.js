@@ -2,13 +2,13 @@
 
 const bunyan = require('bunyan');
 const assert = require('assert');
+const P = require('bluebird');
 
 const eventgateModule = require('../../../../lib/factories/wikimedia-eventgate');
 
 const {
     EventInvalidError
 } = require('../../../../lib/error');
-
 
 const logger = bunyan.createLogger({ name: 'test/EventValidator', level: 'fatal' });
 
@@ -194,3 +194,60 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
         }
     });
 });
+
+
+describe('wikimedia-eventgate makeProduce', () => {
+
+    const options = {
+        stream_field: 'meta.stream',
+        topic_prefix: 'test_it.',
+    };
+
+    it('Should make a function that uses varies Kafka producer based on req.query fire and forget param and topic_prefix', async() => {
+
+        function mockProduceFunction(producerName, topic, partition, message, key) {
+            return P.resolve([{
+                topic,
+                partition: 0,
+                offset: 1,
+                key: key,
+                opaque: { },
+                timestamp: 1539629252472,
+                size: message.length,
+                producerName
+            }]);
+        };
+
+        const mockGuaranteedKafkaProducer = {
+            produce: mockProduceFunction.bind(null, 'guaranteedProducer')
+        };
+        const mockHastyKafkaProducer = {
+            produce: mockProduceFunction.bind(null, 'hastyProducer')
+        };
+
+        const produce = eventgateModule.makeProduce(
+            options, mockGuaranteedKafkaProducer, mockHastyKafkaProducer
+        );
+
+        const testEvent_v1_0 = {
+            '$schema': '/test/0.0.1',
+            meta: {
+                stream: 'test.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+            },
+            test: 'test_value_0'
+        };
+
+        const guaranteedProduceResult = await produce(
+            testEvent_v1_0, { req: { query: { hasty: false } } }
+        );
+        assert.strictEqual(guaranteedProduceResult[0].producerName, 'guaranteedProducer');
+        assert.strictEqual(guaranteedProduceResult[0].topic, 'test_it.test.event');
+
+        const hastyProduceResult = await produce(
+            testEvent_v1_0, { req: { query: { hasty: true } } }
+        );
+        assert.strictEqual(hastyProduceResult[0].producerName, 'hastyProducer');
+        assert.strictEqual(hastyProduceResult[0].topic, 'test_it.test.event');
+    });
+})

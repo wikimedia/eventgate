@@ -145,7 +145,7 @@ to Kafka's concept of a topic.  Much of the time a stream might correspond 1:1 w
 a Kafka topic.  If you don't care about the topic name that is used for a any given event,
 you don't need to configure this.  The default behavior is to sanitize an event's
 schema URI and use it for the Kafka topic name.  E.g. if an event's schema URI is
-`ui/element/button-push`, the topic name will end up being `ui_element_button-push`.
+`/ui/element/button-push`, the topic name will end up being `ui_element_button-push`.
 However, if `stream_field` is configured and present in an event, its value will be
 used as the destination Kafka topic of that event. If you need finer control over
 event -> Kafka topic mapping, you should implement your own Kafka produce function
@@ -191,7 +191,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 
 # TODO
-- Tests for wikimedia-eventgate.
 - monitoring/metrics (for kafka, etc.)
 - security review of AJV
 - close() method for EventGate. ? graceful kafka shutdown?

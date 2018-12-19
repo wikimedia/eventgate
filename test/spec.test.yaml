@@ -310,3 +310,11 @@ paths:
           response:
             status: 202
             body: ""
+
+        - title: Produce with an empty body
+          request:
+            headers:
+              content-type: application/json
+          response:
+            status: 400
+

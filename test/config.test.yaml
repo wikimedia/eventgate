@@ -32,7 +32,7 @@ services:
       # more per-service config settings
 
       # the location of the spec, defaults to spec.yaml if not specified
-      spec: ./spec.test.yaml
+      spec: ./test/spec.test.yaml
 
       # the user agent to use when issuing requests
       user_agent: eventgate_test
