@@ -3,7 +3,8 @@
         "test/**",
         "lib/util.js",
         "lib/kafka.js",
-        "lib/swagger-ui.js"
+        "lib/swagger-ui.js",
+        "app.js"
     ],
     "reporter": [
         "text",
