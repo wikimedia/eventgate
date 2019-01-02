@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/wikimedia/eventgate.svg?branch=master)](https://travis-ci.org/wikimedia/eventgate)
-
 [![Coverage Status](https://coveralls.io/repos/github/wikimedia/eventgate/badge.svg?branch=master)](https://coveralls.io/github/wikimedia/eventgate?branch=master)
 
 # EventGate
