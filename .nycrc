@@ -1,0 +1,12 @@
+{
+    "exclude": [
+        "test/**",
+        "lib/util.js",
+        "lib/kafka.js",
+        "lib/swagger-ui.js"
+    ],
+    "reporter": [
+        "text",
+        "html"
+    ]
+}
