@@ -106,7 +106,7 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
     };
 
 
-    it('Should make function that ensures events are allows in stream and validates events from schemas URIs', async() => {
+    it('Should make function that ensures events are allowed in stream and validates events from schemas URIs', async() => {
         const validate = await eventgateModule.makeWikimediaValidate(options, logger);
 
         const testEvent_v1_0 = {
@@ -120,6 +120,23 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
 
         const validEvent = await validate(testEvent_v1_0);
         assert.deepEqual(validEvent, testEvent_v1_0);
+    });
+
+    it('Should make function that ensures events are allowed in stream config regex', async() => {
+        const validate = await eventgateModule.makeWikimediaValidate(options, logger);
+
+        // This event should pass via regex checking in stream config
+        const testEvent_draft4 = {
+            '$schema': '/test_draft4/0.0.1',
+            meta: {
+                stream: 'test_draft4.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+            },
+            test: 'test_value_0'
+        };
+
+        const validEvent = await validate(testEvent_draft4);
+        assert.deepEqual(validEvent, testEvent_draft4);
     });
 
     it('Should throw an EventInvalidError for invalid event', async() => {
@@ -153,6 +170,30 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
             '$schema': '/error/0.0.1',
             meta: {
                 stream: 'test.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1289',
+            },
+            test: 'test_value_0'
+        };
+
+        let threwError = false;
+        try {
+            await validate(testUnallowedEvent);
+        } catch (err) {
+            assert(err instanceof eventgateModule.UnauthorizedSchemaForStreamError);
+            threwError = true;
+        }
+        if (!threwError) {
+            assert.fail(`Event validation should have have thrown UnauthorizedSchemaForStreamError`);
+        }
+    });
+
+    it('Should throw an error for an event that is not allowed in a regex stream', async() => {
+        const validate = await eventgateModule.makeWikimediaValidate(options, logger);
+
+        const testUnallowedEvent = {
+            '$schema': '/error/0.0.1',
+            meta: {
+                stream: 'test_draft4.event',
                 id: '5e1dd101-641c-11e8-ab6c-b083fecf1289',
             },
             test: 'test_value_0'

@@ -44,6 +44,15 @@ const testEvent_v2_0 = {
     test: 'test_value_0'
 };
 
+const testEvent_draft4 = {
+    '$schema': '/test_draft4/0.0.1',
+    meta: {
+        stream: 'test.event',
+        id: '5e1dd101-641c-11e8-ab6c-b083fecf1290',
+    },
+    test: 'test_value_0'
+};
+
 function extractSchemaUri(event) {
     return event.$schema;
 }
@@ -108,4 +117,30 @@ describe('EventValidator test instance', () => {
             'validate functions should be different'
         );
     });
+
+    it('should validate an event with a draft-04 jsonschema', async() => {
+        const event = await eventValidator.validate(testEvent_draft4);
+        assert.strictEqual(testEvent_draft4, event);
+    });
+
+
+    it('2 EventValidator instances should not conflict', async() => {
+        const ev1 = new EventValidator({
+            extractSchemaUri,
+            resolveSchemaUri,
+            log: logger
+        });
+
+        const ev2 = new EventValidator({
+            extractSchemaUri,
+            resolveSchemaUri,
+            log: logger
+        });
+
+        const e1 = await eventValidator.validate(testEvent_draft4);
+        const e2 = await eventValidator.validate(testEvent_draft4);
+
+        assert.deepEqual(e1, e2);
+    });
+
 });

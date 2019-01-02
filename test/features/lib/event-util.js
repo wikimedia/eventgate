@@ -41,6 +41,12 @@ describe('objectFactory', () => {
     it('should load from a YAML string', () => {
         assert.deepEqual(testObject, eUtil.objectFactory(testObjectYaml));
     });
+
+    it('should throw error for bad data', () => {
+        assert.throws(() => {
+            eUtil.objectFactory(123);
+        });
+    });
 });
 
 describe('objectGet', () => {
@@ -118,6 +124,9 @@ describe('stringMatches', () => {
 describe('fileExtension', () => {
     it('should return empty if no file extension', () => {
         assert.equal('', eUtil.fileExtension('path/to/file'));
+    });
+    it('should return empty if no filename', () => {
+        assert.equal('', eUtil.fileExtension(undefined));
     });
 
     it('should return empty if numeric end of file name', () => {

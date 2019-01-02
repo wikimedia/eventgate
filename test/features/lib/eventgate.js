@@ -75,6 +75,12 @@ describe('EventGate', () => {
         produceStatus: 'error'
     };
 
+    // mapToErrorEvent will push events into producedErrorEvents.
+    // Clear them out after each test.
+    let producedErrorEvents = [];
+    beforeEach(() => {
+        producedErrorEvents = [];
+    });
 
     const mockEventGate = new EventGate({
 
@@ -107,12 +113,50 @@ describe('EventGate', () => {
             }
         },
 
-        mapToEventError: (error, event, context) => {
-            return {
+        mapToErrorEvent: (error, event, context) => {
+            // Only produce error events for EventInvalidError
+            if (!(error instanceof EventInvalidError)) {
+                return null;
+            }
+
+            const errorEvent = {
                 error,
                 original_event: event
             };
+
+            producedErrorEvents.push(errorEvent);
+            return errorEvent;
         }
+    });
+
+    /**
+     * Asserts that count events have been pushed into producedErrorEvents within
+     * timeout milliseconds.
+     * @param {integer} count
+     * @param {integer} timeout
+     */
+    function assertErrorEventsProduced(count, timeout = 100) {
+        // Wait a bit and assert that error events were produced.
+        // Error events are produced asynchronously after the original .process() resolves.
+        return new P((resolve) => {
+            setTimeout(() => {
+                assert.equal(producedErrorEvents.length, count,
+                    `Should have produced ${count} error events within ${timeout} milliseconds`);
+                resolve();
+            }, timeout);
+        });
+    }
+
+    it('Should process throw error if no validate function', async() => {
+        assert.throws(() => {
+            new EventGate({validate: undefined, produce: (e) => e});
+        });
+    });
+
+    it('Should process throw error if no produce function', async() => {
+        assert.throws(() => {
+            new EventGate({validate: (e) => e, produce: undefined});
+        });
     });
 
     it('Should process 2 events', async() => {
@@ -120,6 +164,9 @@ describe('EventGate', () => {
         assert.equal(result.success.length, 2);
         assert.equal(result.invalid.length, 0);
         assert.equal(result.error.length,   0);
+
+        return assertErrorEventsProduced(0);
+
     });
 
     it('Should process 2 invalid events', async() => {
@@ -127,6 +174,8 @@ describe('EventGate', () => {
         assert.equal(result.success.length, 0);
         assert.equal(result.invalid.length, 2);
         assert.equal(result.error.length,   0);
+
+        return assertErrorEventsProduced(2);
     });
 
     it('Should process 2 validation error events', async() => {
@@ -134,6 +183,9 @@ describe('EventGate', () => {
         assert.equal(result.success.length, 0);
         assert.equal(result.invalid.length, 0);
         assert.equal(result.error.length,   2);
+
+        return assertErrorEventsProduced(0);
+
     });
 
     it('Should process 2 produce error events', async() => {
@@ -141,5 +193,7 @@ describe('EventGate', () => {
         assert.equal(result.success.length, 0);
         assert.equal(result.invalid.length, 0);
         assert.equal(result.error.length,   2);
+
+        return assertErrorEventsProduced(0);
     });
 });

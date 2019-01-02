@@ -84,13 +84,15 @@ describe('default-eventgate makeValidate', () => {
 
     const options = {
         // TODO change these when we have a new draft 7 schema in event-schemas repo
-        schema_base_uri: 'test/schemas/',
+        schema_base_uri: './test/schemas/',
         schema_uri_field: '$schema',
         stream_field: 'meta.stream'
     };
 
+    const validate = eventgateModule.makeValidate(options, logger);
+
     it('Should make function that resolves schema uris and validates events', async() => {
-        const validate = await eventgateModule.makeValidate(options, logger);
+        const validate = eventgateModule.makeValidate(options, logger);
 
         const testEvent_v1_0 = {
             '$schema': '/test/0.0.1',
@@ -104,6 +106,31 @@ describe('default-eventgate makeValidate', () => {
         const validEvent = await validate(testEvent_v1_0);
         assert.deepEqual(validEvent, testEvent_v1_0);
     });
+
+    it('Should make function that resolves schema uris and validates draft 04 events', async() => {
+        const validate = eventgateModule.makeValidate(options, logger);
+
+        const validate2 = eventgateModule.makeValidate(options, logger);
+
+        const testEvent_draft4 = {
+            '$schema': '/test_draft4/0.0.1',
+            meta: {
+                stream: 'test_draft4.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+            },
+            test: 'test_value_0'
+        };
+
+        const validEvent = await validate(testEvent_draft4);
+        assert.deepEqual(validEvent, testEvent_draft4);
+        // console.log('AJV1', validate.eventValidator.ajv._cache);
+
+        // console.log('AJV2', validate2.eventValidator.ajv._cache);
+        // assert.notStrictEqual(validate.eventValidator.ajv, validate2.eventValidator.ajv);
+        await validate2(testEvent_draft4);
+
+    });
+
 
     it('Should throw an error for invalid event', async() => {
         const validate = await eventgateModule.makeValidate(options, logger);

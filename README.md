@@ -139,6 +139,11 @@ can optionally be prefixed with `schema_base_uri` and suffixed with
 use the defaults, all of your events should have a $schema field set to
 a resolvable schema URI.
 
+EventValidator always supports draft-07 JSONSchemas (via AJV).  It also
+supports additional JSONSchemas, defaulting to also supporting draft-04.
+If you need to modify or change this, you can override the `metaSchemas` array
+option to the EventValidator constructor.
+
 ## Streams
 A 'stream' here refers to the destination name of an event.  It is closely related
 to Kafka's concept of a topic.  Much of the time a stream might correspond 1:1 with
