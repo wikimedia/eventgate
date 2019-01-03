@@ -53,6 +53,15 @@ const testEvent_draft4 = {
     test: 'test_value_0'
 };
 
+const testEvent_draft6 = {
+    '$schema': '/test_draft6/0.0.1',
+    meta: {
+        stream: 'test.event',
+        id: '5e1dd101-641c-11e8-ab6c-b083fecf1290',
+    },
+    test: 'test_value_0'
+};
+
 function extractSchemaUri(event) {
     return event.$schema;
 }
@@ -118,13 +127,29 @@ describe('EventValidator test instance', () => {
         );
     });
 
-    it('should validate an event with a draft-04 jsonschema', async() => {
-        const event = await eventValidator.validate(testEvent_draft4);
-        assert.strictEqual(testEvent_draft4, event);
+    it('should validate an event with a draft-04 jsonschema, using locally loaded meta schema from ajv', async() => {
+        // This test will cause the draft-04 meta schema that was added by the default
+        // options.metaSchemas to be used.
+        const schema = await eventValidator.schemaFor(testEvent_draft4);
+        const metaSchemaUri = schema.$schema;
+        const metaSchema = eventValidator.ajv.getSchema(metaSchemaUri).schema;
+        assert.strictEqual('http://json-schema.org/draft-04/schema#', eventValidator.ajv._getId(metaSchema));
     });
 
+    it('should validate an event with a draft-06 jsonschema, using remote loaded meta schema from json-schema.org', async() => {
+        // This test will cause the draft-06 meta schema to be requested from json-schema.org,
+        // since the draft-06 schema isn't added in options.metaSchemas.
+        const schema = await eventValidator.schemaFor(testEvent_draft6);
+        const metaSchemaUri = schema.$schema;
+        const metaSchema = eventValidator.ajv.getSchema(metaSchemaUri).schema;
+        assert.strictEqual('http://json-schema.org/draft-06/schema#', eventValidator.ajv._getId(metaSchema));
+    });
 
     it('2 EventValidator instances should not conflict', async() => {
+        // There was a bug in EventValidator constructor where
+        // _.defaults was assigning an incorrect loadSchema function
+        // to ajv.  This test ensures that doesn't happen again.
+
         const ev1 = new EventValidator({
             extractSchemaUri,
             resolveSchemaUri,
