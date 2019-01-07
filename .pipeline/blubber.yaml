@@ -10,7 +10,6 @@ variants:
     base: docker-registry.wikimedia.org/nodejs10-devel
     apt: { packages: [git, build-essential, python-dev] }
     node: { requirements: [package.json]}
-    runs: { environment: { LINK: g++ } }
   test:
     includes: [build]
     entrypoint: [npm, test]
