@@ -1,0 +1,24 @@
+version: v3
+base: docker-registry.wikimedia.org/nodejs10-slim
+lives:
+  in: /srv/service
+runs:
+  environment: { APP_BASE_PATH: /srv/service }
+
+variants:
+  build:
+    base: docker-registry.wikimedia.org/nodejs10-devel
+    apt: { packages: [git, build-essential, python-dev] }
+    node: { requirements: [package.json]}
+    runs: { environment: { LINK: g++ } }
+  test:
+    includes: [build]
+    entrypoint: [npm, test]
+    runs: { insecurely: true }
+  prep:
+    includes: [build]
+    node: { env: production }
+  production:
+    copies: prep
+    node: { env: production }
+    entrypoint: [node, server.js]
