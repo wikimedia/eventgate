@@ -7,7 +7,7 @@ EventGate takes in JSON events via HTTP POST, validates and then produces them
 to a pluggable destination (usually to Kafka). Valid events pass through the
 gate, invalid ones do not.
 
-Throughout this code, an 'event' is meant to refer to a parsed JSON object with
+Throughout this codebase, an 'event' is a parsed JSON object with
 a strict JSONSchema, and a 'schema' refers to an instance of a JSONSchema for
 an event.
 
