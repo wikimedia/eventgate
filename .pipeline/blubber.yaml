@@ -18,7 +18,7 @@ variants:
     node: { requirements: [package.json]}
     runs:
       environment:
-        # BUILD_LIBRDKAFKA: 0
+        BUILD_LIBRDKAFKA: 0
         LINK: g++
   # Runs npm test
   test:
@@ -38,5 +38,6 @@ variants:
     node: { env: production }
   production:
     copies: prep
+    apt: { pacakges: [librdkafka1] }
     node: { env: production }
     entrypoint: [node, server.js]
