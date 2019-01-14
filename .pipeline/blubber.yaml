@@ -14,8 +14,8 @@ variants:
   # Base build image the other variants start from this.
   build:
     base: docker-registry.wikimedia.org/nodejs10-devel
-    apt: { packages: [git, build-essential, python-dev, librdkafka1, librdkafka-dev] }
-    node: { requirements: [package.json]}
+    apt: { packages: [git, build-essential, python-dev, librdkafka-dev] }
+    node: { requirements: [package.json] }
     runs:
       environment:
         BUILD_LIBRDKAFKA: 0
@@ -28,9 +28,9 @@ variants:
   # Same as production, but includes build artifacts and extra packages for debugging.
   development:
     includes: [build]
-    apt: { packages: [kafkacat, telnet, iputils-ping, procps, curl, vim] }
-    entrypoint: [node, server.js]
+    apt: { packages: [librdkafka1, librdkafka++1, kafkacat, telnet, iputils-ping, procps, curl, vim] }
     runs: { insecurely: true }
+    entrypoint: [node, server.js]
   # prep is used for copying from build to remove build artifacts
   # from the production image.
   prep:
@@ -38,6 +38,7 @@ variants:
     node: { env: production }
   production:
     copies: prep
-    apt: { pacakges: [librdkafka1] }
+    apt: { packages: [librdkafka1, librdkafka++1] }
     node: { env: production }
+    runs: { environment: { UV_THREADPOOL_SIZE: 128 } }
     entrypoint: [node, server.js]
