@@ -252,23 +252,3 @@ describe('resolveUri', () => {
         );
     });
 });
-
-
-describe('extractUrl', () => {
-    const event = {
-        meta: {
-            schema_uri: '/test/0.0.1'
-        }
-    };
-    const cwd = path.resolve('.');
-
-    it('should return extracted and resolved file:// url from event', () => {
-        const expected = `file://${cwd}${event.meta.schema_uri}`;
-        assert.equal(expected, eUtil.extractUrl('meta.schema_uri', cwd, undefined, event));
-    });
-
-    it('should return extracted and resolved http:// url from event', () => {
-        const expected = `http://domain.example.com${event.meta.schema_uri}`;
-        assert.equal(expected, eUtil.extractUrl('meta.schema_uri', 'http://domain.example.com', undefined, event));
-    });
-});
