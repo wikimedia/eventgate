@@ -67,7 +67,7 @@ services:
       # point at any URL domain.  If false, they must only contain URI paths,
       # which will be prefixed with one of the schema_base_uris.
       # Setting this to false restricts schema URLs to those specified
-      # in schema_base_uris.
+      # in schema_base_uris.  This defaults to false.
       allow_absolute_schema_uris: false
 
       # This field in each event will be used to extract a destination 'stream' name.
