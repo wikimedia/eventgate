@@ -99,7 +99,7 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
 
     const options = {
         // TODO change these when we have a new draft 7 schema in event-schemas repo
-        schema_base_uri: 'test/schemas/',
+        schema_base_uris: 'test/schemas/',
         schema_uri_field: '$schema',
         stream_field: 'meta.stream',
         stream_config_uri: 'test/schemas/stream-config.test.yaml'

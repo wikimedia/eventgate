@@ -83,8 +83,7 @@ describe('default-eventgate makeExtractStream', () => {
 describe('default-eventgate makeValidate', () => {
 
     const options = {
-        // TODO change these when we have a new draft 7 schema in event-schemas repo
-        schema_base_uri: './test/schemas/',
+        schema_base_uris: ['./test/schemas/'],
         schema_uri_field: '$schema',
         stream_field: 'meta.stream'
     };

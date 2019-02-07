@@ -66,8 +66,8 @@ function extractSchemaUri(event) {
     return event.$schema;
 }
 
-function resolveSchemaUri(uri) {
-    return eUtil.resolveUri(uri, baseSchemaUri);
+function getSchema(uri) {
+    return eUtil.urlGetObject(eUtil.resolveUri(uri, baseSchemaUri));
 }
 
 /**
@@ -80,7 +80,7 @@ function loadTestSchema() {
 describe('EventValidator test instance', () => {
     const eventValidator = new EventValidator({
         extractSchemaUri,
-        resolveSchemaUri,
+        getSchema,
         log: logger
     });
 
@@ -152,13 +152,13 @@ describe('EventValidator test instance', () => {
 
         const ev1 = new EventValidator({
             extractSchemaUri,
-            resolveSchemaUri,
+            getSchema,
             log: logger
         });
 
         const ev2 = new EventValidator({
             extractSchemaUri,
-            resolveSchemaUri,
+            getSchema,
             log: logger
         });
 

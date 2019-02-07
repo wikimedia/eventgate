@@ -80,7 +80,6 @@ function makeMapToErrorEvent(options) {
             },
             raw_event: _.isString(event) ? event : JSON.stringify(event)
         };
-        console.log("made event error", error, event);
 
         // TODO: How to test that some get error-produced and some don't?
         if (error instanceof EventInvalidError || error instanceof MockErrorEventProducableError) {

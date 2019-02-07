@@ -7,7 +7,8 @@ const assert = require('assert');
 const eUtil  = require('../../../lib/event-util');
 
 
-const filePath = '/tmp/_mocha_test_file.yaml';
+const fileName = '_mocha_test_file.yaml'
+const filePath = `/tmp/${fileName}`;
 const fileUrl = `file://${filePath}`;
 
 const testObject = { a: 'A', b: 1,  a0: { a1: { v: 123 } } };
@@ -105,6 +106,48 @@ describe('urlGetObject', () => {
     });
 
     // TODO test urlGet and urlGetObject from http url?  set up test http server?
+});
+
+describe('urlGetFirstObject', () => {
+    before(writeTempFile);
+    after(unlinkTempFile);
+
+    it('should get first existant object from list of urls', (done) => {
+        const fileUrls = ['/tmp/non_existant1.yaml', fileUrl];
+        eUtil.urlGetFirstObject(fileUrls).then((content) => {
+            assert.deepEqual(testObject, content);
+            done();
+        });
+    });
+
+    it('should reject if there are no existant objects at list of urls', (done) => {
+        const fileUrls = ['/tmp/non_existant1.yaml', '/tmp/non_existant2.yaml'];
+        assert.rejects(() => {
+            return eUtil.urlGetFirstObject(fileUrls)
+            .finally(() => done());
+        });
+    });
+});
+
+describe('uriGetFirstObject', () => {
+    before(writeTempFile);
+    after(unlinkTempFile);
+
+    it('should get first existant object at fileName in list of base URIs', (done) => {
+        const baseURIs = ['file:///non_existant1/', 'file:///tmp/'];
+        eUtil.uriGetFirstObject(fileName, baseURIs).then((content) => {
+            assert.deepEqual(testObject, content);
+            done();
+        });
+    });
+
+    it('should reject if there are no existant objects at fileName in list of base URIs', (done) => {
+        const baseURIs = ['file:///non_existant1/', 'file:///non_existant2/'];
+        assert.rejects(() => {
+            return eUtil.uriGetFirstObject(fileName, baseURIs)
+            .finally(() => done());
+        });
+    });
 });
 
 describe('stringMatches', () => {

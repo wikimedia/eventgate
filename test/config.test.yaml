@@ -58,7 +58,7 @@ services:
 
       # If set, this URI will be prepended to any relative schema URI
       # extracted from each event's schema_field
-      schema_base_uri: test/schemas/
+      schema_base_uris: [test/schemas/]
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
       # schema_file_extension: .yaml
