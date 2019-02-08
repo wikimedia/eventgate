@@ -197,7 +197,6 @@ repository.  See also the [ServiceTemplateNode documentation](https://www.mediaw
 
 
 # TODO
-- Restricted list of allowed schema domains.
 - monitoring/metrics (for kafka, etc.)
 - security review of AJV
 - close() method for EventGate. ? graceful kafka shutdown?
