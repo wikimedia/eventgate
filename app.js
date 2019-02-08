@@ -133,6 +133,7 @@ function initApp(options) {
 /**
  * Loads all routes declared in routes/ into the app
  * @param {Application} app the application object to load routes into
+ * @param {string} dir
  * @return {bluebird} a promise resolving to the app object
  */
 function loadRoutes(app, dir) {
@@ -208,7 +209,7 @@ function createServer(app) {
         // Don't delay incomplete packets for 40ms (Linux default) on
         // pipelined HTTP sockets. We write in large chunks or buffers, so
         // lack of coalescing should not be an issue here.
-        server.on("connection", (socket) => {
+        server.on('connection', (socket) => {
             socket.setNoDelay(true);
         });
 
@@ -223,6 +224,8 @@ function createServer(app) {
  * options and the logger- and metrics-reporting objects from
  * service-runner and starts an HTTP server, attaching the application
  * object to it.
+ * @param {Object} options
+ * @return {Function}
  */
 module.exports = function(options) {
 

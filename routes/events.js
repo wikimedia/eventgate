@@ -87,7 +87,7 @@ async function handleEvents(eventGate, conf, req, res) {
     } else if (invalidCount === events.length) {
         // All events were invalid: 400
         const statusMessage = `${invalidCount} out of ${events.length} ` +
-            `events were invalid and not accepted.`;
+            'events were invalid and not accepted.';
         req.logger.log(
             'warn/events',
             { invalid: results.invalid, message: statusMessage }
