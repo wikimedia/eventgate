@@ -46,7 +46,7 @@ instantiated EventGate to validate and produce incoming events.
 The `EventGate` class in lib/eventgate.js handles event validation and produce logic.
 It is instantiated with `validate` and a `produce` functions that each take a single
 `event` and extra `context` object.  `validate` should either return a Promise of the validated
-event (possibly augmented, e.g. field defaults populated) or throw an `EventInvalidError`.
+event (possibly augmented, e.g. field defaults populated) or throw an `ValidationError`.
 `produce` is expected to return a Promise of the `produce` result, or throw an
 `Error`.
 

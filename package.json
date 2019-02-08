@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/wikimedia/eventgate",
   "dependencies": {
-    "ajv": "^6.5.1",
+    "ajv": "^6.8.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",

@@ -10,7 +10,7 @@ const {
     makeValidate
 } = require('../../lib/factories/default-eventgate');
 
-const EventInvalidError = require('../../lib/error').EventInvalidError;
+const ValidationError = require('../../lib/error').ValidationError;
 const EventGate = require('../../lib/eventgate').EventGate;
 
 // Errors of this type should be produced as error events.
@@ -82,7 +82,7 @@ function makeMapToErrorEvent(options) {
         };
 
         // TODO: How to test that some get error-produced and some don't?
-        if (error instanceof EventInvalidError || error instanceof MockErrorEventProducableError) {
+        if (error instanceof ValidationError || error instanceof MockErrorEventProducableError) {
             eventError.message = error.errorsText;
         } else if (error instanceof MockErrorEventUnproducableError) {
             // By returning null, we ensure that this error will not

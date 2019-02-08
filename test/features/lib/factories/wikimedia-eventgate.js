@@ -7,7 +7,7 @@ const P = require('bluebird');
 const eventgateModule = require('../../../../lib/factories/wikimedia-eventgate');
 
 const {
-    EventInvalidError
+    ValidationError
 } = require('../../../../lib/error');
 
 const logger = bunyan.createLogger({ name: 'test/EventValidator', level: 'fatal' });
@@ -20,8 +20,8 @@ describe('wikimedia-eventgate makeMapToErrorEvent', () => {
         error_stream: 'test_event_error'
     });
 
-    it('Should make an error event for EventInvalidError', () => {
-        const error = new EventInvalidError(
+    it('Should make an error event for ValidationError', () => {
+        const error = new ValidationError(
             'was invalid',
             [{ dataPath: '.bad.field', message: 'what a bad field' }]
         );
@@ -139,7 +139,7 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
         assert.deepEqual(validEvent, testEvent_draft4);
     });
 
-    it('Should throw an EventInvalidError for invalid event', async() => {
+    it('Should throw an ValidationError for invalid event', async() => {
         const validate = await eventgateModule.makeWikimediaValidate(options, logger);
 
         const testInvalidEvent = {
@@ -155,11 +155,11 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
         try {
             await validate(testInvalidEvent);
         } catch (err) {
-            assert(err instanceof EventInvalidError);
+            assert(err instanceof ValidationError);
             threwError = true;
         }
         if (!threwError) {
-            assert.fail(`Event validation should have have thrown EventInvalidError`);
+            assert.fail(`Event validation should have have thrown ValidationError`);
         }
     });
 

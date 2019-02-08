@@ -1,4 +1,4 @@
-title: test/event
+title: test
 description: Schema used for simple tests
 $schema: http://json-schema.org/draft-07/schema#
 $id: /test/0.0.1
@@ -21,10 +21,12 @@ properties:
       id:
         type: string
         pattern: '^[a-fA-F0-9]{8}(-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}$'
+        maxLength: 36
         description: the unique ID of this event; should match the dt field
       dt:
         type: string
         format: date-time
+        maxLength: 26
         description: the time stamp of the event, in ISO8601 format
     required:
       - stream

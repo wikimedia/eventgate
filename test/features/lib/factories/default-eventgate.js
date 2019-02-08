@@ -9,7 +9,7 @@ const eventgateModule = require('../../../../lib/factories/default-eventgate');
 const logger = bunyan.createLogger({ name: 'test/EventValidator', level: 'fatal' });
 
 const {
-    EventInvalidError
+    ValidationError
 } = require('../../../../lib/error');
 
 
@@ -147,7 +147,7 @@ describe('default-eventgate makeValidate', () => {
         try {
             await validate(testInvalidEvent);
         } catch (err) {
-            assert(err instanceof EventInvalidError);
+            assert(err instanceof ValidationError);
             threwError = true;
         }
         if (!threwError) {

@@ -27,3 +27,4 @@ rules:
   quote-props: off
   operator-linebreak: off
   max-statements-per-line: off
+  brace-style: off

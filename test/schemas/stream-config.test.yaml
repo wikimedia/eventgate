@@ -1,8 +1,8 @@
 
 # Only test/event events are allowed in the test.event stream.
 test.event:
-  schema_title: test/event
+  schema_title: test
 
 # test_draft4/event events are allowed in any stream that starts with test_draft4
 /^test_draft4\.+/:
-  schema_title: test_draft4/event
+  schema_title: test_draft4

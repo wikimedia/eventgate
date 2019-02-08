@@ -8,7 +8,7 @@ const {
     EventStatus
 } = require('../../../lib/eventgate');
 
-const EventInvalidError = require('../../../lib/error').EventInvalidError;
+const ValidationError = require('../../../lib/error').ValidationError;
 
 const logger = bunyan.createLogger({ name: 'test/EventValidator', level: 'fatal' });
 
@@ -35,8 +35,8 @@ describe('EventStatus', () => {
         assert.deepEqual({ message: error.message }, eventStatusSerialized.context);
     });
 
-    it('Should serialize EventInvalidError EventStatus with full context', () => {
-        const error = new EventInvalidError("error message here", [
+    it('Should serialize ValidationError EventStatus with full context', () => {
+        const error = new ValidationError("error message here", [
             {
                 dataPath: '.path.to.field',
                 message: 'that was a nasty field',
@@ -90,7 +90,7 @@ describe('EventGate', () => {
             if (context.validateStatus == 'success') {
                 return P.resolve(event);
             } else if (context.validateStatus == 'invalid') {
-                throw new EventInvalidError("invalid event", [
+                throw new ValidationError("invalid event", [
                     {
                         dataPath: '.path.to.field',
                         message: 'that was a nasty field',
@@ -114,8 +114,8 @@ describe('EventGate', () => {
         },
 
         mapToErrorEvent: (error, event, context) => {
-            // Only produce error events for EventInvalidError
-            if (!(error instanceof EventInvalidError)) {
+            // Only produce error events for ValidationError
+            if (!(error instanceof ValidationError)) {
                 return null;
             }
 

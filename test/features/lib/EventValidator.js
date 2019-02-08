@@ -4,7 +4,10 @@ const bunyan            = require('bunyan');
 const assert            = require('assert');
 const eUtil             = require('../../../lib/event-util');
 const EventValidator    = require('../../../lib/EventValidator');
-const EventInvalidError = require('../../../lib/error').EventInvalidError;
+const {
+    EventSchemaLoadError,
+    ValidationError
+ } = require('../../../lib/error');
 
 const schemaUri = '/test/0.0.1';
 const baseSchemaUri = './test/schemas';
@@ -62,12 +65,22 @@ const testEvent_draft6 = {
     test: 'test_value_0'
 };
 
+const testEvent_insecure = {
+    '$schema': '/test_insecure/0.0.1',
+    meta: {
+        stream: 'test.event',
+        id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+    },
+    test: 'test_value_0'
+};
+
 function extractSchemaUri(event) {
     return event.$schema;
 }
 
 function getSchema(uri) {
-    return eUtil.urlGetObject(eUtil.resolveUri(uri, baseSchemaUri));
+    const url = eUtil.resolveUri(uri, baseSchemaUri);
+    return eUtil.urlGetObject(url);
 }
 
 /**
@@ -103,9 +116,9 @@ describe('EventValidator test instance', () => {
     it('should fail validation of invalid event', async() => {
         try {
             await eventValidator.validate(testInvalidEvent);
-            assert(false, "EventInvalidError should have been thrown");
+            assert(false, "ValidationError should have been thrown");
         } catch (err) {
-            assert(err instanceof EventInvalidError);
+            assert(err instanceof ValidationError);
         }
     });
 
@@ -143,6 +156,27 @@ describe('EventValidator test instance', () => {
         const metaSchemaUri = schema.$schema;
         const metaSchema = eventValidator.ajv.getSchema(metaSchemaUri).schema;
         assert.strictEqual('http://json-schema.org/draft-06/schema#', eventValidator.ajv._getId(metaSchema));
+    });
+
+    it('should fail validation of an event that uses an insecure schema', async() => {
+        try {
+            await eventValidator.validate(testEvent_insecure);
+            assert(false, "ValidationError should have been thrown");
+        } catch (err) {
+            assert(err instanceof EventSchemaLoadError);
+        }
+    });
+
+    it('should pass validation of an event that uses an insecure schema with allowInsecureSchema: true', async() => {
+        const insecureEventValidator = new EventValidator({
+            extractSchemaUri,
+            getSchema,
+            log: logger,
+            allowInsecureSchemas: true
+        });
+
+        const event = await insecureEventValidator.validate(testEvent_insecure);
+        assert.deepEqual(testEvent_insecure, event);
     });
 
     it('2 EventValidator instances should not conflict', async() => {
