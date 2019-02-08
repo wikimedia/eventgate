@@ -145,6 +145,13 @@ supports additional JSONSchemas, defaulting to also supporting draft-04.
 If you need to modify or change this, you can override the `metaSchemas` array
 option to the EventValidator constructor.
 
+By default, EventValidator will validate all (non-meta) schemas with AJV's
+json-schema-secure schema.  This prevents schemas from including potentially
+risky feataures that could facilitate DOS attacks.
+See: https://github.com/epoberezkin/ajv#security-considerations
+To allow insecure schemas, you can set `allowInsecureSchemas: true` in
+the EventValidator constructor options.
+
 ## Streams
 A 'stream' here refers to the destination name of an event.  It is closely related
 to Kafka's concept of a topic.  Much of the time a stream might correspond 1:1 with
