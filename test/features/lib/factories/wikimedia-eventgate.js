@@ -33,7 +33,7 @@ describe('wikimedia-eventgate makeMapToErrorEvent', () => {
 
         const expected_raw_event = JSON.stringify(event);
         const expected_error_message = error.errorsText;
-        
+
         const errorEvent = mapToErrorEvent(error, event);
 
         assert.strictEqual(errorEvent.raw_event, expected_raw_event);
@@ -98,11 +98,18 @@ describe('wikimedia-eventgate makeExtractTopic', () => {
 describe('wikimedia-eventgate makeWikimediaValidate', () => {
 
     const options = {
-        // TODO change these when we have a new draft 7 schema in event-schemas repo
         schema_base_uris: 'test/schemas/',
         schema_uri_field: '$schema',
         stream_field: 'meta.stream',
         stream_config_uri: 'test/schemas/stream-config.test.yaml'
+    };
+
+    // No stream_config_uri is set here, so any $schema will be
+    // allowed in any stream.
+    const permissiveOptions = {
+        schema_base_uris: 'test/schemas/',
+        schema_uri_field: '$schema',
+        stream_field: 'meta.stream',
     };
 
 
@@ -138,6 +145,24 @@ describe('wikimedia-eventgate makeWikimediaValidate', () => {
         const validEvent = await validate(testEvent_draft4);
         assert.deepEqual(validEvent, testEvent_draft4);
     });
+
+    it('Should make function that allows any schema in any stream with no stream_config_uri set', async() => {
+        const validate = await eventgateModule.makeWikimediaValidate(permissiveOptions, logger);
+
+        // This event should pass via regex checking in stream config
+        const testEvent_draft4 = {
+            '$schema': '/test_draft4/0.0.1',
+            meta: {
+                stream: 'test_draft4.event',
+                id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+            },
+            test: 'test_value_0'
+        };
+
+        const validEvent = await validate(testEvent_draft4);
+        assert.deepEqual(validEvent, testEvent_draft4);
+    });
+
 
     it('Should throw an ValidationError for invalid event', async() => {
         const validate = await eventgateModule.makeWikimediaValidate(options, logger);

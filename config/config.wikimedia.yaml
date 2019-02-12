@@ -44,7 +44,7 @@ services:
       eventgate_factory_module: '../lib/factories/wikimedia-eventgate'
 
       # Mapping of stream names to allowed schemas
-      stream_config_uri: ../event-schemas/config/stream-config.yaml
+      stream_config_uri: ./config/stream-config.yaml
 
       # This field in each event will be used to extract a
       # (possibly relative) schema uri.  The default is $schema.
