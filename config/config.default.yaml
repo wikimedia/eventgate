@@ -36,12 +36,12 @@ services:
     # version: ^0.4.0
     # per-service config
     conf:
-      port: 6927
+      port: 8192
       # uncomment to only listen on localhost
       #interface: localhost
 
       # Don't need CSP headers
-      csp: false 
+      csp: false
 
       # more per-service config settings
       user_agent: eventgate
