@@ -39,6 +39,10 @@ services:
       # uncomment to only listen on localhost
       #interface: localhost
 
+      # Set cors to false by default.  For usage see:
+      # https://github.com/wikimedia/service-template-node/blob/1784fd19fcab699cda44b429ea31fa47e5e82793/config.prod.yaml#L39
+      cors: false
+
       # more per-service config settings
       user_agent: eventgate
 
