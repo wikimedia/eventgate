@@ -39,9 +39,6 @@ services:
       # uncomment to only listen on localhost
       #interface: localhost
 
-      # Don't need CSP headers
-      csp: false
-
       # more per-service config settings
       user_agent: eventgate
 
