@@ -24,7 +24,7 @@ variants:
     node: { requirements: [package.json] }
     runs:
       environment:
-        BUILD_LIBRDKAFKA: 0
+        BUILD_LIBRDKAFKA: "0"
         LINK: g++
   # Runs npm test
   test:
@@ -46,5 +46,5 @@ variants:
     copies: prep
     apt: { packages: [librdkafka1, librdkafka++1] }
     node: { env: production }
-    runs: { environment: { UV_THREADPOOL_SIZE: 128 } }
+    runs: { environment: { UV_THREADPOOL_SIZE: "128" } }
     entrypoint: [node, server.js]
