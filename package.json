@@ -1,7 +1,7 @@
 {
   "name": "eventgate",
   "version": "1.0.0",
-  "description": "A blueprint for MediaWiki REST API services",
+  "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
   "main": "./app.js",
   "scripts": {
     "start": "service-runner",
