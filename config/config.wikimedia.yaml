@@ -95,5 +95,7 @@ services:
       kafka:
         conf:
           metadata.broker.list: 'localhost:9092'
+          compression.codec: snappy
+          message.max.bytes: 4194304
         # kafka topic conf goes here
         topic_conf: {}
