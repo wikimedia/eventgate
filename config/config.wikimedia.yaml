@@ -66,6 +66,12 @@ services:
       # You can alteratively or additionally use a remote HTTP base URI.
       #schema_base_uris: [https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema]
 
+      # These schema URIs will be 'precached' on service startup.
+      # They should be resolveable by the URI prefixes in schema_base_uris.
+      # TODO: we could get this list from a service?
+      schema_precache_uris:
+        - /test/event/0.0.2
+        - /mediawiki/api/request/0.0.1
 
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
