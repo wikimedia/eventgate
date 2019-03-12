@@ -70,6 +70,7 @@ services:
       # They should be resolveable by the URI prefixes in schema_base_uris.
       # TODO: we could get this list from a service?
       schema_precache_uris:
+        - /error/0.0.3
         - /test/event/0.0.2
         - /mediawiki/api/request/0.0.1
 
