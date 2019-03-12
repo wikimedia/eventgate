@@ -57,9 +57,10 @@ async function handleEvents(eventGate, conf, req, res) {
         // Error and end response now if we encounter anything unexpected.
         // This probably shouldn't happen, as eventGate.process should catch Errors
         // and reform them into error EventStatuses.
-        res.statusMessage =
+        const statusMessage =
             `Encountered an unexpected error while processing events: ${err.message}`;
-        req.logger.log('error/events', { error: err, message: res.statusMessage });
+        req.logger.log('error/events', { error: err, message: statusMessage });
+        res.statusMessage = statusMessage;
         res.status(500);
         res.end();
         throw err;
@@ -88,10 +89,7 @@ async function handleEvents(eventGate, conf, req, res) {
         // All events were invalid: 400
         const statusMessage = `${invalidCount} out of ${events.length} ` +
             'events were invalid and not accepted.';
-        req.logger.log(
-            'warn/events',
-            { invalid: results.invalid, message: statusMessage }
-        );
+        req.logger.log('warn/events', statusMessage);
 
         if (!res.finished) {
             res.statusMessage = statusMessage;
@@ -103,15 +101,9 @@ async function handleEvents(eventGate, conf, req, res) {
         const statusMessage = `${results.success.length} out of ${events.length} ` +
             `events were accepted, but ${failureCount} failed (${invalidCount} ` +
             `invalid and ${errorCount} errored).`;
-
-        req.logger.log(
-            'warn/events',
-            { error: results.error, invalid: results.invalid, message: statusMessage }
-        );
+        req.logger.log('warn/events', statusMessage);
 
         if (!res.finished) {
-            req.logger.log('info/events', 'FINISHING REQ');
-
             res.statusMessage = statusMessage;
             res.status(207);
             res.json({ invalid: results.invalid, error: results.error });
@@ -122,10 +114,7 @@ async function handleEvents(eventGate, conf, req, res) {
         const statusMessage = `${failureCount} out of ${events.length} ` +
             `events had failures and were not accepted. (${invalidCount} ` +
             `invalid and ${errorCount} errored).`;
-        req.logger.log(
-            'error/events',
-            { errors: results.error, message: statusMessage }
-        );
+        req.logger.log('error/events', statusMessage);
 
         if (!res.finished) {
             res.statusMessage = statusMessage;
