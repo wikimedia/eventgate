@@ -7,3 +7,6 @@ npm-debug.log
 *.vscode
 *.code-workspace
 package-lock.json
+.eslintcache
+.nyc_output
+

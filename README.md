@@ -147,7 +147,7 @@ option to the EventValidator constructor.
 
 By default, EventValidator will validate all (non-meta) schemas with AJV's
 json-schema-secure schema.  This prevents schemas from including potentially
-risky feataures that could facilitate DOS attacks.
+risky features that could facilitate DOS attacks.
 See: https://github.com/epoberezkin/ajv#security-considerations
 To allow insecure schemas, you can set `allowInsecureSchemas: true` in
 the EventValidator constructor options.
@@ -190,8 +190,8 @@ Property                    |         Default | Description
 `interface`                 |       localhost | hostname on which to listen
 `user_agent`                |        eventgate | The UserAgent seen when making remote http requests (e.g. for remote schemas)
 `schema_uri_field`          |         $schema | The value extracted from this field will be used (with `schema_base_uris` and `schema_file_extension`) to download the event's JSONSchema for validation.
-`schema_base_uris`          |       undefined | If given, a relative schema URI will be prepended with each of these base URIs to build schema URLs.  The resulting URLs will each be requested, and the first existant schema found at that URL will be used. This allows you to configure multiple schema repositories/registries where your schema might be located.  E.g. you could use this if you wanted to have some scheams locally for reliability, but remote for resolvability.
-`schema_file_extension`     |       undefined | If given, this will be appendede to every extracted schema URI unless the filename in the URI already has an extension.
+`schema_base_uris`          |       undefined | If given, a relative schema URI will be prepended with each of these base URIs to build schema URLs.  The resulting URLs will each be requested, and the first existent schema found at that URL will be used. This allows you to configure multiple schema repositories/registries where your schema might be located.  E.g. you could use this if you wanted to have some schemas locally for reliability, but remote for resolvability.
+`schema_file_extension`     |       undefined | If given, this will be appended to every extracted schema URI unless the filename in the URI already has an extension.
 `stream_field`              |       undefined | The name of the stream this event belongs to. If not set, `schema_uri_field` will be used (and sanitized) instead.
 `kafka.conf`                |                 | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
@@ -199,7 +199,7 @@ Property                    |         Default | Description
 
 # service-template-node
 
-This service is based on Wikimedia's [service-tempate-node](https://github.com/wikimedia/service-template-node).  It is a fork of that 'template'
+This service is based on Wikimedia's [service-template-node](https://github.com/wikimedia/service-template-node).  It is a fork of that 'template'
 repository.  See also the [ServiceTemplateNode documentation](https://www.mediawiki.org/wiki/ServiceTemplateNode).
 
 
