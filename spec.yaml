@@ -76,7 +76,7 @@ paths:
       produces:
         - application/json
       responses:
-        204:
+        201:
           description: Success
         207:
           description: Partial Success

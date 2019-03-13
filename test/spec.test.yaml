@@ -79,7 +79,7 @@ paths:
       produces:
         - application/json
       responses:
-        204:
+        201:
           description: Success
         207:
           description: Partial Success
@@ -102,7 +102,7 @@ paths:
                 id: "5e1dd101-641c-11e8-ab6c-b083fecf1287"
               test: test_value
           response:
-            status: 204
+            status: 201
 
         - title: Produce a single invalid event
           request:
@@ -189,7 +189,7 @@ paths:
                   id: "5e1dd101-641c-11e8-ab6c-b083fecf1281"
                 test: test_value1
           response:
-            status: 204
+            status: 201
 
         - title: Produce batch events, one valid, one invalid
           request:

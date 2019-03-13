@@ -82,7 +82,7 @@ async function handleEvents(eventGate, conf, req, res) {
         // i.e. hasty response was not requested.
         if (!res.finished) {
             res.statusMessage = statusMessage;
-            res.status(204);
+            res.status(201);
             res.end();
         }
     } else if (invalidCount === events.length) {
