@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -23,9 +23,10 @@ logging:
 
 # Statsd metrics reporter
 metrics:
-  #type: log
-  #host: localhost
-  #port: 8125
+  name: eventgaate
+  type: statsd
+  host: localhost
+  port: 8125
 
 services:
   - name: EventGate
@@ -104,5 +105,7 @@ services:
           metadata.broker.list: 'localhost:9092'
           compression.codec: snappy
           message.max.bytes: 4194304
+          # report Kafka producer stats every 10 seconds
+          statistics.interval.ms: 5000
         # kafka topic conf goes here
         topic_conf: {}

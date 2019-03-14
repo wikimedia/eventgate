@@ -139,7 +139,9 @@ module.exports = async(appObj) => {
         `Instantiating EventGate from ${eventGateFactoryModule}`
     );
 
-    const eventGate = await require(eventGateFactoryModule).factory(app.conf, app.logger._logger);
+    const eventGate = await require(eventGateFactoryModule).factory(
+        app.conf, app.logger._logger, app.metrics
+    );
     router.post('/events', (req, res) => {
         handleEvents(eventGate, app.conf, req, res);
     });
