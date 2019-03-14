@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: debug
+  level: info
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -22,11 +22,11 @@ logging:
 #    port: 12201
 
 # Statsd metrics reporter
-metrics:
-  name: eventgaate
-  type: statsd
-  host: localhost
-  port: 8125
+# metrics:
+#   name: eventgate
+#   type: statsd
+#   host: localhost
+#   port: 8125
 
 services:
   - name: EventGate
