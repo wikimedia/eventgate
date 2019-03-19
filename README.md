@@ -204,8 +204,3 @@ Property                    |         Default | Description
 
 This service is based on Wikimedia's [service-template-node](https://github.com/wikimedia/service-template-node).  It is a fork of that 'template'
 repository.  See also the [ServiceTemplateNode documentation](https://www.mediawiki.org/wiki/ServiceTemplateNode).
-
-
-# TODO
-- monitoring/metrics (for kafka, etc.)
-- close() method for EventGate. ? graceful kafka shutdown?
