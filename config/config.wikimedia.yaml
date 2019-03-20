@@ -105,7 +105,11 @@ services:
           metadata.broker.list: 'localhost:9092'
           compression.codec: snappy
           message.max.bytes: 4194304
-          # report Kafka producer stats every 10 seconds
+          # report Kafka producer stats every 5 seconds
           statistics.interval.ms: 5000
+          # Silence noisy connection reaper logging
+          # https://github.com/Blizzard/node-rdkafka/issues/326
+          # https://github.com/edenhill/librdkafka/issues/768#issuecomment-246302856
+          log.connection.close: "false"
         # kafka topic conf goes here
         topic_conf: {}
