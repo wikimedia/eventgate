@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: debug
+  level: info
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -105,6 +105,7 @@ services:
           metadata.broker.list: 'localhost:9092'
           compression.codec: snappy
           message.max.bytes: 4194304
+          queue.buffering.max.ms: 100
           # report Kafka producer stats every 5 seconds
           statistics.interval.ms: 5000
           ## Uncomment the below to enable rdkafka trace logging
