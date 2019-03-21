@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -107,6 +107,9 @@ services:
           message.max.bytes: 4194304
           # report Kafka producer stats every 5 seconds
           statistics.interval.ms: 5000
-          log.connection.close: "false"
+          ## Uncomment the below to enable rdkafka trace logging
+          # event_cb: true
+          # log_level: 7
+          # debug: broker,topic,msg
         # kafka topic conf goes here
         topic_conf: {}
