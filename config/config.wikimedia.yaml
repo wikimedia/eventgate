@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -105,7 +105,6 @@ services:
           metadata.broker.list: 'localhost:9092'
           compression.codec: snappy
           message.max.bytes: 4194304
-          queue.buffering.max.ms: 100
           # report Kafka producer stats every 5 seconds
           statistics.interval.ms: 5000
           ## Uncomment the below to enable rdkafka trace logging
@@ -114,3 +113,19 @@ services:
           # debug: broker,topic,msg
         # kafka topic conf goes here
         topic_conf: {}
+
+        # Producer type specific overrides.
+        # If you need to configure some producer specific settings,
+        # e.g. different batch settings, you can provide them here.
+        hasty:
+          conf:
+            # HastyProducer doesn't block HTTP clients, so we can
+            # afford to wait for a largish batch size.
+            queue.buffering.max.ms: 1000
+        guaranteed:
+          conf:
+            # GuaranteedProducer doese block HTTP clients, so we
+            # should use a smaller batch size. Waiting 50 ms
+            # will allow for some kafka produce reqeust batching
+            # while minimizing latency on the HTTP client.
+            queue.buffering.max.ms: 50
