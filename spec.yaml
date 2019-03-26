@@ -78,6 +78,8 @@ paths:
       responses:
         201:
           description: Success
+        202:
+          description: Hasty success. Response returned before events guaranteed to be persisted.
         207:
           description: Partial Success
           schema:
