@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 'use strict';
-
 
 /**
  * A quick and dirty file to check the health of the /v1/events route.
