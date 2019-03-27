@@ -1,0 +1,112 @@
+#!/usr/bin/env node
+/* eslint-disable no-console */
+'use strict';
+
+
+/**
+ * A quick and dirty file to check the health of the /v1/events route.
+ * Run with --help to get usage.
+ * This can post events from a file URL or use JSONSchema event examples from a schema URL.
+ * This will exit 0 if success, exit 1 if failure, or exit 2 if event  could not be POSTed
+ */
+
+const _ = require('lodash');
+const preq = require('preq');
+const yargs = require('yargs');
+const urlGetObject = require('../lib/event-util').urlGetObject;
+
+/**
+ * POSTs events to the provide event service URL. This will write
+ * to stdout and process.exit according to the result or error.
+ * @param {Object|Array} events events to POST
+ * @param {string} serviceUrl event serivce URL
+ * @return {undefined}
+ */
+function postEvents(events, serviceUrl) {
+    return preq.post({
+        uri: serviceUrl,
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: events
+    })
+    .then((res) => {
+        if (res.status <= 202) {
+            console.log(res.status);
+            process.exit(0);
+        } else {
+            // Rethrow anything > 202 as an error.  (207 means events were partially accepeted.)
+            throw res;
+        }
+    })
+    .catch((err) => {
+        console.log(err.status);
+        console.dir(err.body, { depth: null });
+        process.exit(1);
+    });
+}
+
+/**
+ * Given a schema URL, this will load it, and look for the JSONSchema examples field.
+ * If it exists, the examples will be POSTed to the event service URL.
+ * This will write to stdout and process.exit according to result.
+ * @param {string} schemaUrl schema URL
+ * @param {string} serviceUrl event serivce URL
+ * @return {undefined}
+ */
+async function postSchemaExamples(schemaUrl,  serviceUrl) {
+    const schema = await urlGetObject(schemaUrl);
+    if (!schema.examples) {
+        console.log(`Schema ${schema.$id} does not have any examples. Aborting.`);
+        process.exit(2);
+    }
+    process.stdout.write(`Posting ${schema.examples.length} ${schema.$id} examples to ${serviceUrl}... `);
+
+    return postEvents(schema.examples, serviceUrl);
+}
+
+// eslint-disable-next-line no-unused-expressions
+yargs
+.usage('Usage:\n  $0 examples <schema_url> [service_url]\n  $0 events <events_url> [service_url]')
+.command('examples <schema_url> [service_url]', 'Post the events in the `examples` field in the given schema_uri',
+    (yargs_command) => {
+        yargs_command.positional('schema_url', {
+            'type': 'string',
+            'describe': 'schema URL to get event example from'
+        });
+        yargs_command.positional('service_url', {
+            'type': 'string',
+            'describe': 'EventGate service url',
+            'default': 'http://localhost:8192/v1/events'
+        });
+    },
+    async(args) => {
+        await postSchemaExamples(args.schema_url, args.service_url);
+    }
+)
+.command('events <events_url> [service_url]', 'Post the events in <event_url> file',
+    (yargs_command) => {
+        yargs_command.positional('events_url', {
+            'type': 'string',
+            'describe': 'URL to get event(s) from'
+        });
+        yargs_command.positional('service_url', {
+            'type': 'string',
+            'describe': 'EventGate service url',
+            'default': 'http://localhost:8192/v1/events'
+        });
+    },
+    async(args) => {
+        const events = await urlGetObject(args.events_url);
+        const eventCount = _.isArray(events) ? events.length : 1;
+        process.stdout.write(`Posting ${eventCount} events from ${args.events_url} to ${args.service_url}... `);
+        await postEvents(events, args.service_url);
+    }
+)
+.help()
+.argv;
+
+
+
+
+
