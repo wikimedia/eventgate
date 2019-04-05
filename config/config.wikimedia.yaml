@@ -95,6 +95,9 @@ services:
       # This field will be used in log messages to uniquely ID each event.
       id_field: meta.id
 
+      # This field will be used to extract and set a Kafka message timestamp.
+      dt_field: meta.dt
+
       # If a validation error is encountered, a validation error event
       # will be produced to this stream.
       error_stream: eventgate.error.validation

@@ -267,18 +267,19 @@ describe('wikimedia-eventgate makeProduce', () => {
     const options = {
         stream_field: 'meta.stream',
         topic_prefix: 'test_it.',
+        dt_field: 'meta.dt'
     };
 
     it('Should make a function that uses varies Kafka producer based on req.query fire and forget param and topic_prefix', async() => {
 
-        function mockProduceFunction(producerName, topic, partition, message, key) {
+        function mockProduceFunction(producerName, topic, partition, message, key, timestamp) {
             return P.resolve([{
                 topic,
                 partition: 0,
                 offset: 1,
                 key: key,
                 opaque: { },
-                timestamp: 1539629252472,
+                timestamp: timestamp,
                 size: message.length,
                 producerName
             }]);
@@ -300,6 +301,7 @@ describe('wikimedia-eventgate makeProduce', () => {
             meta: {
                 stream: 'test.event',
                 id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+                dt: '2019-01-01T00:00:00Z'
             },
             test: 'test_value_0'
         };
@@ -309,11 +311,14 @@ describe('wikimedia-eventgate makeProduce', () => {
         );
         assert.strictEqual(guaranteedProduceResult[0].producerName, 'guaranteedProducer');
         assert.strictEqual(guaranteedProduceResult[0].topic, 'test_it.test.event');
+        assert.strictEqual(guaranteedProduceResult[0].timestamp, 1546300800000);
+
 
         const hastyProduceResult = await produce(
             testEvent_v1_0, { req: { query: { hasty: true } } }
         );
         assert.strictEqual(hastyProduceResult[0].producerName, 'hastyProducer');
         assert.strictEqual(hastyProduceResult[0].topic, 'test_it.test.event');
+        assert.strictEqual(guaranteedProduceResult[0].timestamp, 1546300800000);
     });
-})
+});
