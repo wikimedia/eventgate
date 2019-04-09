@@ -8,7 +8,6 @@
  * This will exit 0 if success, exit 1 if failure, or exit 2 if event  could not be POSTed
  */
 
-const fs = require('fs');
 const _ = require('lodash');
 const preq = require('preq');
 const yargs = require('yargs');
