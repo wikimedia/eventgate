@@ -129,18 +129,15 @@ services:
             # HastyProducer doesn't block HTTP clients, so we can
             # afford to wait for a largish batch size.
             queue.buffering.max.ms: 1000
-            batch.num.messages: 500
             # Custom kafka config, will call producer.setPollInterval
             # with this value if set.
-            producer.poll.interval.ms: 200
+            producer.poll.interval.ms: 100
         guaranteed:
           conf:
-            # GuaranteedProducer doese block HTTP clients, so we
-            # should use a smaller batch size. Waiting 50 ms
-            # will allow for some kafka produce reqeust batching
-            # while minimizing latency on the HTTP client.
+            # GuaranteedProducer does block HTTP clients, so we attempt to send
+            # the produce request as soon as possible, rather than waiting
+            # for larger batches.
             queue.buffering.max.ms: 0
-            batch.num.messages: 100
             # Custom kafka config, will call producer.setPollInterval
             # with this value if set.
             producer.poll.interval.ms: 10
