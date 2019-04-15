@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: debug
+  level: info
 
 #  streams:
 #  # Use gelf-stream -> logstash
@@ -108,6 +108,10 @@ services:
           metadata.broker.list: 'localhost:9092'
           compression.codec: snappy
           message.max.bytes: 4194304
+          # Silence noisy connection reaper logging
+          # https://github.com/Blizzard/node-rdkafka/issues/326
+          # https://github.com/edenhill/librdkafka/issues/768#issuecomment-246302856
+          log.connection.close: false
           # report Kafka producer stats every 5 seconds
           statistics.interval.ms: 5000
           ## Uncomment the below to enable rdkafka trace logging
@@ -125,10 +129,15 @@ services:
             # HastyProducer doesn't block HTTP clients, so we can
             # afford to wait for a largish batch size.
             queue.buffering.max.ms: 1000
+            # Custom kafka config, will call producer.setPollInterval
+            # with this value if set.
+            producer.poll.interval.ms: 100
         guaranteed:
           conf:
-            # GuaranteedProducer doese block HTTP clients, so we
-            # should use a smaller batch size. Waiting 50 ms
-            # will allow for some kafka produce reqeust batching
-            # while minimizing latency on the HTTP client.
-            queue.buffering.max.ms: 50
+            # GuaranteedProducer does block HTTP clients, so we attempt to send
+            # the produce request as soon as possible, rather than waiting
+            # for larger batches.
+            queue.buffering.max.ms: 0
+            # Custom kafka config, will call producer.setPollInterval
+            # with this value if set.
+            producer.poll.interval.ms: 10
