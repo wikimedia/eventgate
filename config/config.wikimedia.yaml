@@ -13,7 +13,7 @@ worker_heap_limit_mb: 250
 
 # Logger info
 logging:
-  level: info
+  level: debug
 
 #  streams:
 #  # Use gelf-stream -> logstash
