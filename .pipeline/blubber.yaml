@@ -20,7 +20,7 @@ variants:
       # If you update the schema repository, you'll need to update
       # the SHAs that are checked out here, and then rebuild docker images.
       command:
-        - mkdir /srv/service/schemas && git clone --single-branch -- https://gerrit.wikimedia.org/r/mediawiki/event-schemas /srv/service/schemas/mediawiki-event-schemas && cd /srv/service/schemas/mediawiki-event-schemas && git reset --hard 91100b8
+        - mkdir /srv/service/schemas && git clone --single-branch -- https://gerrit.wikimedia.org/r/mediawiki/event-schemas /srv/service/schemas/mediawiki-event-schemas && cd /srv/service/schemas/mediawiki-event-schemas && git reset --hard eb13353
     node: { requirements: [package.json] }
     runs:
       environment:
