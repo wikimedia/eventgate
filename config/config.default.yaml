@@ -39,6 +39,8 @@ services:
       port: 8192
       # uncomment to only listen on localhost
       #interface: localhost
+      # Events can be large; increase max body size
+      max_body_size: 4mb
 
       # more per-service config settings
       user_agent: eventgate

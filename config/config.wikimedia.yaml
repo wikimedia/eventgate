@@ -39,6 +39,8 @@ services:
       port: 8192
       # uncomment to only listen on localhost
       #interface: localhost
+      # Events can be large; increase max body size
+      max_body_size: 4mb
 
       # Set cors to false by default.  For usage see:
       # https://github.com/wikimedia/service-template-node/blob/1784fd19fcab699cda44b429ea31fa47e5e82793/config.prod.yaml#L39
