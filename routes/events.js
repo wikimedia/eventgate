@@ -7,6 +7,7 @@ const _     = require('lodash');
  * The main router object
  */
 const router = sUtil.router();
+const requireRelative = sUtil.requireRelative;
 
 /**
  * The main application object reported when this module is require()d
@@ -139,7 +140,9 @@ module.exports = async(appObj) => {
         `Instantiating EventGate from ${eventGateFactoryModule}`
     );
 
-    const eventGate = await require(eventGateFactoryModule).factory(
+    // add '.' to the list of module search paths so that
+    // this can be used as a library with custom modules.
+    const eventGate = await requireRelative(eventGateFactoryModule).factory(
         app.conf, app.logger._logger, app.metrics
     );
     router.post('/events', (req, res) => {

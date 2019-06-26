@@ -1,6 +1,6 @@
 {
   "name": "eventgate",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
   "main": "./app.js",
   "scripts": {
@@ -11,6 +11,9 @@
     "docker-test": "service-runner docker-test",
     "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "bin": {
+    "eventgate": "server.js"
   },
   "repository": {
     "type": "git",
