@@ -2,7 +2,7 @@
   "name": "eventgate",
   "version": "1.0.15",
   "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
-  "main": "./app.js",
+  "main": "./lib/index.js",
   "scripts": {
     "start": "service-runner",
     "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && npm run lint",
