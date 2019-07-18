@@ -1,6 +1,5 @@
 'use strict';
 
-
 const app = require('./app');
 
 const {
@@ -8,13 +7,14 @@ const {
     EventStatus,
 } = require('./lib/eventgate');
 
-Object.assign(app, {
+module.exports = {
+    // Export app so that service-runner can use this as its
+    // module entrypoint.
+    app,
     EventGate,
     EventStatus,
     EventValidator: require('./lib/EventValidator'),
     error: require('./lib/error'),
     util: require('./lib/event-util'),
     kafka: require('./lib/kafka'),
-});
-
-module.exports = app;
+}
