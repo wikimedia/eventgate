@@ -16,11 +16,13 @@ an event.
 For configuration of the default EventGate implementation (see below), edit
 config.yaml and run `npm start`.  The service will listen for HTTP POST
 requests with Content-Type set to `application/json` at `/v1/events`.  The POST
-body should be an array of JSON event objects.
+body should be an array of JSON event objects.  (The default EventGate uses
+Kafka, so you must have a running Kafka instance to produce to.)
+
 
 # Architecture
 
-The EventGate service attempts to be a generic HTTP POST event intake, event schema validation
+The EventGate service is a generic HTTP POST JSON event intake, event schema validation
 and event producing service.  The schema validation and event produce implementation
 is left up to the user.  This service ships with a schema URL based
 validator and Kafka produce implementation (using node-rdkafka), but you can
@@ -49,7 +51,7 @@ instantiated EventGate to validate and produce incoming events.
 The `EventGate` class in lib/eventgate.js handles event validation and produce logic.
 It is instantiated with `validate` and a `produce` functions that each take a single
 `event` and extra `context` object.  `validate` should either return a Promise of the validated
-event (possibly augmented, e.g. field defaults populated) or throw an `ValidationError`.
+event (possibly augmented, e.g. field defaults populated) or throw a `ValidationError`.
 `produce` is expected to return a Promise of the `produce` result, or throw an
 `Error`.
 
@@ -72,7 +74,7 @@ with each array containing an `EventStatus` instance representing the event's pr
 Throughout the code, functions that are injected into to constructors are expected
 to take a single `event` object and a `context` object.
 E.g. `validate(event, context)`, `produce(event, context)`, etc.  These
-functions are expected to be able to do their job with only these arguments.
+functions should be able to do their job with only these arguments.
 Any additional logic or context should be bound into the function, either by partially applying
 or creating a closure.  Example:
 
@@ -80,6 +82,7 @@ If you wanted to write all incoming events to a file based on some field in the 
 could write an EventGate `produce` function like this:
 
 ```javascript
+const _ require('lodash');
 const writeFileAsync = promisify(fs.writeFile);
 /**
  * @return a function that writes event to the file at event[file_path_field]

@@ -1,1 +1,79 @@
-config/config.default.yaml
+# EventGate example config file.
+#
+# Configures the service-runner as well as the EventGate application.
+# See: https://github.com/wikimedia/service-runner#config-loading
+
+# Number of worker processes to spawn.
+# Set to 0 to run everything in a single process without clustering.
+# Use 'ncpu' to run as many workers as there are CPU units
+num_workers: 0
+
+# Log error messages and gracefully restart a worker if v8 reports that it
+# uses more heap (note: not RSS) than this many mb.
+worker_heap_limit_mb: 250
+
+# Logger info
+logging:
+  level: info
+
+#  streams:
+#  # Use gelf-stream -> logstash
+#  - type: gelf
+#    host: logstash1003.eqiad.wmnet
+#    port: 12201
+
+# Statsd metrics reporter
+# See: https://github.com/wikimedia/service-runner#config-loading
+metrics:
+  #type: log
+  #host: localhost
+  #port: 8125
+
+services:
+  - name: EventGate
+    # a relative path or the name of an npm package, if different from name
+    module: ./app.js
+    # optionally, a version constraint of the npm package
+    # version: ^0.4.0
+    # per-service config
+    conf:
+      port: 8192
+      # uncomment to only listen on localhost
+      #interface: localhost
+      # Events can be large; increase max body size
+      max_body_size: 4mb
+
+      # more per-service config settings
+      user_agent: eventgate
+
+      eventgate_factory_module: '../lib/factories/default-eventgate'
+
+      # This field in each event will be used to extract a
+      # (possibly relative) schema uri.  The default is $schema.
+      # An array of field names will cause EventGate to search for
+      # fields by these names in each event, using the first match.
+      schema_uri_field: $schema
+
+      # If set, these URIs will be prepended to any relative schema URI
+      # extracted from each event's schema_field.  The resulting URLs will
+      # be searched until a schema is found.  Change this
+      # to match paths to your schema repositories.
+      schema_base_uris: [./test/schemas]
+      # You can alteratively use a remote HTTP base URI.
+      #schema_base_uris: [https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema]
+
+      # If set, this will be appended to every extracted schema_uri if that schema_uri
+      # does not already end with a file extension.
+      #schema_file_extension: .yaml
+
+      # This field in each event will be used to extract a destination 'stream' name.
+      # This will equal the destination Kafka topic, unless a topic prefix
+      # is also configured.
+      stream_field: meta.stream
+
+      # kafka configs go here.
+      kafka:
+        conf:
+          metadata.broker.list: 'localhost:9092'
+        # kafka topic conf goes here
+        topic_conf: {}
