@@ -138,11 +138,15 @@ to the JSONSchema for the event.  `EventValidator` will extract and use those UR
 (and cache) those schemas to use for event validation.  The `EventValidator` instance
 used by the default EventGate can request schema URIs from the local filesystem with
 `file://` or remote ones via `http://` based URIs.  The field in the each event where the schema
-URI is located is configured by the `schema_uri_field` config.  When an event is received, the
-schema URI will be extracted from the `schema_uri_field`.  The JSONSchema at the
-URI will be downloaded and used to validate the event.  The extracted schema URI
-can optionally be prefixed with `schema_base_uri` and suffixed with
-`schema_file_extension`.  The default `schema_uri_field` is $schema.  If you
+URI is located is configured by the `schema_uri_field` config, which defaults to `$schema`.
+(`$schema` is a standard field used by JSONSchemas to locate their metaschemas, so it makes
+sense to store an event's schema in this field as well.)
+When an event is received, the schema URI will be extracted from the `schema_uri_field`.
+The JSONSchema at the URI will be downloaded and used to validate the event.
+The extracted schema URI can optionally be prefixed with `schema_base_uri` and suffixed with
+`schema_file_extension`.  Setting a `schema_base_uri` will allow set hostname relative URIs,
+e.g. '/path/to/event-schema/1.0.0' in the events, while configuring the base location of your schema
+repositories, e.g. 'http://my.schema-repo.org/schemas' If you
 use the defaults, all of your events should have a $schema field set to
 a resolvable schema URI.
 
@@ -162,13 +166,15 @@ the EventValidator constructor options.
 A 'stream' here refers to the destination name of an event.  It is closely related
 to Kafka's concept of a topic.  Much of the time a stream might correspond 1:1 with
 a Kafka topic.  If you don't care about the topic name that is used for a any given event,
-you don't need to configure this.  The default behavior is to sanitize an event's
+you don't need to configure a `stream_field`.  The default behavior is to sanitize an event's
 schema URI and use it for the Kafka topic name.  E.g. if an event's schema URI is
 `/ui/element/button-push`, the topic name will end up being `ui_element_button-push`.
 However, if `stream_field` is configured and present in an event, its value will be
 used as the destination Kafka topic of that event. If you need finer control over
 event -> Kafka topic mapping, you should implement your own Kafka produce function
-(see, e.g. wikimedia-eventgate) that does so.
+(see
+[eventgate-wikimedia](https://gerrit.wikimedia.org/r/plugins/gitiles/eventgate-wikimedia/+/refs/heads/master/eventgate-wikimedia.js))\
+for an example.)
 
 # Configuration
 
@@ -201,6 +207,23 @@ Property                    |         Default | Description
 `stream_field`              |       undefined | The name of the stream this event belongs to. If not set, `schema_uri_field` will be used (and sanitized) instead.
 `kafka.conf`                |                 | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
+
+# eventgate-wikimedia implementaion and use as a dependency
+The Wikimedia Foundation runs this EventGate service as a dependency of [eventgate-wikimedia](https://gerrit.wikimedia.org/g/eventgate-wikimedia/+/refs/heads/master).  WMF implements a custom
+EventGate factory in [eventgate-wikimedia.js](https://gerrit.wikimedia.org/r/plugins/gitiles/eventgate-wikimedia/+/refs/heads/master/eventgate-wikimedia.js).
+
+If you are using EventGate as an npm dependency in a custom implementation repository, you will
+need to configure service-runner in your config.yaml file to run the EventGate express app.  Set:
+
+```yaml
+services:
+  - name: EventGate-mycustom-implementation
+    # Load the eventgate module which is installed as an npm dependency
+    module: eventgate
+    # Make service-runner start running via tha exported app function.
+    entrypoint: app
+    # ...
+```
 
 
 # service-template-node
