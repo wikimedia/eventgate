@@ -208,7 +208,7 @@ Property                    |         Default | Description
 `kafka.conf`                |                 | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
 `kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
 
-# eventgate-wikimedia implementaion and use as a dependency
+# eventgate-wikimedia implementation and use as a dependency
 The Wikimedia Foundation runs this EventGate service as a dependency of [eventgate-wikimedia](https://gerrit.wikimedia.org/g/eventgate-wikimedia/+/refs/heads/master).  WMF implements a custom
 EventGate factory in [eventgate-wikimedia.js](https://gerrit.wikimedia.org/r/plugins/gitiles/eventgate-wikimedia/+/refs/heads/master/eventgate-wikimedia.js).
 
