@@ -37,10 +37,16 @@ production via function injection.  The HTTP route that handles POSTing of event
 instantiated EventGate instance.  To make this configurable (without editing the route code), the
 route in routes/events.js will look for `app.conf.eventgate_factory_module` and require it.
 This module is expected to export a function named `factory` that takes a conf `options` object,
-a bunyan `logger`, and an optional `metrics` object that conforms to the node-statsd interface.
+a bunyan `logger`, and an optional `metrics` object that conforms to the node-statsd interface
 (This will actually be provided from
-[service-runner app metrics](https://github.com/wikimedia/service-runner#metric-reporting).
-The function should return a Promise of an instantiated EventGate.
+[service-runner app metrics](https://github.com/wikimedia/service-runner#metric-reporting), and
+the Express router used to handle the events (in case your EventGate implementation wants to
+add any extra routes at this time).  E.g.
+
+```javascript
+function myEventGateFactory(options, logger, metrics, router) { ... }
+````
+The factory function should return a Promise of an instantiated EventGate.
 
 Once the EventGate Promise resolves, the `/v1/events` HTTP route will be added and will use the
 instantiated EventGate to validate and produce incoming events.

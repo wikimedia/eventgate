@@ -25,7 +25,7 @@ async function handleEvents(eventGate, conf, req, res) {
 
     // If empty body, return 400 now.
     if (_.isEmpty(req.body)) {
-        res.statusMessage = 'Must provide JSON encoded events in request body.';
+        res.statusMessage = 'Request body was empty. Must provide JSON encoded events.'
         req.logger.log('warn/events', res.statusMessage);
         res.status(400);
         res.end();
@@ -143,7 +143,7 @@ module.exports = async(appObj) => {
     // add '.' to the list of module search paths so that
     // this can be used as a library with custom modules.
     const eventGate = await requireRelative(eventGateFactoryModule).factory(
-        app.conf, app.logger._logger, app.metrics
+        app.conf, app.logger._logger, app.metrics, router
     );
     router.post('/events', (req, res) => {
         handleEvents(eventGate, app.conf, req, res);
