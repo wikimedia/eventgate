@@ -25,7 +25,7 @@ async function handleEvents(eventGate, conf, req, res) {
 
     // If empty body, return 400 now.
     if (_.isEmpty(req.body)) {
-        res.statusMessage = 'Request body was empty. Must provide JSON encoded events.'
+        res.statusMessage = 'Request body was empty. Must provide JSON encoded events.';
         req.logger.log('warn/events', res.statusMessage);
         res.status(400);
         res.end();
