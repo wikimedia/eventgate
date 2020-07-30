@@ -231,6 +231,12 @@ services:
     # ...
 ```
 
+# Development EventGate implementation
+
+The dev-eventgate factory will intantiate and EventGate that validates using
+$schema URIs just like the default implmenentation, but produces events either
+to a local file configured with `output_path`, or to stdout.  This is useful
+if you just want to validate some events in your develpment environment.
 
 # service-template-node
 
