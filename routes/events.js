@@ -142,7 +142,7 @@ module.exports = async(appObj) => {
 
     // Search in cwd and service-runner app_base_path (the path where EventGate's app.js is)
     // as well as normal module.paths for eventgate_factory_module.
-    // This is so that EventGate can be used as a library dependency with custom modules.
+    // This is so that EventGate can be used as a library dependency with custom modules.
     const pathsToSearch = [process.cwd(), app.conf.app_base_path];
     const eventGate = await requireRelative(eventGateFactoryModule, pathsToSearch).factory(
         app.conf, app.logger._logger, app.metrics, router
