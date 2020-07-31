@@ -30,6 +30,13 @@ function initApp(options) {
     app.conf = options.config;      // this app's config options
     app.info = packageInfo;         // this app's package info
 
+    // --- BEGIN EventGate modification ---
+    // Pass service-runners determined appBasePath into
+    // the application config so that it can be used to
+    // more intelligently load eventgate_factory_modules.
+    app.conf.app_base_path = options.appBasePath;
+    // --- END EventGate modification ---
+
     // ensure some sane defaults
     if (!app.conf.port) { app.conf.port = 8888; }
     if (!app.conf.interface) { app.conf.interface = '0.0.0.0'; }
