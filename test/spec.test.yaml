@@ -321,7 +321,7 @@ paths:
   # from routes/events.js
   /v1/events-test:
     get:
-      description: Produce the configured test_event
+      description: Produce the configured test_events
       produces:
         - application/json
       responses:
