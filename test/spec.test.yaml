@@ -319,7 +319,7 @@ paths:
             status: 400
 
   # from routes/events.js
-  /v1/events-test:
+  /v1/_test/events:
     get:
       description: Produce the configured test_events
       produces:

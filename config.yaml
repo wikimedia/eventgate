@@ -78,7 +78,7 @@ services:
         # kafka topic conf goes here
         topic_conf: {}
 
-      # If test_events is set, a GET /v1/events-test route will be added.
+      # If test_events is set, a GET /v1/_test/events route will be added.
       # When this route is requested, these test_events will be processed through EventGate
       # as if it they were directly POSTed to /v1/events.
       # This is useful for readiness probes that want to make sure the service

@@ -231,9 +231,9 @@ services:
     # ...
 ```
 
-# /v1/events-test route
+# /v1/_test/events route
 If you are using EventGate as a service, and if `test_events` is configured,
-a `GET /v1/events-test` route will be added. When requested, the `test_events` will be produced as if
+a `GET /v1/_test/events` route will be added. When requested, the `test_events` will be produced as if
 they were POSTed to /v1/events. This is useful for readiness probes that want to make sure the service can
 produce events end to end.
 

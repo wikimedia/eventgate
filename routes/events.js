@@ -149,12 +149,12 @@ module.exports = async(appObj) => {
         handleEvents(eventGate, app.conf, req, res);
     });
 
-    // If test_events are configured, then set up an GET /v1/events-test route
+    // If test_events are configured, then set up an GET /v1/_test/events route
     // that will pass the test_events through eventGate in the same way as if the
-    // test_events were directly POSTed to /events.  This is useful for
+    // test_events were directly POSTed to /v1/events.  This is useful for
     // readiness probes that want to make sure the service can produce events end to end.
     if (app.conf.test_events) {
-        router.get('/events-test', (req, res) => {
+        router.get('/_test/events', (req, res) => {
             req.body = app.conf.test_events;
             handleEvents(eventGate, app.conf, req, res);
         });
