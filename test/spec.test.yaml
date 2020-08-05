@@ -318,3 +318,28 @@ paths:
           response:
             status: 400
 
+  # from routes/events.js
+  /v1/events-test:
+    get:
+      description: Produce the configured test_event
+      produces:
+        - application/json
+      responses:
+        201:
+          description: Success
+        207:
+          description: Partial Success
+          schema:
+            $ref: '#/definitions/problem'
+        400:
+          description: Failure
+          schema:
+            $ref: '#/definitions/problem'
+
+      x-amples:
+        - title: Produce a single valid test event
+          request:
+            headers:
+              content-type: application/json
+          response:
+            status: 201

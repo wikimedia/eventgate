@@ -43,9 +43,7 @@ services:
       # extracted from each event's schema_field.  The resulting URLs will
       # be searched until a schema is found.  Change this
       # to match paths to your local schema repositories.
-      schema_base_uris: [
-          https://schema.wikimedia.org/repositories/primary/jsonschema,
-          https://schema.wikimedia.org/repositories/secondary/jsonschema
-      ]
+      schema_base_uris: [./test/schemas]
 
     #   output_path: ./output.json
+

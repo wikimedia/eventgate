@@ -42,7 +42,6 @@ async function handleEvents(eventGate, conf, req, res) {
         conf
     };
 
-    // TODO: bikeshed this query param name.
     // If the requester wants a hasty response, return now!
     if (req.query.hasty) {
         res.statusMessage = `${events.length} events hastily received.`;
@@ -125,7 +124,6 @@ async function handleEvents(eventGate, conf, req, res) {
     }
 }
 
-
 module.exports = async(appObj) => {
 
     app = appObj;
@@ -150,6 +148,17 @@ module.exports = async(appObj) => {
     router.post('/events', (req, res) => {
         handleEvents(eventGate, app.conf, req, res);
     });
+
+    // If test_events are configured, then set up an GET /v1/events-test route
+    // that will pass the test_events through eventGate in the same way as if the
+    // test_events were directly POSTed to /events.  This is useful for
+    // readiness probes that want to make sure the service can produce events end to end.
+    if (app.conf.test_events) {
+        router.get('/events-test', (req, res) => {
+            req.body = app.conf.test_events;
+            handleEvents(eventGate, app.conf, req, res);
+        });
+    }
 
     // the returned object mounts the routes on
     // /{domain}/vX/mount/path
