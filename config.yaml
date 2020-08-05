@@ -77,3 +77,10 @@ services:
           metadata.broker.list: 'localhost:9092'
         # kafka topic conf goes here
         topic_conf: {}
+
+      # If test_events is set, a GET /v1/_test/events route will be added.
+      # When this route is requested, these test_events will be processed through EventGate
+      # as if it they were directly POSTed to /v1/events.
+      # This is useful for readiness probes that want to make sure the service
+      # is alive and ready to produce events end to end.
+      #test_events: [{$schema: /test/event/1.0.0, meta: {stream: test_events}, ...}]

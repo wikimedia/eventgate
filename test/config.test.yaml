@@ -62,3 +62,9 @@ services:
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
       # schema_file_extension: .yaml
+
+      # Add the /v1/events-test route to test event production with these event.
+      test_events:
+        - $schema: /test/0.0.2
+          meta:
+            stream: test.event
