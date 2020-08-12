@@ -155,7 +155,7 @@ module.exports = async(appObj) => {
     // readiness probes that want to make sure the service can produce events end to end.
     if (app.conf.test_events) {
         router.get('/_test/events', (req, res) => {
-            req.body = app.conf.test_events;
+            req.body = _.cloneDeep(app.conf.test_events);
             handleEvents(eventGate, app.conf, req, res);
         });
     }
