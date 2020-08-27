@@ -135,7 +135,7 @@ function initApp(options) {
     // sendBeacon CORS restrictions don't allow sendBeacon to POST with an application/json
     // content type, so we allow its default text/plain to be parsed as JSON.
     // See: https://stackoverflow.com/a/44142982
-    app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb', type: ['application/json', 'text/plain']  }));
+    app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb', type: ['application/json', 'text/plain', 'application/reports+json']  }));
     // --- END EventGate modification ---
     // use the application/x-www-form-urlencoded parser
     app.use(bodyParser.urlencoded({ extended: true }));
