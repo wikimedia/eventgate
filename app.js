@@ -105,6 +105,7 @@ function initApp(options) {
             res.header('access-control-allow-origin', app.conf.cors);
             res.header('access-control-allow-headers', 'accept, x-requested-with, content-type');
             res.header('access-control-expose-headers', 'etag');
+            res.header('access-control-allow-methods', 'post');
         }
         if (app.conf.csp !== false) {
             res.header('x-xss-protection', '1; mode=block');
