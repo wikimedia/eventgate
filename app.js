@@ -105,7 +105,11 @@ function initApp(options) {
             res.header('access-control-allow-origin', app.conf.cors);
             res.header('access-control-allow-headers', 'accept, x-requested-with, content-type');
             res.header('access-control-expose-headers', 'etag');
+            // --- BEGIN EventGate modification ---
+            // This is needed for compatibility with Chrome's Network Error Logging
+            // reporter code: https://bit.ly/2YWcf6f
             res.header('access-control-allow-methods', 'post');
+            // --- END EventGate modification ---
         }
         if (app.conf.csp !== false) {
             res.header('x-xss-protection', '1; mode=block');
