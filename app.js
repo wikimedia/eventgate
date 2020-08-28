@@ -105,6 +105,7 @@ function initApp(options) {
             res.header('access-control-allow-origin', app.conf.cors);
             res.header('access-control-allow-headers', 'accept, x-requested-with, content-type');
             res.header('access-control-expose-headers', 'etag');
+            res.header('access-control-allow-methods', 'post');
         }
         if (app.conf.csp !== false) {
             res.header('x-xss-protection', '1; mode=block');
@@ -134,7 +135,9 @@ function initApp(options) {
     // sendBeacon CORS restrictions don't allow sendBeacon to POST with an application/json
     // content type, so we allow its default text/plain to be parsed as JSON.
     // See: https://stackoverflow.com/a/44142982
-    app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb', type: ['application/json', 'text/plain']  }));
+    // We also parse application/reports+json which is used by the W3C Reporting API:
+    // see https://www.w3.org/TR/reporting/#media-type
+    app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb', type: ['application/json', 'text/plain', 'application/reports+json']  }));
     // --- END EventGate modification ---
     // use the application/x-www-form-urlencoded parser
     app.use(bodyParser.urlencoded({ extended: true }));
