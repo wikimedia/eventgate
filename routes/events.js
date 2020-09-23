@@ -39,6 +39,7 @@ async function handleEvents(eventGate, conf, req, res) {
     // Provide this conf and request context to eventGate.process
     const context = {
         req,
+        res,
         conf
     };
 
