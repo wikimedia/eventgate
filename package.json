@@ -1,10 +1,10 @@
 {
   "name": "eventgate",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
   "main": "./index.js",
   "scripts": {
-    "start": "service-runner",
+    "start": "./server.js -c ./config.dev.yaml",
     "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && npm run lint",
     "lint": "eslint --cache --max-warnings 0 --ext .js --ext .json lib routes app.js",
     "docker-start": "service-runner docker-start",
@@ -47,12 +47,14 @@
     "http-shutdown": "^1.2.0",
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.11",
-    "node-rdkafka": "~2.4.2",
-    "node-rdkafka-statsd": "^0.1.2",
     "preq": "^0.5.6",
     "service-runner": "^2.7.7",
     "swagger-router": "^0.7.1",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
+  },
+  "optionalDependencies": {
+    "node-rdkafka": "~2.9.1",
+    "node-rdkafka-statsd": "^0.1.2"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",

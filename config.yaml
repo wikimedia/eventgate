@@ -1,4 +1,4 @@
-# EventGate example config file.
+# EventGate default with Kafka producer example config file.
 #
 # Configures the service-runner as well as the EventGate application.
 # See: https://github.com/wikimedia/service-runner#config-loading
