@@ -1,6 +1,6 @@
 {
   "name": "eventgate",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
   "main": "./index.js",
   "scripts": {
@@ -53,7 +53,7 @@
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
   },
   "optionalDependencies": {
-    "node-rdkafka": "~2.9.1",
+    "node-rdkafka": "~2.4.2",
     "node-rdkafka-statsd": "^0.1.2"
   },
   "devDependencies": {

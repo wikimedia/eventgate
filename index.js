@@ -16,5 +16,6 @@ module.exports = {
     EventValidator: require('./lib/EventValidator'),
     error: require('./lib/error'),
     util: require('./lib/event-util'),
+    // NOTE: If node-rdkafka is not installed, this will be null.
     kafka: require('./lib/kafka'),
-}
+};
