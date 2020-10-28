@@ -16,5 +16,4 @@ module.exports = {
     EventValidator: require('./lib/EventValidator'),
     error: require('./lib/error'),
     util: require('./lib/event-util'),
-    kafka: require('./lib/kafka'),
-}
+};
