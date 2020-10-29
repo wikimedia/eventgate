@@ -77,19 +77,19 @@ services:
       # If set to 'stdout', events will be written to stdout.
       output_path: stdout
 
-      # kafka configs go here.
       # If kafka.conf is defined, make sure the optionalDependency
-      # node-rdkafka-factory (and node-rdkafka) is installed properly.
-      # kafka:
-      #  conf:
-      #    metadata.broker.list: 'localhost:9092'
-      #    # If this is set, node-rdkafka-statsd will be used
-      #    # to emit metrics to statsd via service-runners metrics
-      #    # object. Make sure the node-rdkafka-statsd optionalDependency
-      #    # is installed properly.
-      #    #statistics.interval.ms: 30000
-      #  # kafka topic conf goes here
-      #  topic_conf: {}
+      # node-rdkafka-factory (and node-rdkafka) is installed.
+      # If kafka.conf[statistics.interval.ms] is set, node-rdkafka-statsd will be used
+      # to emit metrics to statsd via service-runners metrics
+      # object. If you do set this, make sure the node-rdkafka-statsd
+      # optionalDependency is installed.
+      ## kafka configs go here.
+      #kafka:
+      # conf:
+      #   metadata.broker.list: 'localhost:9092'
+      #   statistics.interval.ms: 30000
+      ## kafka topic conf goes here.
+      # topic_conf: {}
 
       # If test_events is set, a GET /v1/_test/events route will be added.
       # When this route is requested, these test_events will be processed through EventGate

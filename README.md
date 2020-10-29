@@ -198,7 +198,7 @@ The following values in `conf` will be used to instantiate a a default EventGate
 that extracts JSONSchemas from schema URIs, validates events using those
 schemas, and then produces them to an output file and or Kafka.
 If `kafka.conf` is set, than Kafka will be used.  Since node-rdkafka-factory
-is an optional dependency, please make sure it (and node-rdkafka) are properly
+is an optional dependency, please make sure it (and node-rdkafka) is properly
 installed if you use this.
 
 All `*_field` configs point to a field in an event, and use
