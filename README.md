@@ -132,7 +132,8 @@ Errors should be produced.
 
 If `eventgate_factory_module` is not specified, this service will use provided configuration
 to instantiate and use an EventGate that validates events with JSONSchemas discovered via
-schema URLs, and produces valid events to Kafka.
+schema URLs.  Depending on configuration, the default EventGate can write events to
+a file, and/or produce them to Kafka.
 
 ## EventValidator class & event schema URLs
 
@@ -191,11 +192,14 @@ To use a custom EventGate implementation, set `eventgate_factory_module` to your
 javascript module that exports a `factory` function that instantiate an EventGate with
 `options`.  See the section above entitled 'EventGate implementation configuration'.
 
-## Default Kafka EventGate configuration
+## Default EventGate configuration
 
 The following values in `conf` will be used to instantiate a a default EventGate
 that extracts JSONSchemas from schema URIs, validates events using those
-schemas, and then produces them to Kafka.
+schemas, and then produces them to an output file and or Kafka.
+If `kafka.conf` is set, than Kafka will be used.  Since node-rdkafka-factory
+is an optional dependency, please make sure it (and node-rdkafka) is properly
+installed if you use this.
 
 All `*_field` configs point to a field in an event, and use
 dotted path notation to access sub-objects.
@@ -211,8 +215,9 @@ Property                    |         Default | Description
 `schema_base_uris`          |       undefined | If given, a relative schema URI will be prepended with each of these base URIs to build schema URLs.  The resulting URLs will each be requested, and the first existent schema found at that URL will be used. This allows you to configure multiple schema repositories/registries where your schema might be located.  E.g. you could use this if you wanted to have some schemas locally for reliability, but remote for resolvability.
 `schema_file_extension`     |       undefined | If given, this will be appended to every extracted schema URI unless the filename in the URI already has an extension.
 `stream_field`              |       undefined | The name of the stream this event belongs to. If not set, `schema_uri_field` will be used (and sanitized) instead.
-`kafka.conf`                |                 | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf.metadata_broker_list.
-`kafka.topic_conf`          |                 | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
+`output_path`               |          stdout | Path to file to write valid events to, or 'stdout'. If undefined, events will not be output to a file.
+`kafka.conf`                |       undefined | [node-rdkafka](https://blizzard.github.io/node-rdkafka/current/) / [librdkafka](https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md) configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.  Make sure you set kafka.conf['metadata.broker.list'].  If undefined, events will not be produced to Kafka.
+`kafka.topic_conf`          |       undefined | node-rdkafka (and librdkafka) topic specific configuration.  This will be passed directly to the node-rdkafka `kafka.Producer` constructor.
 
 # eventgate-wikimedia implementation and use as a dependency
 The Wikimedia Foundation runs this EventGate service as a dependency of [eventgate-wikimedia](https://gerrit.wikimedia.org/g/eventgate-wikimedia/+/refs/heads/master).  WMF implements a custom
@@ -236,13 +241,6 @@ If you are using EventGate as a service, and if `test_events` is configured,
 a `GET /v1/_test/events` route will be added. When requested, the `test_events` will be produced as if
 they were POSTed to /v1/events. This is useful for readiness probes that want to make sure the service can
 produce events end to end.
-
-# Development EventGate implementation
-
-The dev-eventgate factory will intantiate and EventGate that validates using
-$schema URIs just like the default implmenentation, but produces events either
-to a local file configured with `output_path`, or to stdout.  This is useful
-if you just want to validate some events in your develpment environment.
 
 # service-template-node
 

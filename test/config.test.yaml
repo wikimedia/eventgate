@@ -63,8 +63,10 @@ services:
       # does not already end with a file extension.
       # schema_file_extension: .yaml
 
-      # Add the /v1/events-test route to test event production with these event.
+      # Add the /v1/_test/events test route to test event production with these event.
       test_events:
         - $schema: /test/0.0.2
           meta:
-            stream: test.event
+            stream: test_events
+            id: "12345678-1234-5678-1234-567812345678"
+

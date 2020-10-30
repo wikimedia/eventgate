@@ -1,4 +1,5 @@
-# EventGate default with Kafka producer example config file.
+# EventGate default example config file.
+
 #
 # Configures the service-runner as well as the EventGate application.
 # See: https://github.com/wikimedia/service-runner#config-loading
@@ -46,6 +47,7 @@ services:
       # more per-service config settings
       user_agent: eventgate
 
+      # EventGate will be instantiated from the factory method returned by this module.
       eventgate_factory_module: '../lib/factories/default-eventgate'
 
       # This field in each event will be used to extract a
@@ -60,7 +62,7 @@ services:
       # to match paths to your schema repositories.
       schema_base_uris: [./test/schemas]
       # You can alteratively use a remote HTTP base URI.
-      #schema_base_uris: [https://raw.githubusercontent.com/wikimedia/mediawiki-event-schemas/master/jsonschema]
+      #schema_base_uris: [https://schema.wikimedia.org/repositories/primary/jsonschema]
 
       # If set, this will be appended to every extracted schema_uri if that schema_uri
       # does not already end with a file extension.
@@ -71,16 +73,27 @@ services:
       # is also configured.
       stream_field: meta.stream
 
-      # kafka configs go here.
-      kafka:
-        conf:
-          metadata.broker.list: 'localhost:9092'
-        # kafka topic conf goes here
-        topic_conf: {}
+      # If set, events will be written to this file.
+      # If set to 'stdout', events will be written to stdout.
+      output_path: stdout
+
+      # If kafka.conf is defined, make sure the optionalDependency
+      # node-rdkafka-factory (and node-rdkafka) is installed.
+      # If kafka.conf[statistics.interval.ms] is set, node-rdkafka-statsd will be used
+      # to emit metrics to statsd via service-runners metrics
+      # object. If you do set this, make sure the node-rdkafka-statsd
+      # optionalDependency is installed.
+      ## kafka configs go here.
+      # kafka:
+      #   conf:
+      #     metadata.broker.list: 'localhost:9092'
+      #     statistics.interval.ms: 30000
+      #   # kafka topic conf goes here.
+      #   topic_conf: {}
 
       # If test_events is set, a GET /v1/_test/events route will be added.
       # When this route is requested, these test_events will be processed through EventGate
       # as if it they were directly POSTed to /v1/events.
       # This is useful for readiness probes that want to make sure the service
       # is alive and ready to produce events end to end.
-      #test_events: [{$schema: /test/event/1.0.0, meta: {stream: test_events}, ...}]
+      test_events: [{$schema: /test/0.0.1, meta: {stream: test_events, id: "12345678-1234-5678-1234-567812345678"}, test: "example string"}]
