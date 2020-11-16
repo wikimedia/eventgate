@@ -2,12 +2,17 @@
 
 const bunyan            = require('bunyan');
 const assert            = require('assert');
-const eUtil             = require('../../../lib/event-util');
+
+const {
+    resolveUri,
+    urlGetObject,
+} = require('@wikimedia/url-get');
+
 const EventValidator    = require('../../../lib/EventValidator');
 const {
     EventSchemaLoadError,
     ValidationError
- } = require('../../../lib/error');
+} = require('../../../lib/error');
 
 const schemaUri = '/test/0.0.1';
 const baseSchemaUri = './test/schemas';
@@ -79,15 +84,15 @@ function extractSchemaUri(event) {
 }
 
 function getSchema(uri) {
-    const url = eUtil.resolveUri(uri, baseSchemaUri);
-    return eUtil.urlGetObject(url);
+    const url = resolveUri(uri, baseSchemaUri);
+    return urlGetObject(url);
 }
 
 /**
  * Returns a Promise of the loaded test schema.  Used in tests.
  */
 function loadTestSchema() {
-    return eUtil.urlGetObject(eUtil.resolveUri(schemaUri, baseSchemaUri));
+    return urlGetObject(resolveUri(schemaUri, baseSchemaUri));
 }
 
 describe('EventValidator test instance', () => {
