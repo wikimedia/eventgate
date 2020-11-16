@@ -1,11 +1,11 @@
 {
   "name": "eventgate",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
   "main": "./index.js",
   "scripts": {
     "start": "./server.js -c ./config.yaml",
-    "test": "PREQ_CONNECT_TIMEOUT=15 nyc mocha && npm run lint",
+    "test": "PREQ_CONNECT_TIMEOUT=15 mocha && npm run lint",
     "lint": "eslint --cache --max-warnings 0 --ext .js --ext .json lib routes app.js",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
@@ -50,7 +50,8 @@
     "preq": "^0.5.6",
     "service-runner": "^2.7.7",
     "swagger-router": "^0.7.1",
-    "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master"
+    "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
+    "@wikimedia/url-get": "^1.0.0"
   },
   "optionalDependencies": {
     "@wikimedia/node-rdkafka-factory": "^1.0.0",
@@ -58,7 +59,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^5.9.0",
+    "eslint": "^7.4.0",
     "eslint-config-wikimedia": "^0.10.1",
     "eslint-plugin-jsdoc": "^4.1.0",
     "eslint-plugin-json": "^1.2.0",
