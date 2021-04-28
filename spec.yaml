@@ -1,11 +1,11 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
-  version: 0.4.0
+  version: 0.7.0
   title: EventGate
   description: Validates and produces events
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
   license:
-    name: Apache2 License
+    name: Apache2
     url: http://www.apache.org/licenses/LICENSE-2.0
 
 paths:
@@ -21,8 +21,10 @@ paths:
           description: Success
         default:
           description: Error
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: robots.txt check
           request: {}
@@ -36,15 +38,15 @@ paths:
       tags:
         - Root
       description: The root service end-point
-      produces:
-        - application/json
       responses:
         200:
           description: Success
         default:
           description: Error
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: root with no query params
           request: {}
@@ -73,8 +75,7 @@ paths:
   /v1/events:
     post:
       description: Produce events
-      produces:
-        - application/json
+
       responses:
         201:
           description: Success
@@ -82,9 +83,32 @@ paths:
           description: Hasty success. Response returned before events guaranteed to be persisted.
         207:
           description: Partial Success
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         400:
           description: Failure
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
+components:
+  schemas:
+    # A https://tools.ietf.org/html/draft-nottingham-http-problem
+    problem:
+      required:
+        - type
+      properties:
+        status:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        method:
+          type: string
+        uri:
+          type: string

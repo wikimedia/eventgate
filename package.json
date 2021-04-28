@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/wikimedia/eventgate",
   "dependencies": {
+    "@wikimedia/url-get": "^1.0.0",
     "ajv": "^6.8.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
@@ -49,9 +50,8 @@
     "lodash": "^4.17.11",
     "preq": "^0.5.6",
     "service-runner": "^2.7.7",
-    "swagger-router": "^0.7.1",
-    "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
-    "@wikimedia/url-get": "^1.0.0"
+    "swagger-router": "^0.7.4",
+    "swagger-ui-dist": "^3.22.3"
   },
   "optionalDependencies": {
     "@wikimedia/node-rdkafka-factory": "^1.0.0",
