@@ -16,6 +16,7 @@ let app;
 
 /**
  * Handles incoming JSON events in req.body with the EventGate instance.
+ *
  * @param {EventGate} eventGate
  * @param {Object} conf config object to provide in eventGate.process context.
  * @param {http.ClientRequest} req
@@ -125,7 +126,7 @@ async function handleEvents(eventGate, conf, req, res) {
     }
 }
 
-module.exports = async(appObj) => {
+module.exports = async (appObj) => {
 
     app = appObj;
 

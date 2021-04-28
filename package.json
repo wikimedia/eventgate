@@ -1,7 +1,10 @@
 {
   "name": "eventgate",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Event intake service - POST JSONSchemaed events, validate, and produce.",
+  "engines": {
+    "node": ">=10.16.0"
+  },
   "main": "./index.js",
   "scripts": {
     "start": "./server.js -c ./config.yaml",
