@@ -1,25 +1,25 @@
-/* global describe, it, before, after */
-
 'use strict';
-
 
 const preq   = require('preq');
 const assert = require('../../utils/assert.js');
-const server = require('../../utils/server.js');
+const Server = require('../../utils/server.js');
 
-if (!server.stopHookAdded) {
-    server.stopHookAdded = true;
+describe('service information', function () {
+
+    this.timeout(20000);
+
+    let infoUri = null;
+
+    const server = new Server();
+
+    before(() => {
+        return server.start()
+        .then(() => {
+            infoUri = `${server.config.uri}_info/`;
+        });
+    });
+
     after(() => server.stop());
-}
-
-describe('service information', function() {
-
-    this.timeout(20000); // eslint-disable-line no-invalid-this
-
-    before(() => server.start());
-
-    // common URI prefix for info tests
-    const infoUri = `${server.config.uri}_info/`;
 
     // common function used for generating requests
     // and checking their return values
@@ -71,5 +71,13 @@ describe('service information', function() {
             assert.notDeepEqual(res.body.home, undefined, 'No home field returned!');
         });
     });
-});
 
+    it('should fail to get the service info for invalid endpoint', () => {
+        return assert.fails(
+            preq.get({ uri: `${infoUri}zzz` }),
+            (res) => {
+                assert.deepEqual(res.status, 404);
+            }
+        );
+    });
+});

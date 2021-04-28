@@ -1,4 +1,4 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
   version: 0.4.0
   title: EventGate Test Spec
@@ -24,30 +24,29 @@ paths:
           description: Success
         default:
           description: Error
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: robots.txt check
           request: {}
           response:
             status: 200
-            headers:
-              user-agent: '*'
-              disallow: '/'
   /:
     get:
       tags:
         - Root
       description: The root service end-point
-      produces:
-        - application/json
       responses:
         200:
           description: Success
         default:
           description: Error
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
       x-amples:
         - title: root with no query params
           request: {}
@@ -75,20 +74,22 @@ paths:
   # from routes/events.js
   /v1/events:
     post:
-      description: Produce events
-      produces:
-        - application/json
+      summary: Produce events
       responses:
         201:
           description: Success
         207:
           description: Partial Success
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         400:
           description: Failure
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
 
       x-amples:
         - title: Produce a single valid event
@@ -322,19 +323,21 @@ paths:
   /v1/_test/events:
     get:
       description: Produce the configured test_events
-      produces:
-        - application/json
       responses:
         201:
           description: Success
         207:
           description: Partial Success
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
         400:
           description: Failure
-          schema:
-            $ref: '#/definitions/problem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/problem'
 
       x-amples:
         - title: Produce a single valid test event

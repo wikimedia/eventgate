@@ -3,8 +3,6 @@
 const _ = require('lodash');
 const P = require('bluebird');
 
-const uuid = require('cassandra-uuid').TimeUuid;
-
 const {
     makeExtractStream,
     makeValidate

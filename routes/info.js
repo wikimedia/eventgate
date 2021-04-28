@@ -1,8 +1,6 @@
 'use strict';
 
-
 const sUtil = require('../lib/util');
-
 
 /**
  * The main router object
@@ -13,7 +11,6 @@ const router = sUtil.router();
  * The main application object reported when this module is require()d
  */
 let app;
-
 
 /**
  * GET /
@@ -31,7 +28,6 @@ router.get('/', (req, res) => {
 
 });
 
-
 /**
  * GET /name
  * Gets the service's name as defined in package.json
@@ -43,7 +39,6 @@ router.get('/name', (req, res) => {
 
 });
 
-
 /**
  * GET /version
  * Gets the service's version as defined in package.json
@@ -54,7 +49,6 @@ router.get('/version', (req, res) => {
     res.json({ version: app.info.version });
 
 });
-
 
 /**
  * ALL /home
@@ -74,7 +68,6 @@ router.all('/home', (req, res) => {
 
 });
 
-
 module.exports = (appObj) => {
 
     app = appObj;
@@ -86,4 +79,3 @@ module.exports = (appObj) => {
     };
 
 };
-

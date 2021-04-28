@@ -1,9 +1,7 @@
 'use strict';
 
-
 const sUtil = require('../lib/util');
 const swaggerUi = require('../lib/swagger-ui');
-
 
 /**
  * The main router object
@@ -15,20 +13,15 @@ const router = sUtil.router();
  */
 let app;
 
-
 /**
  * GET /robots.txt
  * Instructs robots no indexing should occur on this domain.
  */
 router.get('/robots.txt', (req, res) => {
 
-    res.set({
-        'User-agent': '*',
-        'Disallow': '/'
-    }).end();
+    res.type('text/plain').end('User-agent: *\nDisallow: /\n');
 
 });
-
 
 /**
  * GET /
@@ -47,7 +40,6 @@ router.get('/', (req, res, next) => {
 
 });
 
-
 module.exports = (appObj) => {
 
     app = appObj;
@@ -59,4 +51,3 @@ module.exports = (appObj) => {
     };
 
 };
-
