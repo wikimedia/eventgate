@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "wikimedia/server"
+  ],
+  "plugins": ["json", "jsdoc"],
+  "rules": {
+    "array-bracket-spacing": "off",
+    "camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
+    "comma-dangle": "off",
+    "computed-property-spacing": "off",
+    "indent": ["off", 4],
+    "jsdoc/no-undefined-types": "off",
+    "no-multi-spaces": "off",
+    "no-shadow": "off",
+    "no-underscore-dangle": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
+    "space-in-parens": ["error", "never"]
+  }
+}

@@ -1,6 +1,5 @@
 'use strict';
 
-
 const http = require('http');
 const BBPromise = require('bluebird');
 const express = require('express');
@@ -13,9 +12,9 @@ const yaml = require('js-yaml');
 const addShutdown = require('http-shutdown');
 const path = require('path');
 
-
 /**
  * Creates an express app and initialises it
+ *
  * @param {Object} options the options to initialise the app with
  * @return {bluebird} the promise resolving to the app object
  */
@@ -38,13 +37,13 @@ function initApp(options) {
     // --- END EventGate modification ---
 
     // ensure some sane defaults
-    if (!app.conf.port) { app.conf.port = 8888; }
-    if (!app.conf.interface) { app.conf.interface = '0.0.0.0'; }
-    if (app.conf.compression_level === undefined) { app.conf.compression_level = 3; }
-    if (app.conf.cors === undefined) { app.conf.cors = '*'; }
+    app.conf.port = app.conf.port || 8888;
+    app.conf.interface = app.conf.interface || '0.0.0.0';
+    // eslint-disable-next-line max-len
+    app.conf.compression_level = app.conf.compression_level === undefined ? 3 : app.conf.compression_level;
+    app.conf.cors = app.conf.cors === undefined ? '*' : app.conf.cors;
     if (app.conf.csp === undefined) {
-        // eslint-disable-next-line max-len
-        app.conf.csp = "default-src 'self'; object-src 'none'; media-src *; img-src *; style-src *; frame-ancestors 'self'";
+        app.conf.csp = "default-src 'self'; object-src 'none'; media-src 'none'; img-src 'none'; style-src 'none'; base-uri 'self'; frame-ancestors 'self'";
     }
 
     // set outgoing proxy
@@ -84,8 +83,8 @@ function initApp(options) {
             app.conf.spec = {};
         }
     }
-    if (!app.conf.spec.swagger) {
-        app.conf.spec.swagger = '2.0';
+    if (!app.conf.spec.openapi) {
+        app.conf.spec.openapi = '3.0.0';
     }
     if (!app.conf.spec.info) {
         app.conf.spec.info = {
@@ -116,8 +115,6 @@ function initApp(options) {
             res.header('x-content-type-options', 'nosniff');
             res.header('x-frame-options', 'SAMEORIGIN');
             res.header('content-security-policy', app.conf.csp);
-            res.header('x-content-security-policy', app.conf.csp);
-            res.header('x-webkit-csp', app.conf.csp);
         }
         sUtil.initAndLogRequest(req, app);
         next();
@@ -150,11 +147,11 @@ function initApp(options) {
 
 }
 
-
 /**
  * Loads all routes declared in routes/ into the app
+ *
  * @param {Application} app the application object to load routes into
- * @param {string} dir
+ * @param {string} dir routes folder
  * @return {bluebird} a promise resolving to the app object
  */
 function loadRoutes(app, dir) {
@@ -176,8 +173,8 @@ function loadRoutes(app, dir) {
                 return undefined;
             }
             // check that the route exports the object we need
-            if (route.constructor !== Object || !route.path || !route.router
-                || !(route.api_version || route.skip_domain)) {
+            if (route.constructor !== Object || !route.path || !route.router ||
+                !(route.api_version || route.skip_domain)) {
                 throw new TypeError(`routes/${fname} does not export the correct object!`);
             }
             // normalise the path to be used as the mount point
@@ -204,9 +201,9 @@ function loadRoutes(app, dir) {
 
 }
 
-
 /**
  * Creates and start the service's web server
+ *
  * @param {Application} app the app object to use in the service
  * @return {bluebird} a promise creating the web server
  */
@@ -239,19 +236,19 @@ function createServer(app) {
 
 }
 
-
 /**
  * The service's entry point. It takes over the configuration
  * options and the logger- and metrics-reporting objects from
  * service-runner and starts an HTTP server, attaching the application
  * object to it.
- * @param {Object} options
- * @return {Function}
+ *
+ * @param {Object} options the options to initialise the app with
+ * @return {bluebird} HTTP server
  */
-module.exports = function(options) {
+module.exports = (options) => {
 
     return initApp(options)
-    .then(app => loadRoutes(app, `${__dirname}/routes`))
+    .then((app) => loadRoutes(app, `${__dirname}/routes`))
     .then((app) => {
         // serve static files from static/
         app.use('/static', express.static(`${__dirname}/static`));
@@ -259,4 +256,3 @@ module.exports = function(options) {
     }).then(createServer);
 
 };
-

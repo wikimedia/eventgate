@@ -1,29 +1,25 @@
-/* global describe, it, before, after */
-
 'use strict';
-
 
 const preq   = require('preq');
 const assert = require('../../utils/assert.js');
-const server = require('../../utils/server.js');
+const Server = require('../../utils/server.js');
 
-if (!server.stopHookAdded) {
-    server.stopHookAdded = true;
-    after(() => server.stop());
-}
+describe('express app', function () {
 
-describe('express app', function() {
+    this.timeout(20000);
 
-    this.timeout(20000); // eslint-disable-line no-invalid-this
+    const server = new Server();
 
     before(() => server.start());
+
+    after(() => server.stop());
 
     it('should get robots.txt', () => {
         return preq.get({
             uri: `${server.config.uri}robots.txt`
         }).then((res) => {
             assert.deepEqual(res.status, 200);
-            assert.deepEqual(res.headers.disallow, '/');
+            assert.deepEqual(res.body, 'User-agent: *\nDisallow: /\n');
         });
     });
 
@@ -52,11 +48,7 @@ describe('express app', function() {
             assert.deepEqual(res.headers['x-xss-protection'], '1; mode=block');
             assert.deepEqual(res.headers['x-content-type-options'], 'nosniff');
             assert.deepEqual(res.headers['x-frame-options'], 'SAMEORIGIN');
-            /* eslint-disable max-len */
-            assert.deepEqual(res.headers['content-security-policy'], 'default-src \'self\'; object-src \'none\'; media-src *; img-src *; style-src *; frame-ancestors \'self\'');
-            assert.deepEqual(res.headers['x-content-security-policy'], 'default-src \'self\'; object-src \'none\'; media-src *; img-src *; style-src *; frame-ancestors \'self\'');
-            assert.deepEqual(res.headers['x-webkit-csp'], 'default-src \'self\'; object-src \'none\'; media-src *; img-src *; style-src *; frame-ancestors \'self\'');
-            /* eslint-enable max-len */
+            assert.deepEqual(res.headers['content-security-policy'], 'default-src \'self\'; object-src \'none\'; media-src \'none\'; img-src \'none\'; style-src \'none\'; base-uri \'self\'; frame-ancestors \'self\'');
         });
     });
 
@@ -69,7 +61,8 @@ describe('express app', function() {
     //     }).then((res) => {
     //         assert.deepEqual(res.status, 200);
     //         // if there is no content-length, the reponse was gzipped
-    //         assert.deepEqual(res.headers['content-length'], undefined, 'Did not expect the content-length header!');
+    //         assert.deepEqual(res.headers['content-length'], undefined,
+    //             'Did not expect the content-length header!');
     //     });
     // });
 
@@ -86,4 +79,3 @@ describe('express app', function() {
     //     });
     // });
 });
-
