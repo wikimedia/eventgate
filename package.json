@@ -50,7 +50,7 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.11",
     "preq": "^0.5.9",
-    "service-runner": "^2.7.7",
+    "service-runner": "^2.8.3",
     "swagger-router": "^0.7.4",
     "swagger-ui-dist": "^3.22.3",
     "uuid": "^3.3.2",
