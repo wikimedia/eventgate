@@ -4,12 +4,12 @@ Dockerfile
 
 coverage
 .nyc_output
+config.yaml
 node_modules
 npm-debug.log
 package-lock.json
+.eslintcache
+
 *.vscode
 *.code-workspace
 output.json
-
-.eslintcache
-

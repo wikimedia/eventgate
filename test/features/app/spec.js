@@ -151,7 +151,7 @@ function cmp(result, expected, errMsg) {
     }
 
     if (expected.length > 1 && expected[0] === '/' && expected[expected.length - 1] === '/') {
-        if ((new RegExp(expected.slice(1, -1))).test(result)) {
+        if (new RegExp(expected.slice(1, -1)).test(result)) {
             return true;
         }
     } else if (expected.length === 0 && result.length === 0) {
@@ -264,11 +264,15 @@ describe('Swagger spec', function () {
         })
         .then((spec) => {
             const routeTests = () => {
+                // eslint-disable-next-line mocha/no-sibling-hooks
                 before(() => server.start());
+                // eslint-disable-next-line mocha/no-sibling-hooks
                 after(() => server.stop());
 
                 constructTests(spec).forEach((testCase) => {
+                    // eslint-disable-next-line mocha/handle-done-callback, mocha/no-nested-tests
                     it(testCase.title, function (done) {
+                    // eslint-disable-next-line mocha/no-return-and-callback
                         return preq(testCase.request)
                         .then((res) => {
                             assert.status(res, testCase.response.status);
