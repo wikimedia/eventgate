@@ -26,9 +26,7 @@ logging:
 # Statsd metrics reporter
 # See: https://github.com/wikimedia/service-runner#config-loading
 metrics:
-  #type: log
-  #host: localhost
-  #port: 8125
+  - type: log
 
 services:
   - name: EventGate
