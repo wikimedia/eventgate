@@ -1,29 +1,36 @@
 {
-  "extends": [
-    "wikimedia/server"
-  ],
-  "plugins": ["json", "jsdoc"],
-  "rules": {
-    "array-bracket-spacing": "off",
-    "camelcase": [
-      "error",
-      {
-        "properties": "never"
-      }
-    ],
-    "comma-dangle": "off",
-    "computed-property-spacing": "off",
-    "indent": ["off", 4],
-    "jsdoc/no-undefined-types": "off",
-    "no-multi-spaces": "off",
-    "no-shadow": "off",
-    "no-underscore-dangle": "off",
-    "no-unused-vars": [
-      "error",
-      {
-        "args": "none"
-      }
-    ],
-    "space-in-parens": ["error", "never"]
-  }
+	"extends": [
+		"wikimedia/server",
+		"wikimedia/jsdoc"
+	],
+	"rules": {
+		"array-bracket-spacing": "off",
+		"camelcase": [
+			"error",
+			{
+				"properties": "never"
+			}
+		],
+		"comma-dangle": "off",
+		"computed-property-spacing": "off",
+		"indent": ["off", 4],
+		"no-multi-spaces": "off",
+		"no-shadow": "off",
+		"no-undefined": "off",
+		"no-underscore-dangle": "off",
+		"no-unused-vars": [
+			"error",
+			{
+				"args": "none"
+			}
+		],
+		"space-in-parens": ["error", "never"],
+		"jsdoc/no-undefined-types": "off"
+	},
+	"overrides": [
+		{
+			"files": [ "**/*.json", "**/*.jsonc" ],
+			"extends": "wikimedia/json"
+		}
+	]
 }
