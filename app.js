@@ -140,8 +140,6 @@ function initApp(options) {
     // see https://www.w3.org/TR/reporting/#media-type
     app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb', type: ['application/json', 'text/plain', 'application/reports+json']  }));
     // --- END EventGate modification ---
-    // use the application/x-www-form-urlencoded parser
-    app.use(bodyParser.urlencoded({ extended: true }));
 
     return BBPromise.resolve(app);
 
