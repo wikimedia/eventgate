@@ -52,6 +52,18 @@ describe('express app', function () {
         });
     });
 
+    it('should return 400 when given Content-Type application/x-www-form-urlencoded', () => {
+        return preq.post({
+            uri: `${server.config.uri}v1/events`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: '{"foo": "bar"}'
+        }).catch((res) => {
+            assert.deepEqual(res.status, 400);
+        });
+    });
+
     // it('should get static content gzipped', () => {
     //     return preq.get({
     //         uri: `${server.config.uri}static/index.html`,
