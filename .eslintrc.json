@@ -12,8 +12,8 @@
 			}
 		],
 		"comma-dangle": "off",
-		"computed-property-spacing": "off",
 		"indent": ["off", 4],
+		"computed-property-spacing": "off",
 		"no-multi-spaces": "off",
 		"no-shadow": "off",
 		"no-undefined": "off",
@@ -25,7 +25,12 @@
 			}
 		],
 		"space-in-parens": ["error", "never"],
-		"jsdoc/no-undefined-types": "off"
+		"jsdoc/no-undefined-types": "off",
+		"es-x/no-symbol-prototype-description": "off",
+		"es-x/no-hashbang": "off",
+		"security/detect-non-literal-regexp": "off",
+		"security/detect-non-literal-require": "off",
+		"security/detect-non-literal-fs-filename": "off"
 	},
 	"overrides": [
 		{

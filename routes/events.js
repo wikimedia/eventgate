@@ -7,12 +7,30 @@ const _     = require('lodash');
  * The main router object
  */
 const router = sUtil.router();
-const requireRelative = sUtil.requireRelative;
 
 /**
  * The main application object reported when this module is require()d
  */
 let app;
+
+/**
+ * Given module path m, this will attempt to require it
+ * with the extra paths at the end of module.paths.
+ * module.paths will be unmodified when this function returns.
+ *
+ * @param {string} m
+ * @param {Array<string>} paths list of extra paths to search for module.
+ * @return {any}
+ */
+function requireRelative(m, paths = [process.cwd()]) {
+    const originalModulePaths = module.paths;
+    paths.forEach((path) => module.paths.push(path));
+    try {
+        return require(m);
+    } finally {
+        module.paths = originalModulePaths;
+    }
+}
 
 /**
  * Handles incoming JSON events in req.body with the EventGate instance.

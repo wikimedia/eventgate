@@ -19,7 +19,7 @@ let app;
  */
 router.get('/robots.txt', (req, res) => {
 
-    res.type('text/plain').end('User-agent: *\nDisallow: /\n');
+	res.type('text/plain').end('User-agent: *\nDisallow: /\n');
 
 });
 
@@ -30,24 +30,24 @@ router.get('/robots.txt', (req, res) => {
  */
 router.get('/', (req, res, next) => {
 
-    if ({}.hasOwnProperty.call(req.query || {}, 'spec')) {
-        res.json(app.conf.spec);
-    } else if ({}.hasOwnProperty.call(req.query || {}, 'doc')) {
-        return swaggerUi.processRequest(app, req, res);
-    } else {
-        next();
-    }
+	if ({}.hasOwnProperty.call(req.query || {}, 'spec')) {
+		res.json(app.conf.spec);
+	} else if ({}.hasOwnProperty.call(req.query || {}, 'doc')) {
+		return swaggerUi.processRequest(app, req, res);
+	} else {
+		next();
+	}
 
 });
 
 module.exports = (appObj) => {
 
-    app = appObj;
+	app = appObj;
 
-    return {
-        path: '/',
-        skip_domain: true,
-        router
-    };
+	return {
+		path: '/',
+		skip_domain: true,
+		router
+	};
 
 };

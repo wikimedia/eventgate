@@ -23,6 +23,7 @@ class MockErrorEventUnproducableError extends Error {}
  * in a delivery callback.  Used for testing only!
  *
  * This function uses options to extract details from an incoming event.
+ *
  * @param {Object} options
  * @return {function(*=): *}
  */
@@ -103,7 +104,7 @@ function mockEventGateFactory(options, logger) {
         new EventGate({
             validate: makeValidate(options, logger),
             produce: makeMockProduce(options),
-            eventRepr: event => 'TEST EVENT',
+            eventRepr: (event) => 'TEST EVENT',
             log: logger,
             mapToEventError: makeMapToErrorEvent(options)
         })

@@ -1,0 +1,25 @@
+{
+	"//": "Test the routes; your repo may have other directories which should also be tested.",
+	"include": [
+		"routes/"
+	],
+
+	"all": true,
+
+	"report-dir": "coverage/",
+
+	"reporter": [
+		"lcov",
+		"clover",
+		"text-summary"
+	],
+
+	"cache": true,
+
+	"per-file": true,
+	"statements": 0.0,
+	"branches": 0.0,
+	"functions": 0.0,
+	"lines": 0.0,
+	"check-coverage": false
+}

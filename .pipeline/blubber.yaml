@@ -1,5 +1,7 @@
+# syntax=docker-registry.wikimedia.org/repos/releng/blubber:v0.17.0
+
 version: v4
-base: docker-registry.wikimedia.org/buster-nodejs10-slim
+base: docker-registry.wikimedia.org/nodejs18-slim
 lives:
   in: /srv/service
 runs:
@@ -7,20 +9,21 @@ runs:
 
 variants:
   build:
-    base: docker-registry.wikimedia.org/buster-nodejs10-devel
+    base: docker-registry.wikimedia.org/nodejs18-devel
     copies: [local]
-    apt: { packages: [git, build-essential, python-pkgconfig] }
+    apt: { packages: [git, build-essential, python3, pkg-config] }
     node: { requirements: [package.json] }
-    runs: { environment: { LINK: g++ } }
   development:
     includes: [build]
-    apt: { packages: [ca-certificates] }
+    apt: { packages: [ca-certificates, curl, kafkacat, telnet, iputils-ping, procps, curl, vim] }
     entrypoint: [node, server.js]
-    runs: { environment: { APP_CONFIG_PATH: ./config.dev.yaml } }
+    runs: { environment: { APP_CONFIG_PATH: ./config.yaml } }
   test:
     includes: [build]
     apt: { packages: [ca-certificates] }
     entrypoint: [npm, test]
+    # Needed so that tests can write cache and coverage info in /srv/service
+    runs: { insecurely: true }
   prep:
     includes: [build]
     node: { env: production }
@@ -28,4 +31,4 @@ variants:
     copies: [prep]
     node: { env: production }
     entrypoint: [node, server.js]
-    runs: { environment: { APP_CONFIG_PATH: ./config.prod.yaml } }
+    runs: { environment: { APP_CONFIG_PATH: ./config.yaml } }
