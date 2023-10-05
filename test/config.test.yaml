@@ -24,7 +24,7 @@ services:
     # per-service config
     conf:
       port: 6992
-      # interface: localhost # uncomment to only listen on localhost
+      interface: localhost # uncomment to only listen on localhost
       # more per-service config settings
 
       # the location of the spec, defaults to spec.yaml if not specified

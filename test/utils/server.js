@@ -4,7 +4,10 @@ const preq   = require('preq');
 const TestRunner = require('service-runner/test/TestServer');
 
 class TestServiceTemplateNodeRunner extends TestRunner {
-	constructor(configPath = `${__dirname}/../../config.yaml`) {
+
+// --- BEGIN EventGate modification ---
+    constructor(configPath = `${__dirname}/../config.test.yaml`) {
+// --- END EventGate modification ---
 		super(configPath);
 		this._spec = null;
 	}
