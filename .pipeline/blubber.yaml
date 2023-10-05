@@ -1,5 +1,5 @@
 version: v4
-base: docker-registry.wikimedia.org/buster-nodejs10-slim
+base: docker-registry.wikimedia.org/nodejs18-slim
 lives:
   in: /srv/service
 runs:
@@ -7,11 +7,10 @@ runs:
 
 variants:
   build:
-    base: docker-registry.wikimedia.org/buster-nodejs10-devel
+    base: docker-registry.wikimedia.org/nodejs18-devel
     copies: [local]
-    apt: { packages: [git, build-essential, python-pkgconfig] }
+    apt: { packages: [git, build-essential, python3, pkg-config] }
     node: { requirements: [package.json] }
-    runs: { environment: { LINK: g++ } }
   development:
     includes: [build]
     apt: { packages: [ca-certificates] }
@@ -21,6 +20,8 @@ variants:
     includes: [build]
     apt: { packages: [ca-certificates] }
     entrypoint: [npm, test]
+    # Needed so that tests can write cache and coverage info in /srv/service
+    runs: { insecurely: true }
   prep:
     includes: [build]
     node: { env: production }

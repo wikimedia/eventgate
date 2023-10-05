@@ -20,14 +20,14 @@ const path = require('path');
  */
 function initApp(options) {
 
-    // the main application object
-    const app = express();
+	// the main application object
+	const app = express();
 
-    // get the options and make them available in the app
-    app.logger = options.logger;    // the logging device
-    app.metrics = options.metrics;  // the metrics
-    app.conf = options.config;      // this app's config options
-    app.info = packageInfo;         // this app's package info
+	// get the options and make them available in the app
+	app.logger = options.logger;    // the logging device
+	app.metrics = options.metrics;  // the metrics
+	app.conf = options.config;      // this app's config options
+	app.info = packageInfo;         // this app's package info
 
     // --- BEGIN EventGate modification ---
     // Pass service-runners determined appBasePath into
@@ -46,30 +46,33 @@ function initApp(options) {
         app.conf.csp = "default-src 'self'; object-src 'none'; media-src 'none'; img-src 'none'; style-src 'none'; base-uri 'self'; frame-ancestors 'self'";
     }
 
-    // set outgoing proxy
-    if (app.conf.proxy) {
-        process.env.HTTP_PROXY = app.conf.proxy;
-        // if there is a list of domains which should
-        // not be proxied, set it
-        if (app.conf.no_proxy_list) {
-            if (Array.isArray(app.conf.no_proxy_list)) {
-                process.env.NO_PROXY = app.conf.no_proxy_list.join(',');
-            } else {
-                process.env.NO_PROXY = app.conf.no_proxy_list;
-            }
-        }
-    }
+	// set outgoing proxy
+	if (app.conf.proxy) {
+		process.env.HTTP_PROXY = app.conf.proxy;
+		// if there is a list of domains which should
+		// not be proxied, set it
+		if (app.conf.no_proxy_list) {
+			if (Array.isArray(app.conf.no_proxy_list)) {
+				process.env.NO_PROXY = app.conf.no_proxy_list.join(',');
+			} else {
+				process.env.NO_PROXY = app.conf.no_proxy_list;
+			}
+		}
+	}
 
-    // set up header whitelisting for logging
-    if (!app.conf.log_header_whitelist) {
-        app.conf.log_header_whitelist = [
-            'cache-control', 'content-type', 'content-length', 'if-match',
-            'user-agent', 'x-request-id'
-        ];
-    }
-    app.conf.log_header_whitelist = new RegExp(`^(?:${app.conf.log_header_whitelist.map((item) => {
-        return item.trim();
-    }).join('|')})$`, 'i');
+	// set up header whitelisting for logging
+	if (!app.conf.log_header_whitelist) {
+		app.conf.log_header_whitelist = [
+			'cache-control', 'content-type', 'content-length', 'if-match',
+			'user-agent', 'x-request-id'
+		];
+	}
+	app.conf.log_header_whitelist = new RegExp(`^(?:${app.conf.log_header_whitelist.map((item) => {
+		return item.trim();
+	}).join('|')})$`, 'i');
+
+	// set up the request templates for the APIs
+	apiUtil.setupApiTemplates(app);
 
     // set up the spec
     if (!app.conf.spec) {
@@ -120,8 +123,8 @@ function initApp(options) {
         next();
     });
 
-    // set up the user agent header string to use for requests
-    app.conf.user_agent = app.conf.user_agent || app.info.name;
+	// set up the user agent header string to use for requests
+	app.conf.user_agent = app.conf.user_agent || app.info.name;
 
     // disable the X-Powered-By header
     app.set('x-powered-by', false);
@@ -141,7 +144,7 @@ function initApp(options) {
     app.use(bodyParser.json({ limit: app.conf.max_body_size || '100kb', type: ['application/json', 'text/plain', 'application/reports+json']  }));
     // --- END EventGate modification ---
 
-    return BBPromise.resolve(app);
+	return BBPromise.resolve(app);
 
 }
 
@@ -154,48 +157,48 @@ function initApp(options) {
  */
 function loadRoutes(app, dir) {
 
-    // recursively load routes from .js files under routes/
-    return fs.readdirAsync(dir).map((fname) => {
-        return BBPromise.try(() => {
-            const resolvedPath = path.resolve(dir, fname);
-            const isDirectory = fs.statSync(resolvedPath).isDirectory();
-            if (isDirectory) {
-                loadRoutes(app, resolvedPath);
-            } else if (/\.js$/.test(fname)) {
-                // import the route file
-                const route = require(`${dir}/${fname}`);
-                return route(app);
-            }
-        }).then((route) => {
-            if (route === undefined) {
-                return undefined;
-            }
-            // check that the route exports the object we need
-            if (route.constructor !== Object || !route.path || !route.router ||
+	// recursively load routes from .js files under routes/
+	return fs.readdirAsync(dir).map((fname) => {
+		return BBPromise.try(() => {
+			const resolvedPath = path.resolve(dir, fname);
+			const isDirectory = fs.statSync(resolvedPath).isDirectory();
+			if (isDirectory) {
+				loadRoutes(app, resolvedPath);
+			} else if (/\.js$/.test(fname)) {
+				// import the route file
+				const route = require(`${dir}/${fname}`);
+				return route(app);
+			}
+		}).then((route) => {
+			if (route === undefined) {
+				return undefined;
+			}
+			// check that the route exports the object we need
+			if (route.constructor !== Object || !route.path || !route.router ||
                 !(route.api_version || route.skip_domain)) {
-                throw new TypeError(`routes/${fname} does not export the correct object!`);
-            }
-            // normalise the path to be used as the mount point
-            if (route.path[0] !== '/') {
-                route.path = `/${route.path}`;
-            }
-            if (route.path[route.path.length - 1] !== '/') {
-                route.path = `${route.path}/`;
-            }
-            if (!route.skip_domain) {
-                route.path = `/:domain/v${route.api_version}${route.path}`;
-            }
-            // wrap the route handlers with Promise.try() blocks
-            sUtil.wrapRouteHandlers(route, app);
-            // all good, use that route
-            app.use(route.path, route.router);
-        });
-    }).then(() => {
-        // catch errors
-        sUtil.setErrorHandler(app);
-        // route loading is now complete, return the app object
-        return BBPromise.resolve(app);
-    });
+				throw new TypeError(`routes/${fname} does not export the correct object!`);
+			}
+			// normalise the path to be used as the mount point
+			if (route.path[0] !== '/') {
+				route.path = `/${route.path}`;
+			}
+			if (route.path[route.path.length - 1] !== '/') {
+				route.path = `${route.path}/`;
+			}
+			if (!route.skip_domain) {
+				route.path = `/:domain/v${route.api_version}${route.path}`;
+			}
+			// wrap the route handlers with Promise.try() blocks
+			sUtil.wrapRouteHandlers(route, app);
+			// all good, use that route
+			app.use(route.path, route.router);
+		});
+	}).then(() => {
+		// catch errors
+		sUtil.setErrorHandler(app);
+		// route loading is now complete, return the app object
+		return BBPromise.resolve(app);
+	});
 
 }
 
@@ -207,30 +210,30 @@ function loadRoutes(app, dir) {
  */
 function createServer(app) {
 
-    // return a promise which creates an HTTP server,
-    // attaches the app to it, and starts accepting
-    // incoming client requests
-    let server;
-    return new BBPromise((resolve) => {
-        server = http.createServer(app).listen(
-            app.conf.port,
-            app.conf.interface,
-            resolve
-        );
-        server = addShutdown(server);
-    }).then(() => {
-        app.logger.log('info',
-            `Worker ${process.pid} listening on ${app.conf.interface || '*'}:${app.conf.port}`);
+	// return a promise which creates an HTTP server,
+	// attaches the app to it, and starts accepting
+	// incoming client requests
+	let server;
+	return new BBPromise((resolve) => {
+		server = http.createServer(app).listen(
+			app.conf.port,
+			app.conf.interface,
+			resolve
+		);
+		server = addShutdown(server);
+	}).then(() => {
+		app.logger.log('info',
+			`Worker ${process.pid} listening on ${app.conf.interface || '*'}:${app.conf.port}`);
 
-        // Don't delay incomplete packets for 40ms (Linux default) on
-        // pipelined HTTP sockets. We write in large chunks or buffers, so
-        // lack of coalescing should not be an issue here.
-        server.on('connection', (socket) => {
-            socket.setNoDelay(true);
-        });
+		// Don't delay incomplete packets for 40ms (Linux default) on
+		// pipelined HTTP sockets. We write in large chunks or buffers, so
+		// lack of coalescing should not be an issue here.
+		server.on('connection', (socket) => {
+			socket.setNoDelay(true);
+		});
 
-        return server;
-    });
+		return server;
+	});
 
 }
 
@@ -245,12 +248,12 @@ function createServer(app) {
  */
 module.exports = (options) => {
 
-    return initApp(options)
-    .then((app) => loadRoutes(app, `${__dirname}/routes`))
-    .then((app) => {
-        // serve static files from static/
-        app.use('/static', express.static(`${__dirname}/static`));
-        return app;
-    }).then(createServer);
+	return initApp(options)
+		.then((app) => loadRoutes(app, `${__dirname}/routes`))
+		.then((app) => {
+			// serve static files from static/
+			app.use('/static', express.static(`${__dirname}/static`));
+			return app;
+		}).then(createServer);
 
 };

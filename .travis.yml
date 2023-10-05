@@ -1,7 +1,0 @@
-dist: xenial
-
-language: node_js
-node_js:
-  - "10"
-  - "node"
-after_success: npm run coveralls
