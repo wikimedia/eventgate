@@ -79,6 +79,16 @@ const testEvent_insecure = {
     test: 'test_value_0'
 };
 
+const testEvent_with_const = {
+    '$schema': '/test_const/0.0.1',
+    meta: {
+        stream: 'test.event',
+        id: '5e1dd101-641c-11e8-ab6c-b083fecf1287',
+    },
+	integer_const: 42,
+	string_const: "hello world"
+};
+
 function extractSchemaUri(event) {
     return event.$schema;
 }
@@ -206,5 +216,54 @@ describe('EventValidator test instance', () => {
 
         assert.deepEqual(e1, e2);
     });
+
+	it('should pass validation of valids const', async() => {
+		const event = await eventValidator.validate(testEvent_with_const);
+		assert.deepEqual(testEvent_with_const, event);
+	});
+
+	it('should fail validation on const string with wrong value', async() => {
+		var event_with_invalid_string = {...testEvent_with_const};
+		event_with_invalid_string["string_const"] = "bonjour";  // instead of "hello world"
+		try {
+			await eventValidator.validate(event_with_invalid_string);
+			assert(false, "ValidationError should have been thrown");
+		} catch (err) {
+			assert(err instanceof ValidationError);
+		}
+	});
+
+	it('should fail validation on const integer with wrong value', async() => {
+		var event_with_invalid_integer = {...testEvent_with_const};
+		event_with_invalid_integer["integer_const"] = 99;  // instead of 42
+		try {
+			await eventValidator.validate(event_with_invalid_integer);
+			assert(false, "ValidationError should have been thrown");
+		} catch (err) {
+			assert(err instanceof ValidationError);
+		}
+	});
+
+	it('should fail validation on const string with different type', async() => {
+		var event_with_string_int = {...testEvent_with_const};
+		event_with_string_int["string_const"] = 51;  // instead of string "hellow world"
+		try {
+			await eventValidator.validate(event_with_string_int);
+			assert(false, "ValidationError should have been thrown");
+		} catch (err) {
+			assert(err instanceof ValidationError);
+		}
+	});
+
+	it('should fail validation on const integer with wrong value', async() => {
+		var event_with_int_string = {...testEvent_with_const};
+		event_with_int_string["integer_const"] = "forty-two";  // instead of integer 42
+		try {
+			await eventValidator.validate(event_with_int_string);
+			assert(false, "ValidationError should have been thrown");
+		} catch (err) {
+			assert(err instanceof ValidationError);
+		}
+	});
 
 });
