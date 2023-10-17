@@ -58,8 +58,8 @@
     "uuid": "^9.0.1"
   },
   "optionalDependencies": {
+    "@wikimedia/node-rdkafka-factory": "^1.1.0",
     "@wikimedia/node-rdkafka-prometheus": "^1.1.1",
-    "node-rdkafka": "^2.17.0",
     "node-rdkafka-statsd": "^0.1.2"
   },
   "devDependencies": {
